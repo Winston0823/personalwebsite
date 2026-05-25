@@ -83,19 +83,22 @@ body {
   }
 }
 
-/* Liquid glass for edge-anchored panels (drawers) — no pseudo-element leak */
+/* Liquid glass for edge-anchored panels (drawers) — no pseudo-element leak.
+ * Drawer sits over the dashboard, so the background needs real opacity
+ * plus a heavier blur to actually obscure the widgets behind it. The 3%
+ * white tint we used for inline cards isn't enough at this surface. */
 .glass-plain {
-  background: var(--color-glass-bg);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(245, 245, 247, 0.78);
+  backdrop-filter: blur(24px) saturate(140%);
+  -webkit-backdrop-filter: blur(24px) saturate(140%);
   border-radius: var(--widget-radius);
-  border: 0.5px solid rgba(255, 255, 255, 0.35);
+  border: 0.5px solid rgba(255, 255, 255, 0.55);
   box-shadow:
     /* outer drop shadow for depth */
-    0 2px 16px rgba(0, 0, 0, 0.08),
-    0 1px 4px rgba(0, 0, 0, 0.06),
+    -4px 0 24px rgba(0, 0, 0, 0.08),
+    -1px 0 4px rgba(0, 0, 0, 0.04),
     /* top-left specular highlight */
-    inset 1px 1px 0 0 rgba(255, 255, 255, 0.4),
+    inset 1px 1px 0 0 rgba(255, 255, 255, 0.6),
     /* bottom-right inner shadow for liquid depth */
     inset -1px -1px 2px 0 rgba(0, 0, 0, 0.04);
 }
