@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+
+# build output
+.next/
+out/
+dist/
+
+# typescript
+tsconfig.tsbuildinfo
+
+# environment
+.env
+.env.*
+!.env.example
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
+.DS_Store
+
+# editor
+.vscode/
+.idea/
+
+# local session artifacts (QA captures, design checkpoints)
+qa/
+figma-checkpoint-*.png
+figma-final.png
+site-drawer-open.png
+site-firstload.png
+site-screenshot.png
