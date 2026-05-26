@@ -1736,7 +1736,7 @@ function ProjectGrid({
         </div>
       )}
       {/* Grid */}
-      <div className={`projects-grid grid grid-cols-2 gap-7${fading ? " is-fading" : ""}`}>
+      <div className={`projects-grid grid grid-cols-2 gap-10${fading ? " is-fading" : ""}`}>
         {visible.map((project) => (
           <div
             key={project.id}
