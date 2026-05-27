@@ -2,10 +2,10 @@
 
 import { personalInfo } from "@/lib/detail-content";
 
-const links = [
+const links: { label: string; href: string; external: boolean; icon: React.ReactNode }[] = [
   {
     label: "GitHub",
-    href: personalInfo.social.github,
+    href: personalInfo.social.github ?? "https://github.com",
     external: true,
     icon: (
       <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
@@ -15,7 +15,7 @@ const links = [
   },
   {
     label: "LinkedIn",
-    href: personalInfo.social.linkedin,
+    href: personalInfo.social.linkedin ?? "https://linkedin.com",
     external: true,
     icon: (
       <svg viewBox="0 0 24 24" className="w-5 h-5" fill="currentColor">
