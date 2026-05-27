@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import GradientBackground from "@/components/background/GradientBackground";
 import DotGridBackground from "@/components/background/DotGridBackground";
+import CornerTicker from "@/components/background/CornerTicker";
 import "./globals.css";
 
 const plein = localFont({
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className="min-h-screen antialiased" suppressHydrationWarning>
         <GradientBackground />
         <DotGridBackground />
+        <CornerTicker />
         <div className="relative z-10">{children}</div>
       </body>
     </html>
