@@ -5,6 +5,9 @@ import { useEffect, useRef, useState } from "react";
 const TICKER_TEXT =
   "available summer 2026 · ui/ux engineer · creative developer · let's build something · ";
 const LOOP_DURATION_MS = 40000;
+// Fast-forward the animation by this much on mount so the text starts already
+// curving through the corner rather than mid-edge.
+const INITIAL_PHASE_MS = 10000;
 const RADIUS_RATIO = 0.5;
 const RADIUS_MIN = 320;
 const RADIUS_MAX = 640;
@@ -33,7 +36,12 @@ export default function CornerTicker() {
         { transform: "translate(-50%, -50%) rotate(0deg)" },
         { transform: "translate(-50%, -50%) rotate(-360deg)" },
       ],
-      { duration: LOOP_DURATION_MS, iterations: Infinity, easing: "linear" }
+      {
+        duration: LOOP_DURATION_MS,
+        iterations: Infinity,
+        easing: "linear",
+        delay: -INITIAL_PHASE_MS,
+      }
     );
     return () => anim.cancel();
   }, [dims]);
