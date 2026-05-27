@@ -113,7 +113,7 @@ export default function Home() {
       dispatch({
         type: "ADD_WIDGET",
         widget: {
-          id: `${type}-${Date.now()}`,
+          id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           type,
           position: { col: Math.max(0, col), row: Math.max(0, row) },
           size: meta.defaultSize,

@@ -86,11 +86,23 @@ export function useGridState() {
       if (stored) {
         const parsed = JSON.parse(stored) as WidgetInstance[];
         if (Array.isArray(parsed) && parsed.length > 0) {
+          // Deduplicate ids — older builds generated ids from Date.now() alone,
+          // which could collide when two widgets were added in the same ms.
+          const seen = new Set<string>();
+          const deduped = parsed.map((w) => {
+            if (!seen.has(w.id)) {
+              seen.add(w.id);
+              return w;
+            }
+            const fresh = `${w.type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+            seen.add(fresh);
+            return { ...w, id: fresh };
+          });
           // Replace all widgets with stored ones
           for (const w of initialState.widgets) {
             dispatch({ type: "REMOVE_WIDGET", id: w.id });
           }
-          for (const w of parsed) {
+          for (const w of deduped) {
             dispatch({ type: "ADD_WIDGET", widget: w });
           }
         }
