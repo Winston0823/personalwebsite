@@ -13,6 +13,12 @@ import {
 import { defaultWidgets } from "@/lib/widget-defaults";
 
 const STORAGE_KEY = "portfolio-grid-state";
+const STORAGE_VERSION_KEY = "portfolio-grid-state-version";
+// Bump this whenever defaultWidgets changes in a way that should override
+// existing visitors' saved layouts (size/position adjustments, new widgets,
+// removed widgets). Visitors with a different stored version get the new
+// defaults on next load; their old layout is discarded.
+const STORAGE_VERSION = 2;
 
 function isInBounds(position: GridPosition, size: WidgetSize): boolean {
   return (
@@ -82,6 +88,14 @@ export function useGridState() {
   // Load from localStorage after hydration
   useEffect(() => {
     try {
+      const storedVersion = localStorage.getItem(STORAGE_VERSION_KEY);
+      if (storedVersion !== String(STORAGE_VERSION)) {
+        // Schema changed — drop the stored layout and re-seed with defaults.
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(STORAGE_VERSION_KEY, String(STORAGE_VERSION));
+        setHydrated(true);
+        return;
+      }
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored) as WidgetInstance[];
