@@ -23,6 +23,14 @@ const switzer = localFont({
   display: "swap",
 });
 
+const clash = localFont({
+  src: [
+    { path: "../../public/fonts/ClashGrotesk-Bold.otf", weight: "700", style: "normal" },
+  ],
+  variable: "--font-clash",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Winston Gu",
   description: "Developer & Designer",
@@ -34,7 +42,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full ${plein.variable} ${switzer.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`h-full ${plein.variable} ${switzer.variable} ${clash.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Adobe Fonts (Typekit) — Astronef Std Super, used by the AWL poster */}
+        <link rel="stylesheet" href="https://use.typekit.net/ovr8aqn.css" />
+      </head>
       <body className="min-h-screen antialiased" suppressHydrationWarning>
         <GradientBackground />
         <DotGridBackground />

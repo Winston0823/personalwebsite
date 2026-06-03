@@ -4,6 +4,7 @@ import { Fragment, useState } from "react";
 import { Project } from "@/lib/detail-types";
 import Reveal from "./Reveal";
 import KunaiTransition from "./KunaiTransition";
+import TrailerButton from "./TrailerButton";
 
 /* ── Editorial case-study body (dark) ────────────────────────────────────────
    Full-width reading section that flows below the katana beat. Mono voice kept
@@ -237,6 +238,11 @@ export default function AwlProse({
   let n = 0;
   const next = () => String(++n).padStart(2, "0");
 
+  // Prefer an explicit trailer link; otherwise turn the embed URL into a watch URL.
+  const trailerHref =
+    project.links?.find((l) => /trailer/i.test(l.label))?.url ??
+    (project.videos?.[0] ? project.videos[0].replace("/embed/", "/watch?v=") : "");
+
   return (
     <div className="text-white mx-auto w-full" style={{ maxWidth: "1080px" }}>
       {/* Hero question — the design problem, centered like a hero statement. */}
@@ -314,9 +320,88 @@ export default function AwlProse({
       )}
 
       {project.outcome && (
-        <SectionRow index={next()} label="Outcome" anchor="awl-outcome">
-          <Body>{project.outcome}</Body>
-        </SectionRow>
+        <Reveal
+          id="awl-outcome"
+          data-awl-section=""
+          data-awl-label="Outcome"
+          className="scroll-mt-24"
+          style={{
+            position: "relative",
+            width: "100vw",
+            left: "calc(-50vw + 50%)",
+            marginTop: "4rem",
+          }}
+        >
+          <div
+            className="relative flex items-center"
+            style={{
+              minHeight: "440px",
+              backgroundImage:
+                "linear-gradient(90deg, #050505 0%, #050505 44%, rgba(5,5,5,0.35) 64%, rgba(5,5,5,0) 82%), url('/images/awl/awl-3rd-person-gameplay.png')",
+              backgroundSize: "cover",
+              backgroundPosition: "center right",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
+            <div
+              style={{
+                width: "100%",
+                paddingLeft: "max(1.5rem, calc((100vw - 1040px) / 2))",
+                paddingRight: "1.5rem",
+                paddingTop: "4rem",
+                paddingBottom: "4rem",
+              }}
+            >
+              {/* Same grid format as the other sections: numbered label column
+                  on the left, H3 + body in the content column. */}
+              <div
+                className="grid grid-cols-1 md:grid-cols-[150px_1fr] gap-x-10 gap-y-4"
+                style={{ maxWidth: "720px" }}
+              >
+                <div className="md:sticky md:top-24 self-start">
+                  <div
+                    className="flex items-baseline gap-3 md:flex-col md:gap-1"
+                    style={{ fontFamily: "var(--font-mono)" }}
+                  >
+                    <span style={{ color: ACCENT, fontSize: "0.78rem", letterSpacing: "0.12em" }}>
+                      {next()}
+                    </span>
+                    <span
+                      className="uppercase"
+                      style={{
+                        color: "rgba(255,255,255,0.5)",
+                        fontSize: "0.72rem",
+                        letterSpacing: "0.22em",
+                      }}
+                    >
+                      Outcome
+                    </span>
+                  </div>
+                </div>
+                <div className="min-w-0">
+                  <H3>Where it landed</H3>
+                  <Body>{project.outcome}</Body>
+                </div>
+              </div>
+            </div>
+
+            {/* Trailer affordance floats over the footage on the right, like a
+                play overlay on a video poster. */}
+            {trailerHref && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "75%",
+                  transform: "translate(-50%, -50%)",
+                  zIndex: 2,
+                }}
+              >
+                <TrailerButton href={trailerHref} size={144} />
+              </div>
+            )}
+          </div>
+        </Reveal>
       )}
 
       {/* Credits footer */}

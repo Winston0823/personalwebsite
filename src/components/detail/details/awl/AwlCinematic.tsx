@@ -27,14 +27,14 @@ function MaskedHeadline({ shown, lines }: { shown: boolean; lines: string[][] })
   let idx = 0;
   return (
     <h2
-      className="text-center font-extrabold uppercase"
+      className="text-center uppercase"
       style={{
-        fontFamily: "var(--font-display)",
+        fontFamily: '"astronef-std-super-normal", var(--font-clash), sans-serif',
+        fontWeight: 400,
         fontSize: "clamp(2.4rem, 7.5vw, 6.4rem)",
         lineHeight: 0.98,
         letterSpacing: "-0.02em",
         color: "rgba(255,255,255,0.5)",
-        textShadow: "0 4px 40px rgba(0,0,0,0.6)",
         margin: 0,
       }}
     >

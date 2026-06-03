@@ -57,36 +57,37 @@ const PHRASE = "ASSASSINS WEAKNESS IS LOVE";
 // Each clipped half is inflated this many px beyond the viewport on every side.
 // Larger than the "part" gap so the field still fully covers the screen while
 // the halves are only cracked open; only the final snap exposes the demo.
-const FIELD_MARGIN = 160;
+const FIELD_MARGIN = 48;
 
 function RedTextField() {
-  // One solid-red wall of repeating type — no vignette, no outline rows. Rows
-  // are alternately shifted so the words interlock into a woven, screen-printed
-  // poster. Deterministic so both clipped halves read as one continuous field.
-  // Over-provisioned (lots of rows, wide repeat) so it fills past the viewport
-  // edges even when the halves are inflated to hide the cut gap.
-  const rows = Array.from({ length: 26 });
+  // One solid-red wall of repeating type — large and wrapping, so words break at
+  // their boundaries (no mid-letter clipping at the edges) and stack into a
+  // dense poster. Over-provisioned so it fills past the viewport edges even when
+  // the halves are inflated to hide the cut gap. Deterministic + identical width
+  // per half, so the two clipped copies wrap the same and read as one field.
   return (
     <div
       aria-hidden="true"
-      className="absolute inset-0 overflow-hidden bg-[#050505] flex flex-col justify-center select-none"
+      className="absolute inset-0 overflow-hidden bg-[#050505] flex flex-col justify-start select-none"
     >
-      {rows.map((_, i) => (
+      {Array.from({ length: 16 }).map((_, i) => (
         <div
           key={i}
-          className="whitespace-nowrap font-extrabold"
+          className="whitespace-nowrap"
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "clamp(3.4rem, 8.4vw, 8.5rem)",
-            lineHeight: 0.82,
-            letterSpacing: "-0.045em",
+            fontFamily: '"astronef-std-super-normal", var(--font-clash), sans-serif',
+            fontWeight: 400,
+            fontSize: "clamp(4.5rem, 12vw, 12rem)",
+            lineHeight: 0.84,
+            letterSpacing: "-0.04em",
             textTransform: "uppercase",
             color: "#d40000",
-            // Brick-shift every other row so the field interlocks.
-            transform: `translateX(${i % 2 === 0 ? "0" : "-3.5%"})`,
+            // Alternate rows shift left so the repeating words interlock; rows
+            // overflow both edges so the field fills the screen with no gaps.
+            transform: `translateX(${i % 2 === 0 ? "0" : "-4%"})`,
           }}
         >
-          {`${PHRASE} `.repeat(14)}
+          {`${PHRASE} `.repeat(10)}
         </div>
       ))}
     </div>
@@ -438,33 +439,40 @@ export default function HeartSliceHero({ onSliced }: HeartSliceHeroProps) {
           </svg>
           )}
 
-          <div
-            className="absolute inset-x-0 bottom-16 flex flex-col items-center gap-2 pointer-events-none"
-          >
-            <span
-              className="uppercase"
+          <div className="absolute inset-x-0 bottom-14 flex justify-center pointer-events-none">
+            <div
+              className="flex flex-col items-center gap-1.5 px-6 py-3 rounded-md"
               style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "1rem",
-                letterSpacing: "0.36em",
-                color: "rgba(255,255,255,0.95)",
-                textShadow: "0 2px 16px rgba(0,0,0,0.75)",
-                animation: "awl-hint-pulse 2.2s ease-in-out infinite",
+                background: "rgba(0,0,0,0.5)",
+                border: "1px solid rgba(255,255,255,0.16)",
+                backdropFilter: "blur(6px)",
+                WebkitBackdropFilter: "blur(6px)",
               }}
             >
-              drag across the heart
-            </span>
-            <span
-              className="uppercase"
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: "0.7rem",
-                letterSpacing: "0.3em",
-                color: "rgba(255,255,255,0.55)",
-              }}
-            >
-              slice it to continue
-            </span>
+              <span
+                className="uppercase"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.92rem",
+                  fontWeight: 600,
+                  letterSpacing: "0.3em",
+                  color: "#ffffff",
+                }}
+              >
+                drag across the heart
+              </span>
+              <span
+                className="uppercase"
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: "0.64rem",
+                  letterSpacing: "0.26em",
+                  color: "#3b82f6",
+                }}
+              >
+                slice it to continue
+              </span>
+            </div>
           </div>
 
           {/* Skip — for anyone who'd rather not play. Throws a default slice so
@@ -473,23 +481,25 @@ export default function HeartSliceHero({ onSliced }: HeartSliceHeroProps) {
           <button
             onClick={handleSkip}
             onPointerDown={(e) => e.stopPropagation()}
-            className="absolute bottom-8 right-8 z-40 uppercase cursor-pointer bg-transparent border-0 group flex items-center gap-2"
+            className="absolute bottom-8 right-8 z-40 uppercase cursor-pointer group flex items-center gap-2 px-4 py-2 rounded-md hover:border-white/40"
             style={{
               fontFamily: "var(--font-mono)",
-              fontSize: "0.72rem",
-              letterSpacing: "0.28em",
-              color: "rgba(255,255,255,0.5)",
+              fontSize: "0.8rem",
+              letterSpacing: "0.24em",
+              color: "#ffffff",
+              background: "rgba(0,0,0,0.55)",
+              border: "1px solid rgba(255,255,255,0.22)",
+              backdropFilter: "blur(6px)",
+              WebkitBackdropFilter: "blur(6px)",
               opacity: ready ? 1 : 0,
-              transition: "opacity 600ms ease-out 700ms, color 200ms ease-out",
+              transition: "opacity 600ms ease-out 700ms, border-color 200ms ease-out",
             }}
           >
-            <span className="group-hover:text-white" style={{ transition: "color 200ms" }}>
-              skip
-            </span>
+            <span>skip</span>
             <span
               aria-hidden="true"
-              className="group-hover:translate-x-0.5"
-              style={{ color: "#3b82f6", transition: "transform 200ms" }}
+              className="inline-block group-hover:translate-x-1"
+              style={{ color: "#3b82f6", transition: "transform 200ms ease-out" }}
             >
               →
             </span>
