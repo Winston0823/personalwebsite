@@ -5,6 +5,8 @@ import { createPortal } from "react-dom";
 import { projects } from "@/lib/detail-content";
 import { Project, ProjectRole } from "@/lib/detail-types";
 import { handleCardMove, handleCardLeave } from "@/lib/card-tilt";
+import SectionLabel from "./SectionLabel";
+import AwlCinematic from "./awl/AwlCinematic";
 
 type FilterValue =
   | "games-all"
@@ -162,17 +164,6 @@ function BackArrow() {
 }
 
 /* ── Level 2: Project Case Study ── */
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p
-      className="uppercase font-semibold text-accent"
-      style={{ fontSize: "0.86rem", letterSpacing: "0.22em" }}
-    >
-      {children}
-    </p>
-  );
-}
 
 function CaseImage({ src, alt }: { src: string; alt: string }) {
   return (
@@ -1530,6 +1521,9 @@ function ProjectCaseStudy({
   //   "minimal"              — pure-black panel, mono type, narrow column;
   //                            renders its own self-contained layout
   //                            (everything below is skipped).
+  if (project.heroStyle === "awl") {
+    return <AwlCinematic project={project} onBack={onBack} />;
+  }
   if (project.heroStyle === "minimal") {
     return <MinimalCaseStudy project={project} onBack={onBack} />;
   }

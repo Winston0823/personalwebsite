@@ -1,6 +1,8 @@
 "use client";
 
 import { personalInfo } from "@/lib/detail-content";
+import SectionLabel from "./SectionLabel";
+import { DetailHeader, Hairline } from "./DetailLayout";
 
 function LinkedInIcon() {
   return (
@@ -30,25 +32,12 @@ function DownloadIcon() {
 
 export default function NameDetail() {
   return (
-    <div className="detail-stagger flex flex-col gap-6">
-      {/* Hero name */}
-      <div>
-        <h1
-          className="font-light tracking-tight text-text-primary"
-          style={{ fontSize: "var(--text-heading)" }}
-        >
-          {personalInfo.name}
-        </h1>
-        <p
-          className="mt-1 font-normal text-text-secondary tracking-wide"
-          style={{ fontSize: "var(--text-subheading)" }}
-        >
-          {personalInfo.title}
-        </p>
-      </div>
+    <div className="detail-stagger flex flex-col gap-10 max-w-2xl mx-auto w-full">
+      {/* Editorial header — display-font name with the role as standfirst */}
+      <DetailHeader title={personalInfo.name} standfirst={personalInfo.title} />
 
       {/* Divider */}
-      <div className="w-full h-px" style={{ background: "rgba(255, 255, 255, 0.12)" }} />
+      <Hairline />
 
       {/* Bio */}
       <div className="flex flex-col gap-3">
@@ -64,22 +53,27 @@ export default function NameDetail() {
       </div>
 
       {/* Education */}
-      <div className="flex flex-col gap-1">
-        <p className="font-semibold text-text-primary" style={{ fontSize: "var(--text-body)" }}>
-          {personalInfo.university}
-        </p>
-        <p className="text-text-secondary" style={{ fontSize: "var(--text-caption)" }}>
-          {personalInfo.major}
-        </p>
-        {personalInfo.minor && (
-          <p className="text-text-secondary" style={{ fontSize: "var(--text-caption)" }}>
-            Minor in {personalInfo.minor}
+      <div className="flex flex-col gap-3">
+        <SectionLabel caps={false}>Education</SectionLabel>
+        <div className="flex flex-col gap-0.5">
+          <p className="font-semibold text-text-primary" style={{ fontSize: "var(--text-body)" }}>
+            {personalInfo.university}
           </p>
-        )}
+          <p className="text-text-secondary" style={{ fontSize: "var(--text-caption)" }}>
+            {personalInfo.major}
+          </p>
+          {personalInfo.minor && (
+            <p className="text-text-secondary" style={{ fontSize: "var(--text-caption)" }}>
+              Minor in {personalInfo.minor}
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* Social links + Resume */}
-      <div className="flex items-center gap-3 flex-wrap">
+      {/* Elsewhere — social links + Resume */}
+      <div className="flex flex-col gap-3">
+        <SectionLabel caps={false}>Elsewhere</SectionLabel>
+        <div className="flex items-center gap-3 flex-wrap">
         {personalInfo.social.linkedin && (
           <a
             href={personalInfo.social.linkedin}
@@ -114,6 +108,7 @@ export default function NameDetail() {
             Download Resume
           </a>
         )}
+        </div>
       </div>
     </div>
   );

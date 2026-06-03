@@ -117,8 +117,11 @@ export interface Project {
    *     typography, oversized lowercase title, single centered ~640px column,
    *     no metadata icons / tilted poster / accent labels / narrative
    *     stacks. Best when you want the project to feel like a quiet, deeply
-   *     considered single document. */
-  heroStyle?: "full-bleed" | "editorial" | "minimal";
+   *     considered single document.
+   *   - "awl": bespoke 3-act cinematic experience (heart-slice hero → demo-reel
+   *     parallax → floating 3D katana). Project-specific to Assassin's Weakness
+   *     is Love; folds the existing case-study prose into the katana act. */
+  heroStyle?: "full-bleed" | "editorial" | "minimal" | "awl";
   /** Path to a game-engine or platform icon (SVG) rendered to the LEFT of
    *  the editorial header title. E.g. "/icons/unity.svg". White or
    *  currentColor recommended so it reads on the dark detail panel. */

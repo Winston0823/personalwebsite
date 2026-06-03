@@ -1,6 +1,8 @@
 "use client";
 
 import { personalInfo } from "@/lib/detail-content";
+import SectionLabel from "./SectionLabel";
+import { DetailHeader, Hairline } from "./DetailLayout";
 
 function MailIcon() {
   return (
@@ -46,21 +48,27 @@ function SparkleIcon() {
 
 export default function ContactDetail() {
   return (
-    <div className="detail-stagger flex flex-col gap-6">
-      {/* Email */}
-      <a
-        href={`mailto:${personalInfo.email}`}
-        className="flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
-        style={{ fontSize: "var(--text-body)" }}
-      >
-        <span className="text-text-secondary">
-          <MailIcon />
-        </span>
-        {personalInfo.email}
-      </a>
+    <div className="detail-stagger flex flex-col gap-10 max-w-2xl mx-auto w-full">
+      <DetailHeader
+        title="Say hello"
+        standfirst="I'd love to chat about opportunities, projects I've worked on, or tennis."
+      />
 
-      {/* Social links */}
+      <Hairline />
+
+      {/* Reach me — email + social profiles grouped under one kicker */}
       <div className="flex flex-col gap-3">
+        <SectionLabel caps={false}>Reach me</SectionLabel>
+        <a
+          href={`mailto:${personalInfo.email}`}
+          className="flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
+          style={{ fontSize: "var(--text-body)" }}
+        >
+          <span className="text-text-secondary">
+            <MailIcon />
+          </span>
+          {personalInfo.email}
+        </a>
         {personalInfo.social.linkedin && (
           <a
             href={personalInfo.social.linkedin}
@@ -91,19 +99,20 @@ export default function ContactDetail() {
         )}
       </div>
 
-      {/* Location */}
-      <div
-        className="flex items-center gap-3 text-text-secondary"
-        style={{ fontSize: "var(--text-body)" }}
-      >
-        <LocationIcon />
-        Los Angeles, CA
-      </div>
-
-      {/* Availability */}
-      <div className="flex items-center gap-2 text-accent" style={{ fontSize: "var(--text-body)" }}>
-        <SparkleIcon />
-        Open to internships and collaborations
+      {/* Around — location + current availability */}
+      <div className="flex flex-col gap-3">
+        <SectionLabel caps={false}>Around</SectionLabel>
+        <div
+          className="flex items-center gap-3 text-text-secondary"
+          style={{ fontSize: "var(--text-body)" }}
+        >
+          <LocationIcon />
+          Los Angeles, CA
+        </div>
+        <div className="flex items-center gap-2 text-accent" style={{ fontSize: "var(--text-body)" }}>
+          <SparkleIcon />
+          Open to internships and collaborations
+        </div>
       </div>
 
       {/* Say Hello button */}

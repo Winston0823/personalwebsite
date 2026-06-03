@@ -88,7 +88,7 @@ export const projects: Project[] = [
     videos: ["https://www.youtube.com/embed/6B80wD-dPss"],
     date: "2025-03",
     role: "Co-Designer & Co-Developer",
-    heroStyle: "minimal",
+    heroStyle: "awl",
     engineIcon: "/icons/unity.svg",
     posterRotation: 6,
     coverLayout: "beside-hero",

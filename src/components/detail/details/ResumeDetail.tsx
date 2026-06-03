@@ -1,6 +1,8 @@
 "use client";
 
 import { personalInfo, skills, skillCategories, experience } from "@/lib/detail-content";
+import SectionLabel from "./SectionLabel";
+import { DetailHeader, Hairline } from "./DetailLayout";
 
 function DownloadIcon() {
   return (
@@ -24,50 +26,49 @@ export default function ResumeDetail() {
   );
 
   return (
-    <div className="detail-stagger flex flex-col gap-6">
+    <div className="detail-stagger flex flex-col gap-10 max-w-2xl mx-auto w-full">
+      <DetailHeader
+        title="Résumé"
+        standfirst="Education, experience, and the tools I build with."
+      />
+
+      <Hairline />
+
       {/* Education */}
-      <div className="flex flex-col gap-2">
-        <p
-          className="uppercase tracking-widest font-semibold text-accent"
-          style={{ fontSize: "0.8rem" }}
-        >
-          Education
-        </p>
+      <div className="flex flex-col gap-3">
+        <SectionLabel caps={false}>Education</SectionLabel>
         <div className="flex flex-col gap-0.5">
-          <p className="font-semibold text-white" style={{ fontSize: "1.05rem" }}>
+          <p className="font-semibold text-text-primary" style={{ fontSize: "1.05rem" }}>
             {personalInfo.university}
           </p>
-          <p className="text-white/85" style={{ fontSize: "0.9rem" }}>
+          <p className="text-text-secondary" style={{ fontSize: "0.9rem" }}>
             {personalInfo.major}
           </p>
           {personalInfo.minor && (
-            <p className="text-white/85" style={{ fontSize: "0.9rem" }}>
+            <p className="text-text-secondary" style={{ fontSize: "0.9rem" }}>
               Minor in {personalInfo.minor}
             </p>
           )}
         </div>
       </div>
 
+      <Hairline />
+
       {/* Experience */}
-      <div className="flex flex-col gap-4">
-        <p
-          className="uppercase tracking-widest font-semibold text-accent"
-          style={{ fontSize: "0.8rem" }}
-        >
-          Experience
-        </p>
+      <div className="flex flex-col gap-3">
+        <SectionLabel caps={false}>Experience</SectionLabel>
         <div className="flex flex-col gap-5">
           {experience.map((exp) => (
             <div key={exp.id} className="flex flex-col gap-1.5">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                <p className="font-semibold text-white" style={{ fontSize: "1rem" }}>
+                <p className="font-semibold text-text-primary" style={{ fontSize: "1rem" }}>
                   {exp.role}
                 </p>
-                <p className="text-white/70" style={{ fontSize: "0.8rem" }}>
+                <p className="text-text-secondary opacity-80" style={{ fontSize: "0.8rem" }}>
                   {exp.start} – {exp.end}
                 </p>
               </div>
-              <p className="text-white/85" style={{ fontSize: "0.9rem" }}>
+              <p className="text-text-secondary" style={{ fontSize: "0.9rem" }}>
                 {exp.company}
                 {exp.location ? ` · ${exp.location}` : ""}
               </p>
@@ -75,7 +76,7 @@ export default function ResumeDetail() {
                 {exp.bullets.map((bullet, i) => (
                   <li
                     key={i}
-                    className="text-white/85 leading-relaxed"
+                    className="text-text-secondary leading-relaxed"
                     style={{ fontSize: "0.85rem" }}
                   >
                     {bullet}
@@ -87,14 +88,11 @@ export default function ResumeDetail() {
         </div>
       </div>
 
+      <Hairline />
+
       {/* Skills by category */}
-      <div className="flex flex-col gap-4">
-        <p
-          className="uppercase tracking-widest font-semibold text-accent"
-          style={{ fontSize: "0.8rem" }}
-        >
-          Skills
-        </p>
+      <div className="flex flex-col gap-3">
+        <SectionLabel caps={false}>Skills</SectionLabel>
         {Object.entries(grouped).map(([key, names]) => (
           <div key={key} className="flex flex-col gap-2">
             <p

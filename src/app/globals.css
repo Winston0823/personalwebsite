@@ -958,3 +958,74 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
     animation: none;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   AWL cinematic case study (heroStyle: "awl")
+   Bespoke 3-act experience: heart-slice hero → demo-reel parallax → katana.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Solid black panel, no glass chrome — same treatment as the minimal theme
+   but with the close button pinned to the far edge for a full-bleed feel. */
+body[data-detail-theme="awl"] .detail-panel,
+body[data-detail-theme="awl"] .detail-panel.is-settled {
+  background: #050505;
+  border-color: rgba(255, 255, 255, 0.06);
+  text-shadow: none;
+  box-shadow: 0 8px 60px rgba(0, 0, 0, 0.6), 0 2px 20px rgba(0, 0, 0, 0.4);
+}
+body[data-detail-theme="awl"] .detail-panel::before,
+body[data-detail-theme="awl"] .detail-panel::after {
+  display: none;
+}
+body[data-detail-theme="awl"] .detail-close-btn {
+  right: 22px !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+}
+/* The scroll container clips horizontally by default (overflow-x: clip) which
+   would chop the sliding background halves before they exit. While AWL is
+   mounted let them travel off-stage cleanly. */
+body[data-detail-theme="awl"] .detail-scroll {
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* Floating heart — gentle vertical bob layered with a heartbeat pulse. The
+   two animations live on nested elements so they compose without fighting. */
+@keyframes awl-bob {
+  0%, 100% { transform: translateY(-10px) rotate(-2deg); }
+  50%      { transform: translateY(10px) rotate(2deg); }
+}
+/* Looping CTA: the slash draws itself across the heart while a fingertip dot
+   traces the same diagonal, demonstrating the slice gesture. */
+@keyframes awl-swipe-draw {
+  0%        { stroke-dashoffset: 255; opacity: 0; }
+  10%       { opacity: 0.9; }
+  42%       { stroke-dashoffset: 0; opacity: 0.9; }
+  60%       { stroke-dashoffset: 0; opacity: 0.9; }
+  80%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes awl-swipe-dot {
+  0%        { transform: translate(-90px, -90px); opacity: 0; }
+  10%       { opacity: 1; }
+  42%       { transform: translate(90px, 90px); opacity: 1; }
+  60%       { transform: translate(90px, 90px); opacity: 1; }
+  80%, 100% { transform: translate(90px, 90px); opacity: 0; }
+}
+/* One-shot blue glint along the cut line at the moment of the slice. */
+@keyframes awl-cut-flash {
+  0%   { opacity: 0; }
+  18%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes awl-hint-pulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.85; }
+}
+
+/* AWL controls the full panel edge-to-edge, so drop the case-study scroll
+   padding while it's mounted; its own sections own all spacing. */
+body[data-detail-theme="awl"] .detail-scroll {
+  padding: 0 !important;
+}

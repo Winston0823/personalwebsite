@@ -1,22 +1,21 @@
 "use client";
 
 import { useNowPlaying } from "@/hooks/useNowPlaying";
+import { DetailHeader } from "./DetailLayout";
 
 export default function NowPlayingDetail() {
   const track = useNowPlaying();
 
   return (
-    <div className="detail-stagger flex flex-col md:flex-row gap-10 md:gap-14 items-center md:items-start">
+    <div className="detail-stagger flex flex-col md:flex-row gap-10 md:gap-14 items-center md:items-start max-w-4xl mx-auto w-full">
       {/* Left: voice on what I'm into. Reads as a personality side-bar so
        *  the visitor learns something about taste, not just the current
        *  track. */}
       <div className="flex flex-col gap-4 md:flex-1 md:max-w-md">
-        <p
-          className="font-semibold uppercase tracking-[0.18em] text-accent"
-          style={{ fontSize: "var(--text-widget-title)" }}
-        >
-          On rotation
-        </p>
+        <DetailHeader
+          title="On rotation"
+          standfirst="What I'm listening to lately — and the music I keep coming back to."
+        />
         <p
           className="text-text-primary leading-relaxed"
           style={{ fontSize: "var(--text-body)" }}
