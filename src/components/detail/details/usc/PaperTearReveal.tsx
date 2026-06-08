@@ -27,6 +27,13 @@ const PAPER = "/images/usc-racing/torn-paper.png";
 // every light still reads clearly.
 const SCRAP = { left: "12%", top: "1%", width: "76%", height: "54%" } as const;
 
+// Playback rate for the start-lights clip — 1.5× tightens the intro.
+const CLIP_RATE = 1.5;
+// Marks that the cinematic has been seen this tab/session, so reopening it in
+// the same tab skips the buildup. Stored in sessionStorage (not localStorage),
+// so it's tab-specific: a fresh tab/window always gets the full intro once.
+const SEEN_KEY = "usc-lights-seen-v1";
+
 export default function PaperTearReveal({
   photorealSrc,
   videoSrc,
@@ -40,6 +47,8 @@ export default function PaperTearReveal({
   const [launched, setLaunched] = useState(false);
   const firedRef = useRef(false);
   const mountAt = useRef(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const returningRef = useRef(false);
 
   // Clip the start-lights video to the torn-paper silhouette via the photo's
   // alpha — a raster mask defaults to alpha masking, so the video is visible
@@ -66,15 +75,41 @@ export default function PaperTearReveal({
     mountAt.current = performance.now();
     if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       launch();
+      return;
+    }
+    // Reopening in the same tab skips the buildup: jump straight to the armed
+    // end-frame (lights sitting at "lights out") so a single press enters. The
+    // flag is written at mount start, so even a reload mid-intro fast-paths —
+    // but it lives in sessionStorage, so a new tab/window replays the full intro.
+    try {
+      if (window.sessionStorage.getItem(SEEN_KEY)) {
+        returningRef.current = true;
+        setArmed(true);
+      }
+      window.sessionStorage.setItem(SEEN_KEY, "1");
+    } catch {
+      /* private mode / storage blocked — fall back to the full intro */
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Safety net: if the clip stalls / never ends, arm after a generous timeout.
+  // Safety net: if the clip stalls / never ends, arm after a timeout (scaled to
+  // the faster playback rate).
   useEffect(() => {
-    const t = window.setTimeout(() => arm(), 9000);
+    const t = window.setTimeout(() => arm(), 6500);
     return () => clearTimeout(t);
   }, []);
+
+  // Once armed, any key enters the page — mirrors the click-to-launch affordance.
+  useEffect(() => {
+    if (!armed || launched) return;
+    const onKey = () => {
+      if (performance.now() - mountAt.current > 500) launch();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [armed, launched]);
 
   const grain =
     "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E\")";
@@ -153,11 +188,25 @@ export default function PaperTearReveal({
         }}
       >
         <video
+          ref={videoRef}
           src={videoSrc}
           autoPlay
           muted
           playsInline
           preload="auto"
+          onLoadedMetadata={(e) => {
+            const v = e.currentTarget;
+            v.playbackRate = CLIP_RATE;
+            // Return visit: snap to the final "lights out" frame instead of replaying.
+            if (returningRef.current) {
+              try {
+                v.pause();
+                v.currentTime = Math.max(0, v.duration - 0.1);
+              } catch {
+                /* seeking unsupported — leave it to play through */
+              }
+            }
+          }}
           onEnded={arm}
           onError={arm}
           className="absolute inset-0 w-full h-full"

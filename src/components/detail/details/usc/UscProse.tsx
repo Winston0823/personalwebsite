@@ -54,7 +54,7 @@ function DecisionBlock({
           {paragraphs.map((p, i) => (
             <p
               key={i}
-              style={{ fontFamily: "var(--font-mono)", fontSize: "0.95rem", lineHeight: 1.7, color: i === 0 ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.62)" }}
+              style={{ fontFamily: "var(--font-sans)", fontSize: "1rem", lineHeight: 1.65, color: i === 0 ? "rgba(255,255,255,0.88)" : "rgba(255,255,255,0.66)" }}
             >
               {p}
             </p>
@@ -95,7 +95,7 @@ export default function UscProse({ project }: { project: Project }) {
         </span>
         <p
           className="text-white"
-          style={{ fontFamily: "var(--font-mono)", fontSize: "clamp(1.15rem, 2.2vw, 1.6rem)", lineHeight: 1.5, fontWeight: 500 }}
+          style={{ fontFamily: "var(--font-sans)", fontSize: "clamp(1.2rem, 2.2vw, 1.65rem)", lineHeight: 1.5, fontWeight: 500 }}
         >
           A student racing team has to <Em>recruit engineers</Em>, <Em>win over sponsors</Em>,
           and <Em>look as serious as the machines it builds</Em>. Every screen had to read as
@@ -193,7 +193,7 @@ export default function UscProse({ project }: { project: Project }) {
             {cta.heading}
           </span>
           {cta.sublabel && (
-            <p className="text-white/65 max-w-md" style={{ fontFamily: "var(--font-mono)", fontSize: "0.95rem", lineHeight: 1.6 }}>
+            <p className="text-white/65 max-w-md" style={{ fontFamily: "var(--font-sans)", fontSize: "1rem", lineHeight: 1.6 }}>
               {cta.sublabel}
             </p>
           )}

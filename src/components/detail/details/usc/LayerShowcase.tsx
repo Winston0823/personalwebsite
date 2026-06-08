@@ -63,7 +63,7 @@ export default function LayerShowcase() {
         </h3>
         <p
           className="text-white/70 mt-3 max-w-2xl"
-          style={{ fontFamily: "var(--font-mono)", fontSize: "1rem", lineHeight: 1.7 }}
+          style={{ fontFamily: "var(--font-sans)", fontSize: "1.02rem", lineHeight: 1.65 }}
         >
           Having a cool formula car is what defines the team&rsquo;s success. But to
           accurately display who we are, I decided to design more than just a showcase of
