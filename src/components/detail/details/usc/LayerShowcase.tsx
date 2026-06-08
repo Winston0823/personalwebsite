@@ -53,24 +53,26 @@ export default function LayerShowcase() {
           className="uppercase"
           style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", letterSpacing: "0.3em", color: "#e3b53d" }}
         >
-          The decision · the hero
+          Hero Section
         </span>
         <h3
           className="text-white mt-2"
           style={{ fontFamily: "var(--font-mono)", fontWeight: 700, fontSize: "clamp(1.5rem, 3vw, 2.1rem)", letterSpacing: "-0.01em" }}
         >
-          Two cars, one hero.
+          We might just be the coolest team out there.
         </h3>
         <p
           className="text-white/70 mt-3 max-w-2xl"
           style={{ fontFamily: "var(--font-mono)", fontSize: "1rem", lineHeight: 1.7 }}
         >
-          A render alone says &ldquo;nice car.&rdquo; But this is an <em>engineering</em>{" "}
-          team — so the hero is built from two registered layers of the same car. The
-          photoreal render the world sees, and a holographic wireframe of the parts
-          underneath. As you move across it, the render <em>pixel-dissolves</em> into the
-          wireframe — form melting into engineering. Same framing, same camera, so the
-          dissolve lands pixel-for-pixel.
+          Having a cool formula car is what defines the team&rsquo;s success. But to
+          accurately display who we are, I decided to design more than just a showcase of
+          our work &mdash; a true insight into what we like and could create. Our hero
+          shows the photoreal render the world sees, and an interactive hover that reveals
+          the holographic wireframe of the parts underneath. As you move across it, the
+          render <em>pixel-dissolves</em> into the wireframe, melting into the engineering
+          side of our team. Same framing, same camera, so the dissolve lands
+          pixel-for-pixel.
         </p>
       </Reveal>
 
