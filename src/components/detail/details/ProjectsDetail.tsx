@@ -7,6 +7,8 @@ import { Project, ProjectRole } from "@/lib/detail-types";
 import { handleCardMove, handleCardLeave } from "@/lib/card-tilt";
 import SectionLabel from "./SectionLabel";
 import AwlCinematic from "./awl/AwlCinematic";
+import SublimeCinematic from "./sublime/SublimeCinematic";
+import UscCinematic from "./usc/UscCinematic";
 
 type FilterValue =
   | "games-all"
@@ -177,6 +179,40 @@ function CaseImage({ src, alt }: { src: string; alt: string }) {
         decoding="async"
       />
     </div>
+  );
+}
+
+/* Prominent closing call-to-action. Louder than the quiet `links` row:
+   a centered heading, optional subline, and a solid accent button that
+   drives the reader to the live artifact. Opt-in via `project.cta`. */
+function CtaBlock({ cta }: { cta: NonNullable<Project["cta"]> }) {
+  return (
+    <section className="flex flex-col items-center text-center gap-3 max-w-3xl mx-auto w-full py-2">
+      <SectionLabel>{cta.heading}</SectionLabel>
+      {cta.sublabel && (
+        <p
+          className="text-text-secondary leading-relaxed max-w-md"
+          style={{ fontSize: "var(--text-body)" }}
+        >
+          {cta.sublabel}
+        </p>
+      )}
+      <a
+        href={cta.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 rounded-full font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5 mt-1"
+        style={{
+          background: "var(--color-accent)",
+          padding: "0.85rem 1.75rem",
+          fontSize: "var(--text-body)",
+          boxShadow: "0 8px 24px -6px var(--color-accent)",
+        }}
+      >
+        {cta.label}
+        <span aria-hidden="true">→</span>
+      </a>
+    </section>
   );
 }
 
@@ -1524,6 +1560,12 @@ function ProjectCaseStudy({
   if (project.heroStyle === "awl") {
     return <AwlCinematic project={project} onBack={onBack} />;
   }
+  if (project.heroStyle === "sublime") {
+    return <SublimeCinematic project={project} onBack={onBack} />;
+  }
+  if (project.heroStyle === "usc") {
+    return <UscCinematic project={project} onBack={onBack} />;
+  }
   if (project.heroStyle === "minimal") {
     return <MinimalCaseStudy project={project} onBack={onBack} />;
   }
@@ -1591,6 +1633,10 @@ function ProjectCaseStudy({
           </p>
         </section>
       )}
+
+      {/* Closing call-to-action — the loud "go see it live" beat before the
+          quiet metadata sections (tags / credits / links). */}
+      {project.cta && <CtaBlock cta={project.cta} />}
 
       {/* Additional video embeds (beyond hero) */}
       {project.videos && project.videos.length > 0 && (

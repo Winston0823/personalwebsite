@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from "react";
 import { Project } from "@/lib/detail-types";
-import Reveal from "./Reveal";
+import Reveal from "../../shared/Reveal";
 import KunaiTransition from "./KunaiTransition";
 import TrailerButton from "./TrailerButton";
 

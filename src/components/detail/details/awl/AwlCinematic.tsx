@@ -5,8 +5,8 @@ import dynamic from "next/dynamic";
 import { Project } from "@/lib/detail-types";
 import HeartSliceHero from "./HeartSliceHero";
 import AwlProse from "./AwlProse";
-import Reveal from "./Reveal";
-import InView from "./InView";
+import Reveal from "../../shared/Reveal";
+import InView from "../../shared/InView";
 
 // R3F must stay out of SSR (and the main bundle). Loaded only once the AWL
 // page mounts.

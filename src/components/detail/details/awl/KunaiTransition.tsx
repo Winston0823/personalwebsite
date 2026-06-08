@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import InView from "./InView";
+import InView from "../../shared/InView";
 
 // R3F kept out of SSR + the main bundle.
 const KunaiCanvas = dynamic(() => import("./KunaiCanvas"), { ssr: false });

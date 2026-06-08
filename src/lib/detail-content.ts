@@ -172,7 +172,7 @@ export const projects: Project[] = [
     featured: true,
     priority: 1,
     thumbnail: "/images/sublime.png",
-    heroStyle: "minimal",
+    heroStyle: "sublime",
     engineIcon: "/icons/unreal.svg",
     coverLayout: "beside-hero",
     coverAspect: "4 / 5",
@@ -285,6 +285,83 @@ export const projects: Project[] = [
     links: [
       { label: "Steam page", url: "https://store.steampowered.com/app/4420050/The_Unrealtor/" },
     ],
+  },
+  {
+    id: "project-usc-racing",
+    title: "USC Formula Electric",
+    description:
+      "The official website for USC's Formula Electric racing team — a black-and-gold design system, a real-time 3D car hero, and a templated page for every engineering division.",
+    longDescription:
+      "USC Formula Electric is a student-run team that designs and builds an electric race car from the ground up. The site is its front door: it has to recruit engineers, court sponsors, and present a 50+ person student team as a serious motorsport brand. I led the design and build — a token-driven design system, a real-time 3D hero, and a templated system that gives each of the team's ten specialized divisions its own editorial page.",
+    tags: ["Next.js", "Tailwind v4", "React Three Fiber", "Framer Motion", "Design System"],
+    dashboardLine:
+      "Official site for USC's Formula Electric team — design system, real-time 3D car hero, a page per division. Next.js + R3F.",
+    category: "other",
+    domain: "ui-ux",
+    roles: [],
+    featured: true,
+    priority: 1,
+    thumbnail: "/images/usc-racing/usc-racing-hero.png",
+    images: [
+      "/images/usc-racing/usc-racing-hero.png",
+      "/images/usc-racing/usc-racing-aero.png",
+      "/images/usc-racing/usc-racing-sponsorship.png",
+    ],
+    // TODO: confirm the real build window — placeholder for now.
+    date: "2024 – Present",
+    role: "Lead Developer & UI/UX Architect",
+    heroStyle: "usc",
+    details: {
+      teamSize: "50+ members",
+      context: "USC Formula Electric",
+      tools: [
+        "Next.js (App Router)",
+        "React",
+        "Tailwind CSS v4",
+        "React Three Fiber / Three.js",
+        "Framer Motion",
+        "Lenis",
+      ],
+      statement:
+        "A student team should look every bit as engineered as the car it builds. The whole site runs on one tight visual vocabulary — black, USC gold, an ambient cardinal glow — so every page feels like part of the same machine.",
+    },
+    // Framed as the goal — what the design had to achieve.
+    problem:
+      "A student racing team has to recruit engineers, win over sponsors, and look as serious as the machines it builds — all at once. The site had to read as a professional motorsport brand while staying a recruiting-first, student-run front door.",
+    contributions: [
+      {
+        title: "A design system, not a coat of paint",
+        detail:
+          "A token-driven black-and-gold system in Tailwind v4 — USC gold (#E3B53D) and an ambient cardinal glow over true black — with a layered type stack: Ethnocentric for display, Rajdhani for body, Inter Tight for headlines, JetBrains Mono for data. Every page is assembled from the same vocabulary.",
+        image: "/images/usc-racing/usc-racing-sponsorship.png",
+      },
+      {
+        title: "Every division gets its own voice",
+        detail:
+          "Ten specialized divisions — aerodynamics, powertrain, accumulator, and the rest — each get a templated page: an oversized editorial headline, pinned 'polaroid' build photos with handwritten captions, and a prev/next division counter. One template, ten personalities.",
+        image: "/images/usc-racing/usc-racing-aero.png",
+      },
+      {
+        title: "A 3D car hero, rendered live in the browser",
+        detail:
+          "The landing hero renders the car with React Three Fiber and drei, lit with a warm ambient glow over a black field. No baked video — real-time WebGL that reacts as the page loads.",
+      },
+      {
+        title: "Motion that respects the scroll",
+        detail:
+          "Lenis drives smooth scrolling from a single provider that also centralizes route-change scroll-reset; Framer Motion handles section reveals and scroll choreography. A feature-flag module keeps the growing site safe to ship.",
+      },
+    ],
+    outcome:
+      "Serves as the team's official front door — recruiting engineers, courting sponsors, and presenting 50+ members across ten divisions as a single, professional brand.",
+    cta: {
+      heading: "See it live",
+      sublabel:
+        "The team site in production — explore the divisions, the sponsorship pitch, and the real-time 3D hero.",
+      label: "Explore the live site",
+      // TODO: replace with the deployed URL before publishing.
+      url: "#",
+    },
   },
 ];
 

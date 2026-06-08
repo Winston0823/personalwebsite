@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, type MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
+import { Environment, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
 
 /* Procedural kunai (throwing knife): a diamond blade, wrapped grip, and ring
@@ -40,15 +41,15 @@ function Kunai({ progressRef }: { progressRef: MutableRefObject<number> }) {
   const blade = useKunaiBlade();
 
   const steel = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: "#c7ccd6", metalness: 0.95, roughness: 0.2 }),
+    () => new THREE.MeshStandardMaterial({ color: "#d2d7e0", metalness: 0.92, roughness: 0.18 }),
     [],
   );
   const dark = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: "#15151b", metalness: 0.55, roughness: 0.6 }),
+    () => new THREE.MeshStandardMaterial({ color: "#23232c", metalness: 0.35, roughness: 0.6 }),
     [],
   );
   const ringMat = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: "#23232b", metalness: 0.8, roughness: 0.4 }),
+    () => new THREE.MeshStandardMaterial({ color: "#3a3a44", metalness: 0.85, roughness: 0.28 }),
     [],
   );
 
@@ -119,14 +120,16 @@ export default function KunaiCanvas({
       dpr={[1, 1.5]}
       style={{ pointerEvents: "none", background: "transparent" }}
     >
-      <ambientLight intensity={0.75} />
-      <directionalLight position={[3, 4, 5]} intensity={3.0} color="#ffffff" />
-      <directionalLight position={[-4, 1, -2]} intensity={1.1} color="#aac4ff" />
-      {/* Front fill from camera so the blade stays readable through the spin */}
-      <directionalLight position={[0, 1, 6]} intensity={1.5} color="#ffffff" />
-      {/* Blue rim — on-theme VFX glow */}
-      <pointLight position={[-2, 0, 3]} intensity={6} color="#2f7dff" distance={12} />
-      <pointLight position={[3, 2, 4]} intensity={1.8} color="#ffffff" distance={16} />
+      {/* Mostly ambient + a baked light-panel environment for reflections. */}
+      <ambientLight intensity={0.4} />
+      <Environment resolution={256} frames={1}>
+        <Lightformer form="rect" intensity={2.2} color="#ffffff" scale={[10, 10, 1]} position={[0, 6, 6]} target={[0, 0, 0]} />
+        <Lightformer form="rect" intensity={1.3} color="#9ec1ff" scale={[6, 9, 1]} position={[-7, 1, 2]} target={[0, 0, 0]} />
+        <Lightformer form="rect" intensity={3} color="#2f7dff" scale={[1.2, 7, 1]} position={[3.5, 0, 4]} target={[0, 0, 0]} />
+        <Lightformer form="rect" intensity={0.7} color="#fff2d8" scale={[6, 6, 1]} position={[4, 3, -6]} target={[0, 0, 0]} />
+      </Environment>
+      {/* faint blue accent so the edge still glows */}
+      <pointLight position={[-2, 0, 3]} intensity={2.5} color="#2f7dff" distance={14} />
       <Kunai progressRef={progressRef} />
     </Canvas>
   );

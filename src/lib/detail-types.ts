@@ -121,7 +121,7 @@ export interface Project {
    *   - "awl": bespoke 3-act cinematic experience (heart-slice hero → demo-reel
    *     parallax → floating 3D katana). Project-specific to Assassin's Weakness
    *     is Love; folds the existing case-study prose into the katana act. */
-  heroStyle?: "full-bleed" | "editorial" | "minimal" | "awl";
+  heroStyle?: "full-bleed" | "editorial" | "minimal" | "awl" | "sublime" | "usc";
   /** Path to a game-engine or platform icon (SVG) rendered to the LEFT of
    *  the editorial header title. E.g. "/icons/unity.svg". White or
    *  currentColor recommended so it reads on the dark detail panel. */
@@ -169,6 +169,16 @@ export interface Project {
   team?: string[];
   /** External links: itch.io, GitHub, devlog, playable build, etc. */
   links?: CaseStudyLink[];
+  /** Prominent closing call-to-action block. Renders near the end of the
+   *  case study as a heading + optional subline + primary button — louder
+   *  than the quiet `links` row. Use to drive the reader to the live
+   *  artifact (deployed site, playable build). */
+  cta?: {
+    heading: string;
+    sublabel?: string;
+    label: string;
+    url: string;
+  };
 }
 
 export interface Skill {

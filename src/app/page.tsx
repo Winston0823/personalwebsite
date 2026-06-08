@@ -37,7 +37,7 @@ const restrictToWindow: Modifier = ({ transform, activeNodeRect, windowRect }) =
 };
 
 export default function Home() {
-  const { state, dispatch } = useGridState();
+  const { state, dispatch, findNearestOpenPosition } = useGridState();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isOverTrash, setIsOverTrash] = useState(false);
   const [isConsuming, setIsConsuming] = useState(false);
@@ -171,13 +171,20 @@ export default function Home() {
     const widget = state.widgets.find((w) => w.id === id);
     if (!widget) return;
 
+    const desired = {
+      col: widget.position.col + colDelta,
+      row: widget.position.row + rowDelta,
+    };
+
+    // If the drop lands on another widget (or off-grid), settle into the
+    // nearest open slot instead of snapping back to the original position.
+    const target =
+      findNearestOpenPosition(desired, widget.size, widget.id) ?? desired;
+
     dispatch({
       type: "MOVE_WIDGET",
       id: widget.id,
-      position: {
-        col: widget.position.col + colDelta,
-        row: widget.position.row + rowDelta,
-      },
+      position: target,
     });
   }
 

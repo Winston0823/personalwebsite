@@ -163,5 +163,49 @@ export function useGridState() {
     [state.widgets]
   );
 
-  return { state, dispatch, findOpenPosition };
+  // Find the open, in-bounds slot whose top-left is closest to `desired`.
+  // Used when a drag lands on an occupied (or out-of-bounds) spot: instead of
+  // snapping back, the widget settles into the nearest free slot. `excludeId`
+  // is the widget being moved, so it doesn't count its own current cells as
+  // blocking. Returns null only when the grid has no room for the size.
+  const findNearestOpenPosition = useCallback(
+    (
+      desired: GridPosition,
+      size: WidgetSize,
+      excludeId: string
+    ): GridPosition | null => {
+      // Clamp the reference point to the valid top-left range so an
+      // out-of-bounds drag resolves toward the nearest edge rather than 0,0.
+      const maxCol = GRID_COLS - size.cols;
+      const maxRow = GRID_ROWS - size.rows;
+      const refCol = Math.max(0, Math.min(desired.col, maxCol));
+      const refRow = Math.max(0, Math.min(desired.row, maxRow));
+
+      let best: GridPosition | null = null;
+      let bestDist = Infinity;
+      for (let row = 0; row <= maxRow; row++) {
+        for (let col = 0; col <= maxCol; col++) {
+          const candidate: WidgetInstance = {
+            id: excludeId,
+            type: "name",
+            position: { col, row },
+            size,
+          };
+          if (isOverlapping(state.widgets, candidate)) continue;
+          const dc = col - refCol;
+          const dr = row - refRow;
+          const dist = dc * dc + dr * dr;
+          if (dist < bestDist) {
+            bestDist = dist;
+            best = { col, row };
+            if (dist === 0) return best; // exact desired slot is free
+          }
+        }
+      }
+      return best;
+    },
+    [state.widgets]
+  );
+
+  return { state, dispatch, findOpenPosition, findNearestOpenPosition };
 }

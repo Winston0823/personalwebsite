@@ -4,7 +4,7 @@ import { projects } from "@/lib/detail-content";
 
 // Featured projects shown in the widget preview (in display order).
 // Edit this list to change which projects appear on the dashboard.
-const FEATURED_IDS = ["project-5", "project-7", "project-6", "project-1"]; // AWL, Unrealtor, Sublime, Dreaming
+const FEATURED_IDS = ["project-5", "project-7", "project-6", "project-usc-racing"]; // AWL, Unrealtor, Sublime, USC Formula Electric
 
 const featured = FEATURED_IDS.map((id) => projects.find((p) => p.id === id)).filter(
   (p): p is NonNullable<typeof p> => p !== undefined

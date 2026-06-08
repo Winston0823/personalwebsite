@@ -1029,3 +1029,148 @@ body[data-detail-theme="awl"] .detail-scroll {
 body[data-detail-theme="awl"] .detail-scroll {
   padding: 0 !important;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   USC Formula Electric cinematic case study (heroStyle: "usc")
+   "The Unveiling": drag cardinal-velvet curtains apart to reveal the live hero,
+   then a "two cars, one hero" layer demo and design-decision narrative. Black
+   panel, gold accents.
+   ───────────────────────────────────────────────────────────────────────── */
+body[data-detail-theme="usc"] .detail-panel,
+body[data-detail-theme="usc"] .detail-panel.is-settled {
+  background: #050505;
+  border-color: rgba(227, 181, 61, 0.1);
+  text-shadow: none;
+  box-shadow: 0 8px 60px rgba(0, 0, 0, 0.6), 0 2px 20px rgba(0, 0, 0, 0.4);
+}
+body[data-detail-theme="usc"] .detail-panel::before,
+body[data-detail-theme="usc"] .detail-panel::after {
+  display: none;
+}
+body[data-detail-theme="usc"] .detail-close-btn {
+  right: 22px !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid rgba(227, 181, 61, 0.35) !important;
+  color: #e3b53d !important;
+}
+/* USC owns the full panel edge-to-edge; drop the scroll padding. */
+body[data-detail-theme="usc"] .detail-scroll {
+  padding: 0 !important;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+/* Velvet fold field — a tileable vertical light/dark ribbing that reads as
+   gathered fabric. Two stacked gradients: broad shading + fine ridges. */
+.usc-velvet {
+  background-color: #6b0a10;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.55) 0px,
+      rgba(0, 0, 0, 0.12) 7px,
+      rgba(255, 90, 90, 0.18) 15px,
+      rgba(0, 0, 0, 0.12) 23px,
+      rgba(0, 0, 0, 0.55) 30px
+    ),
+    linear-gradient(90deg, rgba(0,0,0,0.45), rgba(0,0,0,0) 18%, rgba(0,0,0,0) 82%, rgba(0,0,0,0.45));
+  background-size: 30px 100%, 100% 100%;
+}
+/* Gold valance/trim at the top of each panel. */
+.usc-valance {
+  background: linear-gradient(180deg, #f2cf6a 0%, #e3b53d 38%, #b8881f 100%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), inset 0 -3px 6px rgba(0,0,0,0.3);
+}
+@keyframes usc-seam-glow {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .usc-seam-pulse { animation: none !important; }
+}
+
+/* Launch sequence — one-shot gold bloom + speed streaks on "lights out". */
+@keyframes usc-launch-bloom {
+  0%   { opacity: 0; }
+  28%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes usc-streak {
+  0%   { transform: translateX(-130%); opacity: 0; }
+  25%  { opacity: 0.9; }
+  100% { transform: translateX(130%); opacity: 0; }
+}
+@keyframes usc-pulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Sublime cinematic case study (heroStyle: "sublime")
+   Atmospheric counterweight to AWL: a glide clip freezes and paint-blooms into
+   the cover painting, then a quiet painterly descent. Warmer near-black panel.
+   ───────────────────────────────────────────────────────────────────────── */
+body[data-detail-theme="sublime"] .detail-panel,
+body[data-detail-theme="sublime"] .detail-panel.is-settled {
+  background: #0a0b0d;
+  border-color: rgba(255, 255, 255, 0.06);
+  text-shadow: none;
+  box-shadow: 0 8px 60px rgba(0, 0, 0, 0.6), 0 2px 20px rgba(0, 0, 0, 0.4);
+}
+body[data-detail-theme="sublime"] .detail-panel::before,
+body[data-detail-theme="sublime"] .detail-panel::after {
+  display: none;
+}
+body[data-detail-theme="sublime"] .detail-close-btn {
+  right: 22px !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+}
+/* Sublime owns the full panel edge-to-edge; drop the scroll padding. */
+body[data-detail-theme="sublime"] .detail-scroll {
+  padding: 0 !important;
+  scroll-behavior: smooth;
+}
+
+/* Scroll cue bob (shared, transform-only — no rotation). */
+@keyframes sublime-bob {
+  0%, 100% { transform: translateY(-4px); }
+  50%      { transform: translateY(4px); }
+}
+
+/* ── CRT hero effects (heroStyle "sublime") ──────────────────────────────── */
+/* Subtle phosphor flicker — luminance only, never opacity-to-zero. */
+@keyframes crt-flicker {
+  0%, 100% { filter: brightness(1); }
+  47%      { filter: brightness(1.02); }
+  48%      { filter: brightness(0.96); }
+  49%      { filter: brightness(1.03); }
+  62%      { filter: brightness(0.98); }
+}
+/* Bright scanline rolling slowly down the tube. */
+@keyframes crt-scanroll {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+/* One-shot degauss wobble on click. */
+@keyframes crt-degauss {
+  0%   { transform: scale(1) skewX(0deg); filter: hue-rotate(0deg) saturate(1); }
+  15%  { transform: scale(1.012) skewX(0.6deg); filter: hue-rotate(12deg) saturate(1.5); }
+  35%  { transform: scale(0.996) skewX(-0.5deg); filter: hue-rotate(-10deg) saturate(1.2); }
+  60%  { transform: scale(1.004) skewX(0.2deg); filter: hue-rotate(4deg) saturate(1.1); }
+  100% { transform: scale(1) skewX(0deg); filter: hue-rotate(0deg) saturate(1); }
+}
+/* Channel-flip vertical-hold roll glitch on click. */
+@keyframes crt-channelflip {
+  0%   { background-position-y: 0; }
+  100% { background-position-y: 100%; }
+}
+/* Power-on: the classic CRT turn-on snap (thin line → full frame). */
+@keyframes crt-poweron {
+  0%   { transform: scaleY(0.004) scaleX(1); filter: brightness(6); opacity: 0; }
+  8%   { opacity: 1; }
+  30%  { transform: scaleY(0.01) scaleX(1); filter: brightness(5); }
+  55%  { transform: scaleY(1) scaleX(1.02); filter: brightness(2.2); }
+  100% { transform: scaleY(1) scaleX(1); filter: brightness(1); opacity: 1; }
+}

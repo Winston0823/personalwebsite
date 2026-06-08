@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, type MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, ContactShadows } from "@react-three/drei";
+import { Float, ContactShadows, Environment, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
 
 /* Procedural katana, upgraded from primitive boxes: the blade is an extruded
@@ -47,9 +47,9 @@ function Katana({ progressRef }: { progressRef: MutableRefObject<number> }) {
   const steel = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#d7dce6",
-        metalness: 0.96,
-        roughness: 0.17,
+        color: "#dde3ec",
+        metalness: 0.92,
+        roughness: 0.18,
       }),
     [],
   );
@@ -74,18 +74,18 @@ function Katana({ progressRef }: { progressRef: MutableRefObject<number> }) {
   const guardMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#23232a",
-        metalness: 0.8,
-        roughness: 0.38,
+        color: "#3a3a44",
+        metalness: 0.85,
+        roughness: 0.28,
       }),
     [],
   );
   const wrap = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#101015",
-        metalness: 0.4,
-        roughness: 0.65,
+        color: "#23232c",
+        metalness: 0.35,
+        roughness: 0.6,
       }),
     [],
   );
@@ -162,12 +162,18 @@ export default function KatanaCanvas({
       dpr={[1, 1.5]}
       style={{ pointerEvents: "none" }}
     >
-      <ambientLight intensity={0.35} />
-      <directionalLight position={[3, 4, 5]} intensity={2.6} color="#ffffff" />
-      <directionalLight position={[-4, 2, -3]} intensity={1.1} color="#aab8ff" />
-      {/* Blue rim light — picks the blade out against the black section */}
-      <pointLight position={[-2, -1, 3]} intensity={6} color="#2f7dff" distance={12} />
-      <pointLight position={[3, 2, 4]} intensity={1.4} color="#ffffff" distance={16} />
+      {/* Mostly ambient + a baked environment of soft light panels for the metal
+          to reflect — atmospheric (scene stays dark) but the blade reads via its
+          reflections, not flat fill. */}
+      <ambientLight intensity={0.4} />
+      <Environment resolution={256} frames={1}>
+        <Lightformer form="rect" intensity={2.2} color="#ffffff" scale={[10, 10, 1]} position={[0, 6, 6]} target={[0, 0, 0]} />
+        <Lightformer form="rect" intensity={1.3} color="#9ec1ff" scale={[6, 9, 1]} position={[-7, 1, 2]} target={[0, 0, 0]} />
+        <Lightformer form="rect" intensity={3} color="#2f7dff" scale={[1.2, 7, 1]} position={[3.5, 0, 4]} target={[0, 0, 0]} />
+        <Lightformer form="rect" intensity={0.7} color="#fff2d8" scale={[6, 6, 1]} position={[4, 3, -6]} target={[0, 0, 0]} />
+      </Environment>
+      {/* faint blue accent so the edge still glows */}
+      <pointLight position={[-2, -1, 3]} intensity={2.5} color="#2f7dff" distance={14} />
       <Float speed={2} rotationIntensity={0.22} floatIntensity={0.85} floatingRange={[-0.16, 0.16]}>
         <Katana progressRef={progressRef} />
       </Float>
