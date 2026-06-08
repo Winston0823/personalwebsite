@@ -44,7 +44,9 @@ export default function PixelLiquidDemo({
 
     const cssSize = { w: 0, h: 0 };
     const resize = () => {
-      const dpr = window.devicePixelRatio || 1;
+      // Cap dpr — a 2× retina full-canvas redraw every frame is a lot of fill
+      // for an effect this subtle; 1.5 is indistinguishable here.
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       cssSize.w = canvas.offsetWidth;
       cssSize.h = canvas.offsetHeight;
       canvas.width = cssSize.w * dpr;
@@ -75,9 +77,13 @@ export default function PixelLiquidDemo({
 
     const pixelAlpha = new Map<string, number>();
     let raf = 0;
+    let onScreen = true;
 
     function frame() {
       if (!ctx) return;
+      // Stop the loop entirely when scrolled offscreen or the tab is hidden —
+      // no point redrawing a demo nobody can see. ensure() restarts it.
+      if (!onScreen || document.hidden) { raf = 0; return; }
       const w = cssSize.w;
       const h = cssSize.h;
       const t = performance.now() / 1000;
@@ -142,10 +148,27 @@ export default function PixelLiquidDemo({
       ctx.globalCompositeOperation = "source-over";
       raf = requestAnimationFrame(frame);
     }
-    frame();
+    const ensure = () => {
+      if (!raf && onScreen && !document.hidden) raf = requestAnimationFrame(frame);
+    };
+    // Only animate while the canvas is on screen (Act 2 is one slice of a long
+    // scroll) and the tab is visible.
+    const io = new IntersectionObserver(
+      (entries) => {
+        onScreen = entries[0]?.isIntersecting ?? true;
+        ensure();
+      },
+      { threshold: 0.01 }
+    );
+    io.observe(canvas);
+    const onVisibility = () => ensure(); // hidden self-stops inside frame()
+    document.addEventListener("visibilitychange", onVisibility);
+    ensure();
 
     return () => {
       cancelAnimationFrame(raf);
+      io.disconnect();
+      document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMove);
     };

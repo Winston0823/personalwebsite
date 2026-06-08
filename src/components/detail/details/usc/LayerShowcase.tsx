@@ -53,7 +53,7 @@ export default function LayerShowcase() {
           className="uppercase"
           style={{ fontFamily: "var(--font-mono)", fontSize: "0.68rem", letterSpacing: "0.3em", color: "#e3b53d" }}
         >
-          Hero Section
+          Two cars, one hero
         </span>
         <h3
           className="text-white mt-2"
