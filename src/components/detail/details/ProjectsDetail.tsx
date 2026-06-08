@@ -3,64 +3,24 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { projects } from "@/lib/detail-content";
-import { Project, ProjectRole } from "@/lib/detail-types";
+import { Project } from "@/lib/detail-types";
 import { handleCardMove, handleCardLeave } from "@/lib/card-tilt";
 import SectionLabel from "./SectionLabel";
 import AwlCinematic from "./awl/AwlCinematic";
 import SublimeCinematic from "./sublime/SublimeCinematic";
 import UscCinematic from "./usc/UscCinematic";
 
-type FilterValue =
-  | "games-all"
-  | "games-designer"
-  | "games-art-ui"
-  | "games-engineer"
-  | "ui-ux"
-  | "entrepreneurship";
+type FilterValue = "all" | "games" | "ui-ux" | "entrepreneurship";
 
-type FilterSection =
-  | { kind: "leaf"; header: string; value: FilterValue }
-  | {
-      kind: "group";
-      header: string;
-      /** The "default" sub-filter chosen when the group is clicked directly. */
-      defaultValue: FilterValue;
-      subs: { value: FilterValue; label: string }[];
-    };
-
-const FILTER_SECTIONS: FilterSection[] = [
-  {
-    kind: "group",
-    header: "Games",
-    defaultValue: "games-all",
-    subs: [
-      { value: "games-all", label: "All" },
-      { value: "games-designer", label: "Designer" },
-      { value: "games-art-ui", label: "Art / UI" },
-      { value: "games-engineer", label: "Engineer" },
-    ],
-  },
-  { kind: "leaf", header: "UI / UX", value: "ui-ux" },
-  { kind: "leaf", header: "Entrepreneurship", value: "entrepreneurship" },
+// Flat, single-level taxonomy. "All" always renders; each domain leaf is pruned
+// to those that actually have projects (see ProjectFiltersSidebar), so e.g.
+// Entrepreneurship stays hidden until its first project ships.
+const FILTER_SECTIONS: { value: FilterValue; header: string }[] = [
+  { value: "all", header: "All" },
+  { value: "games", header: "Games" },
+  { value: "ui-ux", header: "UI / UX" },
+  { value: "entrepreneurship", header: "Entrepreneurship" },
 ];
-
-function Chevron() {
-  return (
-    <svg
-      className="filter-chevron"
-      width="10"
-      height="10"
-      viewBox="0 0 10 10"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="3 2 7 5 3 8" />
-    </svg>
-  );
-}
 
 function ProjectFiltersSidebar({
   active,
@@ -70,84 +30,31 @@ function ProjectFiltersSidebar({
   onSelect: (v: FilterValue) => void;
 }) {
   const [mounted, setMounted] = useState(false);
-  // Sole source of truth for a group's open/closed state. Initialized once
-  // so that the group containing the default active filter starts open.
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => {
-    const initial: Record<string, boolean> = {};
-    for (const section of FILTER_SECTIONS) {
-      if (section.kind === "group") {
-        initial[section.header] = section.subs.some((s) => s.value === active);
-      }
-    }
-    return initial;
-  });
-
   useEffect(() => setMounted(true), []);
 
   if (!mounted) return null;
 
+  // "All" always shows; a domain leaf shows only when it has ≥1 project, so
+  // empty sections self-prune and reappear automatically once filled.
+  const sections = FILTER_SECTIONS.filter(
+    (s) => s.value === "all" || projects.some((p) => p.domain === s.value)
+  );
+
   return createPortal(
     <div className="filter-sidebar">
       <div className="filter-sidebar__label">Filter</div>
-      {FILTER_SECTIONS.map((section, i) => {
-        const isLast = i === FILTER_SECTIONS.length - 1;
-
-        if (section.kind === "leaf") {
-          return (
-            <div key={section.header} className="filter-section">
-              <button
-                className={`filter-item filter-item--top${
-                  active === section.value ? " active" : ""
-                }`}
-                onClick={() => onSelect(section.value)}
-              >
-                <span>{section.header}</span>
-              </button>
-              {!isLast && <div className="filter-section__divider" />}
-            </div>
-          );
-        }
-
-        const open = !!openGroups[section.header];
-        const groupIsActive = section.subs.some((s) => s.value === active);
-
+      {sections.map((section, i) => {
+        const isLast = i === sections.length - 1;
         return (
-          <div key={section.header} className="filter-section">
+          <div key={section.value} className="filter-section">
             <button
-              className={`filter-item filter-item--top filter-item--group${
-                open ? " is-open" : ""
-              }${groupIsActive ? " active" : ""}`}
-              onClick={() =>
-                setOpenGroups((s) => ({ ...s, [section.header]: !s[section.header] }))
-              }
-              aria-expanded={open}
+              className={`filter-item filter-item--top${
+                active === section.value ? " active" : ""
+              }`}
+              onClick={() => onSelect(section.value)}
             >
               <span>{section.header}</span>
-              <Chevron />
             </button>
-            <div
-              className={`filter-group-children${open ? " is-open" : ""}`}
-              role="group"
-            >
-              <div className="filter-group-children__inner">
-                {section.subs.map((sub) => (
-                  <button
-                    key={sub.value}
-                    className={`filter-item filter-item--sub${
-                      active === sub.value ? " active" : ""
-                    }`}
-                    onClick={() => {
-                      onSelect(sub.value);
-                      // Ensure the group is open whenever a sub is selected.
-                      setOpenGroups((s) => ({ ...s, [section.header]: true }));
-                    }}
-                    tabIndex={open ? 0 : -1}
-                  >
-                    {sub.label}
-                  </button>
-                ))}
-              </div>
-            </div>
             {!isLast && <div className="filter-section__divider" />}
           </div>
         );
@@ -1739,14 +1646,10 @@ function ProjectGrid({
   const visible = projects
     .filter((p) => {
       switch (renderedFilter) {
-        case "games-all":
+        case "all":
+          return p.domain != null;
+        case "games":
           return p.domain === "games";
-        case "games-designer":
-          return p.domain === "games" && p.roles.includes("designer");
-        case "games-art-ui":
-          return p.domain === "games" && p.roles.includes("art-ui");
-        case "games-engineer":
-          return p.domain === "games" && p.roles.includes("engineer");
         case "ui-ux":
           return p.domain === "ui-ux";
         case "entrepreneurship":
@@ -1837,7 +1740,7 @@ function ProjectGrid({
 
 export default function ProjectsDetail() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [filter, setFilter] = useState<FilterValue>("games-all");
+  const [filter, setFilter] = useState<FilterValue>("all");
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Reset the panel's scroll position whenever we swap between grid and
