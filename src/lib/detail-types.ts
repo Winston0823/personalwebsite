@@ -92,6 +92,11 @@ export interface Project {
   /** Roles only meaningful when domain === "games". */
   roles: ProjectRole[];
   featured: boolean;
+  /** When true, the project renders a lightweight "coming soon" teaser
+   *  (hero + blurb + tags) instead of a full case study, and its grid card
+   *  shows a "Coming soon" badge. Use for work that's worth listing but not
+   *  yet written up. */
+  comingSoon?: boolean;
   /** Lower number = higher up in the projects grid. Projects without a
    *  priority fall to the end, preserving the order they appear in the
    *  data file. Use integers (1, 2, 3, …) but gaps are fine. */

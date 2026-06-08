@@ -359,9 +359,25 @@ export const projects: Project[] = [
       sublabel:
         "The team site in production — explore the divisions, the sponsorship pitch, and the real-time 3D hero.",
       label: "Explore the live site",
-      // TODO: replace with the deployed URL before publishing.
-      url: "#",
+      url: "https://www.uscformulae.com/",
     },
+  },
+  {
+    id: "project-ambit",
+    title: "Ambit",
+    description:
+      "Chat-first, proximity-based hiring — Bay Area founders meet local talent, within reach.",
+    longDescription:
+      "Ambit is a hiring app I'm designing and building end to end: chat-first, proximity-based matching that connects Bay Area founders with nearby talent. Native iOS via React Native, an atomic design system, and a warm, tactile visual language built for Hinge-level polish. A full case study is on the way.",
+    tags: ["React Native", "Expo", "Product Design", "0→1"],
+    category: "other",
+    domain: "entrepreneurship",
+    roles: [],
+    featured: false,
+    comingSoon: true,
+    thumbnail: "/images/ambit/hero.jpg",
+    date: "2026 — in progress",
+    role: "Founder, Designer & Developer",
   },
 ];
 

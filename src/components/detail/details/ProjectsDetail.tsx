@@ -9,6 +9,7 @@ import SectionLabel from "./SectionLabel";
 import AwlCinematic from "./awl/AwlCinematic";
 import SublimeCinematic from "./sublime/SublimeCinematic";
 import UscCinematic from "./usc/UscCinematic";
+import ComingSoonDetail from "./ComingSoonDetail";
 
 type FilterValue = "all" | "games" | "ui-ux" | "entrepreneurship";
 
@@ -1458,6 +1459,11 @@ function ProjectCaseStudy({
     };
   }, []);
 
+  // Coming-soon projects skip the case study entirely — a brief teaser only.
+  if (project.comingSoon) {
+    return <ComingSoonDetail project={project} onBack={onBack} />;
+  }
+
   // Branch on heroStyle.
   //   "full-bleed" (default) — cinematic CaseHero with parallax (The Sublime).
   //   "editorial"            — title left, tilted poster right (AWL).
@@ -1689,7 +1695,23 @@ function ProjectGrid({
             onMouseLeave={handleCardLeave}
           >
             {/* Thumbnail fills the card */}
-            <div className="card-media bg-black/5">
+            <div className="card-media bg-black/5 relative">
+              {project.comingSoon && (
+                <span
+                  className="absolute top-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 uppercase"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.56rem",
+                    letterSpacing: "0.16em",
+                    color: "#1a1a1a",
+                    background: "rgba(233,201,138,0.92)",
+                    backdropFilter: "blur(4px)",
+                  }}
+                >
+                  <span style={{ width: 4, height: 4, borderRadius: 9999, background: "#1a1a1a" }} />
+                  Coming soon
+                </span>
+              )}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={project.thumbnail}
