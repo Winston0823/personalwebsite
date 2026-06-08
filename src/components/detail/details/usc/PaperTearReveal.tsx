@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /* Act 1 — "Lights out", as a torn-paper reveal.
 
-   The hero (photoreal car) is printed on paper that is ALREADY torn open in the
-   TOP-CENTER — a ragged hole through which the full F1 start-light gantry hangs
-   (just as it hangs over a real grid). The clip autoplays on load and lights up
+   The hero (photoreal car) is printed on paper that is torn open in the
+   TOP-CENTER — a ragged scrap of real torn paper through which the full F1
+   start-light gantry shows (just as it hangs over a real grid). The torn shape
+   is a photographed paper texture (torn-paper.png), so every edge is authentic
+   rather than a synthetic polygon. The clip autoplays on load and lights up
    left→right; when it finishes (all five lit) it freezes on its last frame and
    the launch prompt arms. On click the launch fires: the paper lifts away, the
    video clears, and the clean photoreal hero is revealed with a gold bloom +
@@ -16,28 +18,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 const GOLD = "#e3b53d";
 
-// Ragged top-center hole, in 0–100 viewBox units. Sized to frame the whole
-// gantry so every light reads clearly. The video panel behind is a touch larger
-// so its edges tuck under the torn paper.
-const HOLE = { x0: 15, x1: 85, y0: 5, y1: 49 };
+// Real torn-paper texture (transparent margins, opaque scrap). Its alpha is the
+// mask: the start-lights video shows only where the paper is, so the video
+// inherits the photo's authentic ragged/crumpled silhouette.
+const PAPER = "/images/usc-racing/torn-paper.png";
 
-function buildHolePoints(seed: number): string[] {
-  let s = seed;
-  const rnd = () => {
-    s = (s * 1103515245 + 12345) & 0x7fffffff;
-    return s / 0x7fffffff;
-  };
-  const { x0, x1, y0, y1 } = HOLE;
-  const jx = 2.4;
-  const jy = 2.0;
-  const n = 9;
-  const pts: [number, number][] = [];
-  for (let i = 0; i <= n; i++) pts.push([x0 + ((x1 - x0) * i) / n, y0 + (rnd() * 2 - 1) * jy]); // top L→R
-  for (let i = 1; i <= n; i++) pts.push([x1 + (rnd() * 2 - 1) * jx, y0 + ((y1 - y0) * i) / n]); // right T→B
-  for (let i = 1; i <= n; i++) pts.push([x1 - ((x1 - x0) * i) / n, y1 + (rnd() * 2 - 1) * jy]); // bottom R→L
-  for (let i = 1; i < n; i++) pts.push([x0 + (rnd() * 2 - 1) * jx, y1 - ((y1 - y0) * i) / n]); // left B→T
-  return pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`);
-}
+// Top-center placement of the torn scrap, matching the old gantry framing so
+// every light still reads clearly.
+const SCRAP = { left: "12%", top: "1%", width: "76%", height: "54%" } as const;
 
 export default function PaperTearReveal({
   photorealSrc,
@@ -53,17 +41,17 @@ export default function PaperTearReveal({
   const firedRef = useRef(false);
   const mountAt = useRef(0);
 
-  const holeArr = useMemo(() => buildHolePoints(7), []);
-  const points = useMemo(() => holeArr.join(" "), [holeArr]);
-  const maskUri = useMemo(() => {
-    // Alpha mask: the sheet is opaque white everywhere EXCEPT the hole, which is
-    // cut out via an even-odd subpath (transparent → paper hidden → video shows).
-    // mask-image defaults to alpha masking, so a transparent hole is the
-    // reliable cross-browser way to punch through.
-    const holePath = "M " + holeArr.map((p) => p.replace(",", " ")).join(" L ") + " Z";
-    const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M0 0 H100 V100 H0 Z ${holePath}' fill='white' fill-rule='evenodd'/></svg>`;
-    return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
-  }, [holeArr]);
+  // Clip the start-lights video to the torn-paper silhouette via the photo's
+  // alpha — a raster mask defaults to alpha masking, so the video is visible
+  // only where the paper scrap is opaque.
+  const videoMask: React.CSSProperties = {
+    WebkitMaskImage: `url(${PAPER})`,
+    maskImage: `url(${PAPER})`,
+    WebkitMaskSize: "100% 100%",
+    maskSize: "100% 100%",
+    WebkitMaskRepeat: "no-repeat",
+    maskRepeat: "no-repeat",
+  };
 
   const arm = () => setArmed(true);
 
@@ -135,56 +123,55 @@ export default function PaperTearReveal({
         }}
       />
 
-      {/* ── Start-light gantry video, seen through the top-center rip ── */}
-      <video
-        src={videoSrc}
-        autoPlay
-        muted
-        playsInline
-        preload="auto"
-        onEnded={arm}
-        onError={arm}
+      {/* ── Paper sheet (front) — the hero printed on matte stock ── */}
+      <div className="absolute inset-0" style={{ zIndex: 20, ...paperExit }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={photorealSrc} alt="" aria-hidden="true" draggable={false} className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(0.3) contrast(0.92) brightness(0.86)" }} />
+        {/* warm paper wash so the print reads as matte stock vs. the vivid hero */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(244,238,226,0.10)" }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: grain, backgroundSize: "120px 120px", mixBlendMode: "overlay", opacity: 0.4 }} />
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(120% 80% at 50% 0%, rgba(0,0,0,0.28), transparent 60%)" }} />
+      </div>
+
+      {/* ── Start-light gantry, clipped to a real torn-paper scrap, laid over
+              the print in the top-center. The video inherits the photo's torn
+              silhouette; a faint multiply of the paper sells the crumpled stock
+              without dimming the lights. Sits above the sheet (z22) so it reads
+              as a separate scrap, and peels away with it on launch. ── */}
+      <div
+        className="absolute"
         style={{
-          position: "absolute",
-          left: "12%",
-          top: "1%",
-          width: "76%",
-          height: "54%",
-          objectFit: "cover",
-          objectPosition: "center 60%",
-          zIndex: 10,
+          left: SCRAP.left,
+          top: SCRAP.top,
+          width: SCRAP.width,
+          height: SCRAP.height,
+          zIndex: 22,
+          filter: "drop-shadow(0 10px 22px rgba(0,0,0,0.5))",
           opacity: launched ? 0 : 1,
-          transform: launched ? "scale(1.08)" : "scale(1)",
+          transform: launched ? "translateY(-5%) scale(1.06)" : "none",
           transition: "opacity 520ms ease-out, transform 760ms cubic-bezier(0.16,1,0.3,1)",
         }}
-      />
-
-      {/* ── Paper sheet (front), already torn open in the top-center ── */}
-      <div className="absolute inset-0" style={{ zIndex: 20, ...paperExit }}>
-        {/* masked car print — the hole punches through to the video */}
-        <div
-          className="absolute inset-0"
-          style={{
-            WebkitMaskImage: maskUri,
-            maskImage: maskUri,
-            WebkitMaskSize: "100% 100%",
-            maskSize: "100% 100%",
-            WebkitMaskRepeat: "no-repeat",
-            maskRepeat: "no-repeat",
-          }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={photorealSrc} alt="" aria-hidden="true" draggable={false} className="absolute inset-0 w-full h-full object-cover" style={{ filter: "grayscale(0.3) contrast(0.92) brightness(0.86)" }} />
-          {/* warm paper wash so the print reads as matte stock vs. the vivid hero */}
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "rgba(244,238,226,0.10)" }} />
-          <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: grain, backgroundSize: "120px 120px", mixBlendMode: "overlay", opacity: 0.4 }} />
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(120% 80% at 50% 0%, rgba(0,0,0,0.28), transparent 60%)" }} />
-        </div>
-        {/* torn-edge paper lip — a faint white stroke tracing the rip */}
-        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          <polygon points={points} fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="0.5" strokeLinejoin="round" style={{ filter: "drop-shadow(0 0.5px 0.7px rgba(0,0,0,0.7))" }} />
-          <polygon points={points} fill="none" stroke="rgba(0,0,0,0.35)" strokeWidth="0.18" strokeLinejoin="round" />
-        </svg>
+      >
+        <video
+          src={videoSrc}
+          autoPlay
+          muted
+          playsInline
+          preload="auto"
+          onEnded={arm}
+          onError={arm}
+          className="absolute inset-0 w-full h-full"
+          style={{ objectFit: "cover", objectPosition: "center 60%", ...videoMask }}
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={PAPER}
+          alt=""
+          aria-hidden="true"
+          draggable={false}
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{ objectFit: "fill", mixBlendMode: "multiply", opacity: 0.3 }}
+        />
       </div>
 
       {/* ── One-shot launch effects ── */}
