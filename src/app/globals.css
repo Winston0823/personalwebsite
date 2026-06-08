@@ -1130,3 +1130,22 @@ body[data-detail-theme="sublime"] .detail-scroll {
   55%  { transform: scaleY(1) scaleX(1.02); filter: brightness(2.2); }
   100% { transform: scaleY(1) scaleX(1); filter: brightness(1); opacity: 1; }
 }
+
+/* ── Mobile hybrid layout reveal ──────────────────────────────────────────
+   Blocks start hidden and fade-rise as they enter the viewport. A JS fallback
+   (MobileLayout) force-reveals everything after a short delay, so nothing can
+   get stuck blank the way the old opacity-gated version did. */
+.m-rise {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.m-rise.is-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .m-rise { opacity: 1; transform: none; }
+  .m-rise.is-in { transition: none; }
+}

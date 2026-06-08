@@ -44,6 +44,9 @@ export default function Home() {
   const [activeDragType, setActiveDragType] = useState<WidgetType | null>(null);
   const [expandedWidget, setExpandedWidget] = useState<WidgetInstance | null>(null);
   const [expandOriginRect, setExpandOriginRect] = useState<DOMRect | null>(null);
+  // Mobile opens details through a synthetic widget instance (type drives the
+  // detail content); no grid position is needed.
+  const [mobileDetail, setMobileDetail] = useState<{ widget: WidgetInstance; rect: DOMRect } | null>(null);
   const breakpoint = useBreakpoint();
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -191,7 +194,21 @@ export default function Home() {
   if (breakpoint === "mobile") {
     return (
       <main>
-        <MobileLayout />
+        <MobileLayout
+          onOpen={(type, rect) =>
+            setMobileDetail({
+              widget: { id: `m-${type}`, type, position: { col: 0, row: 0 }, size: widgetRegistry[type].defaultSize },
+              rect,
+            })
+          }
+        />
+        {mobileDetail && (
+          <DetailOverlay
+            widget={mobileDetail.widget}
+            originRect={mobileDetail.rect}
+            onClose={() => setMobileDetail(null)}
+          />
+        )}
       </main>
     );
   }
