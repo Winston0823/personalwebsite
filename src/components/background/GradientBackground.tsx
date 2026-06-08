@@ -135,9 +135,23 @@ export default function GradientBackground() {
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const lerp = 0.08;
+    // The drift is a ~40s orbit, so updating at 30fps is visually identical to
+    // 60 while halving the per-frame trig + style writes. Compositing the move
+    // is cheap because each blurred blob is promoted to its own GPU layer
+    // (will-change: transform) and only its transform changes — the expensive
+    // blur bitmap stays cached rather than re-rasterizing every frame.
+    const FRAME_MS = 1000 / 30;
+    let lastTick = 0;
 
-    const tick = () => {
-      const now = performance.now();
+    // Promote each blob to its own compositor layer once.
+    blobRefs.current.forEach((el) => {
+      if (el) el.style.willChange = "transform";
+    });
+
+    const tick = (now: number) => {
+      rafId.current = requestAnimationFrame(tick);
+      if (now - lastTick < FRAME_MS) return;
+      lastTick = now;
 
       blobs.forEach((blob, i) => {
         const el = blobRefs.current[i];
@@ -160,10 +174,8 @@ export default function GradientBackground() {
 
         currentPos.current[i].x += (targetX - currentPos.current[i].x) * lerp;
         currentPos.current[i].y += (targetY - currentPos.current[i].y) * lerp;
-        el.style.translate = `${currentPos.current[i].x}px ${currentPos.current[i].y}px`;
+        el.style.transform = `translate3d(${currentPos.current[i].x}px, ${currentPos.current[i].y}px, 0)`;
       });
-
-      rafId.current = requestAnimationFrame(tick);
     };
 
     rafId.current = requestAnimationFrame(tick);
@@ -175,9 +187,20 @@ export default function GradientBackground() {
       };
     };
 
+    // Don't burn cycles animating a tab nobody's looking at.
+    const handleVisibility = () => {
+      cancelAnimationFrame(rafId.current);
+      if (!document.hidden) {
+        lastTick = 0;
+        rafId.current = requestAnimationFrame(tick);
+      }
+    };
+
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    document.addEventListener("visibilitychange", handleVisibility);
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("visibilitychange", handleVisibility);
       cancelAnimationFrame(rafId.current);
     };
   }, []);

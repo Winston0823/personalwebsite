@@ -164,9 +164,20 @@ export default function DotGridBackground() {
       ensureRunning();
     }
 
+    // Pause the loop entirely on hidden tabs; repaint the resting grid on return.
+    function handleVisibility() {
+      if (document.hidden) {
+        running = false;
+        cancelAnimationFrame(rafRef.current);
+      } else {
+        ensureRunning();
+      }
+    }
+
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     window.addEventListener("mouseleave", handleMouseLeave);
     window.addEventListener("resize", resize);
+    document.addEventListener("visibilitychange", handleVisibility);
 
     resize();
     ensureRunning(); // initial paint of the resting grid
@@ -175,6 +186,7 @@ export default function DotGridBackground() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseleave", handleMouseLeave);
       window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", handleVisibility);
       cancelAnimationFrame(rafRef.current);
     };
   }, []);
