@@ -67,6 +67,14 @@ export default function PaperTearReveal({
   const launch = () => {
     if (firedRef.current) return;
     firedRef.current = true;
+    // Mark this tab as having entered, so a reopen/reload skips the buildup.
+    // Written here (on consume) — not at mount — so React StrictMode's double
+    // effect invocation in dev can't read back its own write and false-skip.
+    try {
+      window.sessionStorage.setItem(SEEN_KEY, "1");
+    } catch {
+      /* storage blocked — no persistence, every open replays */
+    }
     setLaunched(true);
     window.setTimeout(() => onOpened(), 780);
   };
@@ -77,16 +85,15 @@ export default function PaperTearReveal({
       launch();
       return;
     }
-    // Reopening in the same tab skips the buildup: jump straight to the armed
-    // end-frame (lights sitting at "lights out") so a single press enters. The
-    // flag is written at mount start, so even a reload mid-intro fast-paths —
-    // but it lives in sessionStorage, so a new tab/window replays the full intro.
+    // If this tab has already entered once, skip the buildup: jump straight to
+    // the armed end-frame (lights at "lights out") so a single press enters.
+    // The flag lives in sessionStorage, so a new tab/window replays the full
+    // intro. (Read only here; the write happens in launch(), see above.)
     try {
       if (window.sessionStorage.getItem(SEEN_KEY)) {
         returningRef.current = true;
         setArmed(true);
       }
-      window.sessionStorage.setItem(SEEN_KEY, "1");
     } catch {
       /* private mode / storage blocked — fall back to the full intro */
     }
