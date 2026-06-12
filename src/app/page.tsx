@@ -18,7 +18,7 @@ import PortfolioGrid from "@/components/grid/PortfolioGrid";
 import MobileLayout from "@/components/grid/MobileLayout";
 import DrawerHandle from "@/components/drawer/DrawerHandle";
 import WidgetDrawer from "@/components/drawer/WidgetDrawer";
-import FirstLoadReveal from "@/components/onboarding/FirstLoadReveal";
+import CustomCursor from "@/components/cursor/CustomCursor";
 import { TRASH_ZONE_ID } from "@/components/grid/TrashZone";
 import { useGridState } from "@/hooks/useGridState";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
@@ -53,6 +53,8 @@ export default function Home() {
   const handleExpand = useCallback((widget: WidgetInstance, rect: DOMRect) => {
     setExpandedWidget(widget);
     setExpandOriginRect(rect);
+    // Cursor learn-then-quiet: one more completed "inspect"
+    window.dispatchEvent(new CustomEvent("cursor-action", { detail: "inspect" }));
   }, []);
 
   const handleCollapse = useCallback(() => {
@@ -79,10 +81,16 @@ export default function Home() {
       setActiveDragType(null);
     }
     dispatch({ type: "SET_DRAGGING", isDragging: true });
+    // Drive the custom cursor's grabbing/trash states. During a dnd-kit drag
+    // the pointermove target is the dragged element, so the cursor reads
+    // these body flags instead of data-cursor attributes.
+    document.body.dataset.ccDragging = "true";
   }
 
   function handleDragOver(event: DragOverEvent) {
-    setIsOverTrash(event.over?.id === TRASH_ZONE_ID);
+    const overTrash = event.over?.id === TRASH_ZONE_ID;
+    setIsOverTrash(overTrash);
+    document.body.dataset.ccTrash = String(overTrash);
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -90,6 +98,10 @@ export default function Home() {
     setIsOverTrash(false);
     setActiveDragType(null);
     dispatch({ type: "SET_DRAGGING", isDragging: false });
+    delete document.body.dataset.ccDragging;
+    delete document.body.dataset.ccTrash;
+    // Cursor learn-then-quiet: one more completed "pickup"
+    window.dispatchEvent(new CustomEvent("cursor-action", { detail: "pickup" }));
 
     const { active, delta } = event;
     const id = String(active.id);
@@ -251,7 +263,7 @@ export default function Home() {
             onClose={handleCollapse}
           />
         )}
-        <FirstLoadReveal />
+        <CustomCursor />
       </main>
 
       {/* Drag overlay for drawer-to-grid dragging */}

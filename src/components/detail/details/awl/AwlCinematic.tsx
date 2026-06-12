@@ -189,7 +189,7 @@ export default function AwlCinematic({
   };
 
   return (
-    <div ref={rootRef} className="relative w-full text-white">
+    <div ref={rootRef} className="relative w-full text-white" data-cursor-theme="awl">
       {/* ── Reading-progress hairline — pinned to top of the scroll viewport ── */}
       <div
         className="sticky top-0 z-50 pointer-events-none"

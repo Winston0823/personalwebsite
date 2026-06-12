@@ -61,6 +61,7 @@ export default function ContactDetail() {
         <SectionLabel caps={false}>Reach me</SectionLabel>
         <a
           href={`mailto:${personalInfo.email}`}
+          data-cursor="link"
           className="flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
           style={{ fontSize: "var(--text-body)" }}
         >
@@ -74,6 +75,7 @@ export default function ContactDetail() {
             href={personalInfo.social.linkedin}
             target="_blank"
             rel="noopener noreferrer"
+            data-cursor="link"
             className="flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
             style={{ fontSize: "var(--text-body)" }}
           >
@@ -88,6 +90,7 @@ export default function ContactDetail() {
             href={personalInfo.social.github}
             target="_blank"
             rel="noopener noreferrer"
+            data-cursor="link"
             className="flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
             style={{ fontSize: "var(--text-body)" }}
           >
@@ -119,6 +122,7 @@ export default function ContactDetail() {
       <div>
         <a
           href={`mailto:${personalInfo.email}`}
+          data-cursor="link"
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-accent text-white font-medium hover:bg-accent-hover transition-colors"
           style={{ fontFamily: "var(--font-rounded)", fontSize: "var(--text-body)" }}
         >

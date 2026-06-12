@@ -221,6 +221,7 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
       <div
         ref={backdropRef}
         className="detail-backdrop active"
+        data-cursor="close"
         onClick={handleClose}
       />
 
@@ -240,7 +241,7 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
               >
                 {widget.type === "nowPlaying" ? "Now Playing" : widget.type.charAt(0).toUpperCase() + widget.type.slice(1)}
               </span>
-              <button onClick={handleClose} className="detail-close-btn">
+              <button onClick={handleClose} className="detail-close-btn" data-cursor="close">
                 <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 6L6 18M6 6l12 12" />
                 </svg>
@@ -253,6 +254,7 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
             <button
               onClick={handleClose}
               className="detail-close-btn absolute top-5 right-5 z-30"
+              data-cursor="close"
               style={{
                 background: "rgba(0,0,0,0.4)",
                 border: "1px solid rgba(255,255,255,0.18)",

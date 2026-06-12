@@ -102,7 +102,7 @@ export default function UscCinematic({
   };
 
   return (
-    <div ref={rootRef} className="flex flex-col bg-[#050505] text-white">
+    <div ref={rootRef} className="flex flex-col bg-[#050505] text-white" data-cursor-theme="usc">
       {/* Reading-progress hairline */}
       <div className="sticky top-0 z-50 pointer-events-none" style={{ height: 0, opacity: opened ? 1 : 0, transition: "opacity 500ms ease 300ms" }}>
         <div className="relative" style={{ height: 0 }}>

@@ -204,6 +204,7 @@ export default function UscProse({ project }: { project: Project }) {
             href={cta.url}
             target="_blank"
             rel="noopener noreferrer"
+            data-cursor="link"
             className="hard-frame hard-frame--press inline-flex items-center gap-2 font-bold mt-1"
             style={{
               background: "#e3b53d",

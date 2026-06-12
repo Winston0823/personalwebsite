@@ -18,6 +18,7 @@ export default function TrailerButton({
       rel="noopener noreferrer"
       aria-label="Watch trailer"
       title="Watch trailer"
+      data-cursor="play"
       className="inline-block cursor-pointer hover:opacity-100 hover:scale-105"
       style={{
         color: "#ffffff",

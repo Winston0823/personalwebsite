@@ -48,6 +48,7 @@ export default function LinksWidget() {
   return (
     <div
       className="flex items-center justify-center gap-4 h-full"
+      data-cursor="default"
       onPointerDownCapture={(e) => e.stopPropagation()}
       onPointerUpCapture={(e) => e.stopPropagation()}
       onClickCapture={(e) => e.stopPropagation()}
@@ -58,6 +59,7 @@ export default function LinksWidget() {
           key={link.label}
           href={link.href}
           title={link.label}
+          data-cursor="link"
           aria-label={link.label}
           {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
           onPointerDown={(e) => {
@@ -72,7 +74,7 @@ export default function LinksWidget() {
             e.stopPropagation();
             e.preventDefault();
           }}
-          style={{ touchAction: "auto", cursor: "pointer" }}
+          style={{ touchAction: "auto" }}
           className="w-10 h-10 rounded-full ghost-border flex items-center justify-center text-text-secondary hover:text-accent hover:bg-accent/5 transition-colors"
         >
           {link.icon}

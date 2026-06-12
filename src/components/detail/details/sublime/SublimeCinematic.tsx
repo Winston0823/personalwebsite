@@ -180,7 +180,7 @@ export default function SublimeCinematic({
   };
 
   return (
-    <div ref={rootRef} className="relative w-full text-white">
+    <div ref={rootRef} className="relative w-full text-white" data-cursor-theme="sublime">
       {/* Reading-progress hairline */}
       <div className="sticky top-0 z-50 pointer-events-none" style={{ height: 0 }}>
         <div className="relative" style={{ height: 0 }}>

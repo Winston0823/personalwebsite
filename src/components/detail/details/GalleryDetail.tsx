@@ -67,6 +67,7 @@ export default function GalleryDetail() {
               href={art.image}
               target="_blank"
               rel="noreferrer"
+              data-cursor="view"
               className="group relative block overflow-hidden rounded-xl bg-text-secondary/5 ring-1 ring-black/5 shadow-sm"
               style={{
                 gridColumn: `span ${colSpan}`,

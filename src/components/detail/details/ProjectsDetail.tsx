@@ -52,6 +52,7 @@ function ProjectFiltersSidebar({
               className={`filter-item filter-item--top${
                 active === section.value ? " active" : ""
               }`}
+              data-cursor="button"
               onClick={() => onSelect(section.value)}
             >
               <span>{section.header}</span>
@@ -109,6 +110,7 @@ function CtaBlock({ cta }: { cta: NonNullable<Project["cta"]> }) {
         href={cta.url}
         target="_blank"
         rel="noopener noreferrer"
+        data-cursor="link"
         className="inline-flex items-center gap-2 rounded-full font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5 mt-1"
         style={{
           background: "var(--color-accent)",
@@ -842,6 +844,7 @@ function ImageCompareSlider({
       <div
         ref={containerRef}
         className="relative w-full overflow-hidden select-none"
+        data-cursor="compare"
         style={{
           aspectRatio: "16 / 10",
           borderRadius: 6,
@@ -1178,6 +1181,7 @@ function MinimalCaseStudy({
                 href={primaryLink.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-cursor="link"
                 className="inline-flex items-center self-start hover:bg-white/5 transition-colors"
                 style={{
                   fontFamily: "var(--font-mono)",
@@ -1431,6 +1435,7 @@ function MinimalCaseStudy({
               href={l.url}
               target="_blank"
               rel="noopener noreferrer"
+              data-cursor="link"
               className="hover:text-white transition-colors"
               style={{ fontFamily: "var(--font-mono)" }}
             >
@@ -1605,6 +1610,7 @@ function ProjectCaseStudy({
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                data-cursor="link"
                 className="tag-pill hover:opacity-90 transition-opacity"
               >
                 {link.label} ↗
@@ -1690,6 +1696,7 @@ function ProjectGrid({
           <div
             key={project.id}
             className="project-card aspect-[4/3]"
+            data-cursor="view"
             onClick={() => onSelect(project)}
             onMouseMove={handleCardMove}
             onMouseLeave={handleCardLeave}

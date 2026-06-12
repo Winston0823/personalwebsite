@@ -32,6 +32,7 @@ export default function DrawerHandle({ onClick, isOpen = false }: DrawerHandlePr
       }}
       aria-label="Toggle widget drawer"
       aria-expanded={isOpen}
+      data-cursor="drawer-handle"
       className={[
         // positioning
         "group fixed right-0 top-1/2 -translate-y-1/2 z-40",
@@ -53,8 +54,8 @@ export default function DrawerHandle({ onClick, isOpen = false }: DrawerHandlePr
         "transition-[width,background-color,box-shadow] duration-[220ms] ease-[cubic-bezier(0.2,0,0,1)]",
         // focus ring — 2px accent halo, no offset (tab is flush to viewport edge)
         "outline-none focus-visible:ring-2 focus-visible:ring-accent",
-        // cursor
-        "cursor-pointer overflow-hidden",
+        // cursor handled by the custom cursor system (data-cursor above)
+        "overflow-hidden",
       ].join(" ")}
     >
       {/* Vertical "Widgets" label — hidden at rest, revealed on hover/focus.

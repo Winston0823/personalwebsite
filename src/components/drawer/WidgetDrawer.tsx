@@ -53,7 +53,8 @@ function DrawerWidgetPreview({ type }: { type: WidgetType }) {
       ref={measureRef}
       {...listeners}
       {...attributes}
-      className="glass rounded-lg overflow-hidden cursor-grab active:cursor-grabbing"
+      data-cursor="drawer-item"
+      className="glass rounded-lg overflow-hidden"
       style={{
         flexBasis: `calc(${widthPercent}% - 4px)`,
         aspectRatio: `${aspectRatio}`,
@@ -108,6 +109,7 @@ export default function WidgetDrawer({ isOpen, onClose }: WidgetDrawerProps) {
         </h2>
         <button
           onClick={onClose}
+          data-cursor="button"
           className="w-8 h-8 rounded-full ghost-border flex items-center justify-center text-text-secondary hover:text-text-primary transition-colors"
         >
           <svg viewBox="0 0 24 24" className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

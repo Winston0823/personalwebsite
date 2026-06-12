@@ -105,7 +105,9 @@ export default function WidgetShell({
       : hasEntered ? undefined : "translateY(20px) scale(0.95)",
     opacity: hasEntered ? undefined : 0,
     zIndex: isDragging ? 50 : 1,
-    cursor: isDragging ? "grabbing" : "grab",
+    // No cursor property here — the custom cursor handles grab/grabbing
+    // states, and competing declarations make the native cursor flash in
+    // Chrome. Non-cc fallback lives in globals.css.
     touchAction: "none",
     transition: isDragging || justDropped
       ? "box-shadow 0.2s ease"
@@ -117,6 +119,13 @@ export default function WidgetShell({
   // Subtle cursor-aware tilt on the glass shell — ambient "life" signal
   // that doesn't compete with content. Suppressed during drag so it
   // doesn't fight the drag transform.
+  //
+  // The transform write is deferred to rAF rather than run inside the
+  // mousemove handler. Mutating the element directly under the pointer
+  // *during* the move event makes Chromium recompute the cursor mid-event
+  // and flash the native arrow over the custom cursor; applying it on the
+  // next frame (no associated pointer event) keeps the cursor stable.
+  const tiltRaf = useRef<number | null>(null);
   function handleGlassMove(e: React.MouseEvent<HTMLDivElement>) {
     if (isDragging) return;
     const el = e.currentTarget;
@@ -125,9 +134,17 @@ export default function WidgetShell({
     const ny = (e.clientY - rect.top) / rect.height - 0.5;
     const MAX_TILT = 3;
     const SCALE = 1.012;
-    el.style.transform = `perspective(900px) rotateX(${ny * -MAX_TILT * 2}deg) rotateY(${nx * MAX_TILT * 2}deg) scale(${SCALE})`;
+    if (tiltRaf.current !== null) cancelAnimationFrame(tiltRaf.current);
+    tiltRaf.current = requestAnimationFrame(() => {
+      tiltRaf.current = null;
+      el.style.transform = `perspective(900px) rotateX(${ny * -MAX_TILT * 2}deg) rotateY(${nx * MAX_TILT * 2}deg) scale(${SCALE})`;
+    });
   }
   function handleGlassLeave(e: React.MouseEvent<HTMLDivElement>) {
+    if (tiltRaf.current !== null) {
+      cancelAnimationFrame(tiltRaf.current);
+      tiltRaf.current = null;
+    }
     e.currentTarget.style.transform = "";
   }
 
@@ -135,6 +152,7 @@ export default function WidgetShell({
     <div
       ref={mergedRef}
       data-widget-id={widget.id}
+      data-cursor={isExpandable ? "widget" : "widget-drag"}
       {...attributes}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}

@@ -54,10 +54,10 @@ export default function UiCarousel({
           />
         ))}
 
-        <button type="button" aria-label="Previous" onClick={() => go(-1)} className="hover:border-white/45" style={{ ...arrow, left: 12 }}>
+        <button type="button" aria-label="Previous" data-cursor="prev" onClick={() => go(-1)} className="hover:border-white/45" style={{ ...arrow, left: 12 }}>
           <CaretLeft size={18} weight="bold" />
         </button>
-        <button type="button" aria-label="Next" onClick={() => go(1)} className="hover:border-white/45" style={{ ...arrow, right: 12 }}>
+        <button type="button" aria-label="Next" data-cursor="next" onClick={() => go(1)} className="hover:border-white/45" style={{ ...arrow, right: 12 }}>
           <CaretRight size={18} weight="bold" />
         </button>
       </div>
@@ -73,6 +73,7 @@ export default function UiCarousel({
               key={it.src}
               type="button"
               aria-label={`Go to ${it.caption}`}
+              data-cursor="button"
               onClick={() => setI(idx)}
               style={{
                 width: idx === i ? 18 : 7,

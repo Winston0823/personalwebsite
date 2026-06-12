@@ -1196,3 +1196,305 @@ body[data-detail-theme="sublime"] .detail-scroll {
   .m-rise { opacity: 1; transform: none; }
   .m-rise.is-in { transition: none; }
 }
+
+/* ============================================================
+ * Custom cursor
+ * The cursor is the site's onboarding layer: a blue dot that
+ * morphs into labeled pills over interactive targets.
+ * Only active for fine pointers — touch keeps native behavior.
+ * ============================================================ */
+
+/* Hide the native cursor everywhere the custom one is active.
+   A transparent image comes first in the fallback chain: Chrome/WebKit on
+   macOS have a long-standing quirk where `none` flashes the native arrow
+   each time the cursor is re-resolved — which happens on EVERY mousemove
+   (re-hit-test) and again whenever the element under the pointer mutates
+   (the widget tilt rewriting style.transform). That's why the flash only
+   shows while moving, not when stationary.
+
+   The image must be a *valid, non-empty* bitmap. An empty <svg> decodes to
+   zero opaque pixels, which Blink can treat as an invalid image and discard
+   — falling back to `none`, which flickers. A real 1×1 transparent PNG
+   decodes to a cached invisible bitmap, so re-resolution lands on it
+   instead of the system arrow. */
+@media (pointer: fine) {
+  html.cc-active,
+  html.cc-active body,
+  html.cc-active * {
+    cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==")
+        0 0,
+      none !important;
+  }
+  /* …except opt-out regions (text-heavy detail panels), where the
+     browser cursor (I-beam over text, pointer over links) is more useful. */
+  html.cc-active [data-cursor-native],
+  html.cc-active [data-cursor-native] * {
+    cursor: auto !important;
+  }
+  /* …but interactive elements *inside* an opt-out region still opt back in to
+     the custom cursor (close button, compare slider, links). Re-hide the
+     native arrow on them so it doesn't show *under* the custom ring. Two
+     attribute selectors out-specify the [data-cursor-native] * rule above. */
+  html.cc-active [data-cursor-native] [data-cursor] {
+    cursor: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==")
+        0 0,
+      none !important;
+  }
+}
+
+/* Native-cursor fallbacks when the custom cursor isn't running
+   (touch devices, JS disabled). Components no longer declare their own
+   cursor styles — competing declarations cause Chrome to re-resolve the
+   cursor at element boundaries, which is what makes the native cursor
+   flash during movement. */
+html:not(.cc-active) [data-cursor="widget"],
+html:not(.cc-active) [data-cursor="widget-drag"],
+html:not(.cc-active) [data-cursor="drawer-item"] {
+  cursor: grab;
+}
+html:not(.cc-active) [data-cursor="link"],
+html:not(.cc-active) [data-cursor="button"],
+html:not(.cc-active) [data-cursor="drawer-handle"],
+html:not(.cc-active) [data-cursor="view"],
+html:not(.cc-active) [data-cursor="play"],
+html:not(.cc-active) [data-cursor="prev"],
+html:not(.cc-active) [data-cursor="next"],
+html:not(.cc-active) [data-cursor="close"],
+html:not(.cc-active) [data-cursor="copy"] {
+  cursor: pointer;
+}
+html:not(.cc-active) [data-cursor="compare"] {
+  cursor: ew-resize;
+}
+
+/* Two-part cursor: a precise dot at the pointer plus a larger ring that
+ * trails it with eased lag (positions driven from JS via rAF lerp).
+ * Over targets the ring expands into a frosted pill; on press both contract. */
+
+.cc-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  /* All cursor colors flow through these three vars so a per-project theme
+     (see .cc-layer[data-theme=...]) can recolor the whole cursor by setting
+     them once. --cc-accent drives dot/ring/icons; --cc-contrast is the pill
+     label/icon color on filled pills; --cc-glow is the dot/ring halo. */
+  --cc-accent: var(--color-accent);
+  --cc-accent-soft: rgba(0, 122, 255, 0.45);
+  --cc-accent-faint: rgba(0, 122, 255, 0.08);
+  --cc-pill-border: rgba(0, 122, 255, 0.35);
+  --cc-contrast: var(--color-accent);
+  --cc-glow: none;
+}
+
+.cc-pos {
+  position: fixed;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+/* --- Dot: true pointer position --- */
+.cc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--cc-accent);
+  box-shadow: var(--cc-glow);
+  transform: translate(-50%, -50%);
+  transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease,
+    scale 0.15s ease;
+}
+
+/* --- Ring: lagged follower, morphs per state --- */
+.cc-ring {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1.5px solid var(--cc-accent-soft);
+  background: transparent;
+  color: var(--cc-accent);
+  box-shadow: var(--cc-glow);
+  animation: cc-pop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+  user-select: none;
+  transition: scale 0.18s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+}
+
+/* Pill states: ring expands into a frosted label */
+.cc-layer[data-state="widget"] .cc-ring,
+.cc-layer[data-state="widget-drag"] .cc-ring,
+.cc-layer[data-state="link"] .cc-ring,
+.cc-layer[data-state="drawer-handle"] .cc-ring,
+.cc-layer[data-state="drawer-item"] .cc-ring,
+.cc-layer[data-state="trash"] .cc-ring,
+.cc-layer[data-state="view"] .cc-ring,
+.cc-layer[data-state="play"] .cc-ring,
+.cc-layer[data-state="compare"] .cc-ring,
+.cc-layer[data-state="copy"] .cc-ring {
+  width: auto;
+  height: 28px;
+  padding: 0 11px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-color: var(--cc-pill-border);
+  /* Pills carry a tinted text/icon color so themed accents read on the
+     frosted-white chip (e.g. USC gold label on white). */
+  color: var(--cc-contrast);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* The dot recedes while a pill is showing */
+.cc-layer[data-state="widget"] .cc-dot,
+.cc-layer[data-state="widget-drag"] .cc-dot,
+.cc-layer[data-state="link"] .cc-dot,
+.cc-layer[data-state="drawer-handle"] .cc-dot,
+.cc-layer[data-state="drawer-item"] .cc-dot,
+.cc-layer[data-state="trash"] .cc-dot,
+.cc-layer[data-state="view"] .cc-dot,
+.cc-layer[data-state="play"] .cc-dot,
+.cc-layer[data-state="compare"] .cc-dot,
+.cc-layer[data-state="copy"] .cc-dot {
+  width: 4px;
+  height: 4px;
+}
+
+/* Generic buttons + icon-only rings (prev / next / close): the ring grows and
+   brightens with the accent and centers a single glyph — pointer feel, no
+   label. close/prev/next sit slightly larger so the glyph has room. */
+.cc-layer[data-state="button"] .cc-ring,
+.cc-layer[data-state="prev"] .cc-ring,
+.cc-layer[data-state="next"] .cc-ring,
+.cc-layer[data-state="close"] .cc-ring {
+  width: 38px;
+  height: 38px;
+  border-color: var(--cc-accent);
+  background: var(--cc-accent-faint);
+  justify-content: center;
+}
+
+/* The dot recedes behind the icon-only rings too */
+.cc-layer[data-state="prev"] .cc-dot,
+.cc-layer[data-state="next"] .cc-dot,
+.cc-layer[data-state="close"] .cc-dot {
+  width: 4px;
+  height: 4px;
+}
+
+/* Mid-drag: ring hugs the dot */
+.cc-layer[data-state="grabbing"] .cc-ring {
+  width: 20px;
+  height: 20px;
+  border-color: var(--cc-accent);
+}
+.cc-layer[data-state="grabbing"] .cc-dot {
+  width: 10px;
+  height: 10px;
+}
+
+/* Over the trash zone mid-drag */
+.cc-layer[data-state="trash"] .cc-ring {
+  background: #ff3b30;
+  border-color: #ff3b30;
+  color: #fff;
+  box-shadow: 0 2px 14px rgba(255, 59, 48, 0.4);
+}
+.cc-layer[data-state="trash"] .cc-dot {
+  background: #ff3b30;
+}
+
+.cc-layer[data-state="hidden"] .cc-ring,
+.cc-layer[data-state="hidden"] .cc-dot {
+  opacity: 0;
+  animation: none;
+}
+
+/* Press feedback: everything contracts slightly */
+.cc-layer[data-pressed] .cc-ring {
+  scale: 0.88;
+}
+.cc-layer[data-pressed] .cc-dot {
+  scale: 0.8;
+}
+
+/* Separator dot between the Inspect / Pick up actions */
+.cc-sep {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--cc-accent-soft);
+  flex: none;
+}
+
+/* ── Per-project cursor themes ──
+   The cursor reads the nearest [data-cursor-theme] ancestor on each move and
+   mirrors it as data-theme here. Each theme only overrides the palette vars;
+   all state geometry above stays shared. */
+
+/* Sublime — the game's pink-crystal accent (see sublime/* ACCENT = #e83a8a),
+   with a soft matching halo on the dot and ring. NOTE: the brief asked for a
+   CRT phosphor green, but the sublime case study has no green in its palette —
+   its signature color is the pink crystal — so the theme mirrors the real
+   accent and adds the requested soft glow around it. */
+.cc-layer[data-theme="sublime"] {
+  --cc-accent: #e83a8a;
+  --cc-accent-soft: rgba(232, 58, 138, 0.55);
+  --cc-accent-faint: rgba(232, 58, 138, 0.12);
+  --cc-pill-border: rgba(232, 58, 138, 0.45);
+  --cc-contrast: #e83a8a;
+  --cc-glow: 0 0 10px rgba(232, 58, 138, 0.55), 0 0 4px rgba(232, 58, 138, 0.4);
+}
+
+/* AWL — minimal monochrome: near-black accent, hairline ring, no glow. */
+.cc-layer[data-theme="awl"] {
+  --cc-accent: #111113;
+  --cc-accent-soft: rgba(17, 17, 19, 0.5);
+  --cc-accent-faint: rgba(17, 17, 19, 0.06);
+  --cc-pill-border: rgba(17, 17, 19, 0.35);
+  --cc-contrast: #111113;
+  --cc-glow: none;
+}
+/* Thin the ring to a hairline so it reads as a precise monochrome marker. */
+.cc-layer[data-theme="awl"] .cc-ring {
+  border-width: 1px;
+}
+
+/* USC Formula Electric — cardinal/gold accent (#e3b53d, see usc/* ACCENT) with
+   a subtle matching gold glow. */
+.cc-layer[data-theme="usc"] {
+  --cc-accent: #e3b53d;
+  --cc-accent-soft: rgba(227, 181, 61, 0.5);
+  --cc-accent-faint: rgba(227, 181, 61, 0.12);
+  --cc-pill-border: rgba(227, 181, 61, 0.45);
+  --cc-contrast: #b8881f;
+  --cc-glow: 0 0 9px rgba(227, 181, 61, 0.5), 0 0 3px rgba(227, 181, 61, 0.35);
+}
+
+@keyframes cc-pop {
+  from {
+    scale: 0.6;
+    opacity: 0.3;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-ring {
+    animation: none;
+  }
+}

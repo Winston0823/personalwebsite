@@ -118,6 +118,7 @@ export default function ResumeDetail() {
           href={personalInfo.resume ?? "/resume.pdf"}
           target="_blank"
           rel="noopener noreferrer"
+          data-cursor="link"
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-accent text-white font-medium hover:bg-accent-hover transition-colors"
           style={{ fontFamily: "var(--font-rounded)", fontSize: "0.95rem" }}
         >
