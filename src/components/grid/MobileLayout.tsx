@@ -108,7 +108,7 @@ export default function MobileLayout({
             Winston<br />Gu
           </h1>
           <p className="mt-3" style={{ fontFamily: "var(--font-mono)", fontSize: "0.72rem", color: "var(--color-text-secondary)", letterSpacing: "0.04em" }}>
-            available summer 2026 · let&rsquo;s build something
+            available summer 2027 · let&rsquo;s build something
           </p>
         </div>
       </section>

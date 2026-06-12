@@ -24,8 +24,8 @@ function Panel({
   return (
     <figure className="m-0 flex flex-col gap-2">
       <div
-        className="relative w-full overflow-hidden rounded-xl"
-        style={{ aspectRatio: "16 / 9", boxShadow: "0 18px 50px -16px rgba(0,0,0,0.7)", outline: "1px solid rgba(227,181,61,0.18)" }}
+        className="hard-frame relative w-full overflow-hidden rounded-xl"
+        style={{ aspectRatio: "16 / 9" }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={src} alt={caption} className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
@@ -97,8 +97,8 @@ export default function LayerShowcase() {
             </svg>
           </div>
           <div
-            className="relative w-full overflow-hidden rounded-xl bg-black"
-            style={{ aspectRatio: "16 / 9", boxShadow: "0 18px 50px -16px rgba(0,0,0,0.7)", outline: "1px solid rgba(227,181,61,0.35)" }}
+            className="hard-frame relative w-full overflow-hidden rounded-xl bg-black"
+            style={{ aspectRatio: "16 / 9" }}
           >
             {/* Wireframe sits behind; the canvas paints the render on top and erases it */}
             {/* eslint-disable-next-line @next/next/no-img-element */}

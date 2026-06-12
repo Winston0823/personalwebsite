@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const TICKER_TEXT =
-  "available summer 2026 · ui/ux engineer · creative developer · let's build something · ";
+  "available summer 2027 · ui/ux engineer · creative developer · let's build something · ";
 const LOOP_DURATION_MS = 40000;
 // Fast-forward the animation by this much on mount so the text starts already
 // curving through the corner rather than mid-edge.

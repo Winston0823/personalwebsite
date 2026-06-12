@@ -62,8 +62,8 @@ function DecisionBlock({
         </div>
         {image && (
           <div
-            className="relative w-full overflow-hidden rounded-xl"
-            style={{ aspectRatio: "16 / 9", outline: "1px solid rgba(227,181,61,0.18)", boxShadow: "0 18px 50px -16px rgba(0,0,0,0.7)" }}
+            className="hard-frame relative w-full overflow-hidden rounded-xl"
+            style={{ aspectRatio: "16 / 9" }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={image} alt={imageAlt ?? ""} className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
@@ -166,8 +166,8 @@ export default function UscProse({ project }: { project: Project }) {
           {STATS.map((s) => (
             <div
               key={s.label}
-              className="rounded-xl px-5 py-6 flex flex-col gap-1"
-              style={{ background: "rgba(227,181,61,0.06)", border: "1px solid rgba(227,181,61,0.18)" }}
+              className="hard-frame rounded-xl px-5 py-6 flex flex-col gap-1"
+              style={{ background: "rgba(227,181,61,0.06)" }}
             >
               <span
                 className="text-[#e3b53d]"
@@ -197,22 +197,23 @@ export default function UscProse({ project }: { project: Project }) {
               {cta.sublabel}
             </p>
           )}
-          {/* Mirrors the live team site's CTA button: flat USC-gold pill,
-              pure-black text, plain arrow, no glow — but kept in the page's mono
-              face for typographic consistency. */}
+          {/* USC-gold pill with the Ambit-style hard frame: a dark-amber offset
+              block (a darker shade of the pill's own gold) that reads as a crisp
+              hard shadow. Grows on hover, presses into the block on click. */}
           <a
             href={cta.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full font-bold transition-transform duration-200 hover:-translate-y-0.5 mt-1"
+            className="hard-frame hard-frame--press inline-flex items-center gap-2 font-bold mt-1"
             style={{
               background: "#e3b53d",
               color: "#000",
               padding: "0.85rem 1.9rem",
               fontFamily: "var(--font-mono)",
               fontSize: "0.95rem",
-              boxShadow: "0 6px 16px -8px rgba(0,0,0,0.5)",
-            }}
+              ["--hf-color" as string]: "#e3b53d",
+              ["--hf-radius" as string]: "9999px",
+            } as React.CSSProperties}
           >
             {cta.label}
             <span aria-hidden="true">→</span>

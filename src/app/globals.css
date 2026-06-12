@@ -1131,6 +1131,53 @@ body[data-detail-theme="sublime"] .detail-scroll {
   100% { transform: scaleY(1) scaleX(1); filter: brightness(1); opacity: 1; }
 }
 
+/* ── Hard-frame treatment (Ambit-style offset block) ───────────────────────
+   Borrowed from the Ambit app's "hard shadow" button: a crisp, zero-blur
+   solid block offset behind an element, plus a matching border. RN needed a
+   second <View> for this; on web a single box-shadow with 0 blur IS the hard
+   shadow, so it's one element and no extra DOM.
+
+   Both the block and the border derive from ONE base color (--hf-color) via
+   color-mix, so they always read as cohesive darker shades — a gold element
+   gets a dark-amber block that reads as a shadow, while on a dark image the
+   same amber reads as a gold-family frame. Defaults to USC gold.
+
+   Add `.hard-frame--press` for the click compression (press into the shadow). */
+.hard-frame {
+  --hf-color: #e3b53d;
+  --hf-x: 0px;
+  --hf-y: 6px;
+  --hf-radius: 12px;
+  border: 2px solid color-mix(in oklab, var(--hf-color) 70%, #000);
+  border-radius: var(--hf-radius);
+  box-shadow: var(--hf-x) var(--hf-y) 0 0 color-mix(in oklab, var(--hf-color) 60%, #000);
+  transition:
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Lift straight up + grow while the block deepens — reads as peeling off the
+   page. The block stays directly below the element (Ambit-style bottom shadow,
+   no horizontal offset). */
+.hard-frame:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--hf-x) calc(var(--hf-y) + 3px) 0 0
+    color-mix(in oklab, var(--hf-color) 60%, #000);
+}
+/* Press into the shadow: slide down by the offset, block collapses to 0. */
+.hard-frame--press:active {
+  transform: translate(var(--hf-x), var(--hf-y)) scale(0.99);
+  box-shadow: 0 0 0 0 color-mix(in oklab, var(--hf-color) 60%, #000);
+  transition-duration: 0.08s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hard-frame,
+  .hard-frame:hover,
+  .hard-frame--press:active {
+    transition: none;
+    transform: none;
+  }
+}
+
 /* ── Mobile hybrid layout reveal ──────────────────────────────────────────
    Blocks start hidden and fade-rise as they enter the viewport. A JS fallback
    (MobileLayout) force-reveals everything after a short delay, so nothing can
