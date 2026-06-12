@@ -103,7 +103,7 @@ export default function NameDetail() {
             href={personalInfo.resume}
             target="_blank"
             rel="noopener noreferrer"
-            data-cursor="link"
+            data-cursor="download"
             className="flex items-center gap-2 px-5 py-2 rounded-full bg-accent text-white font-medium hover:bg-accent-hover transition-colors"
             style={{ fontFamily: "var(--font-rounded)", fontSize: "var(--text-caption)" }}
           >

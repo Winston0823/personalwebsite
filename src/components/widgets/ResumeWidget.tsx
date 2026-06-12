@@ -16,6 +16,7 @@ export default function ResumeWidget() {
         <a
           href={personalInfo.resume ?? "/resume.pdf"}
           download
+          data-cursor="download"
           className="inline-flex items-center gap-1 text-accent font-medium hover:opacity-80 transition-opacity"
           style={{ fontSize: "var(--text-caption)" }}
           aria-label="Download résumé as PDF"

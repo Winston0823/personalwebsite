@@ -1285,7 +1285,14 @@ html:not(.cc-active) [data-cursor="compare"] {
   --cc-accent-faint: rgba(0, 122, 255, 0.08);
   --cc-pill-border: rgba(0, 122, 255, 0.35);
   --cc-contrast: var(--color-accent);
-  --cc-glow: none;
+  --cc-glow: 0 0 transparent;
+  /* Contrast halo so the accent cursor reads on ANY background — a hard 1px
+     dark edge for light widgets + a soft light bloom for the dimmed detail
+     backdrop. Keeps the brand/theme color; layered before --cc-glow. */
+  --cc-halo: 0 0 0 1px rgba(0, 0, 0, 0.28), 0 0 6px rgba(255, 255, 255, 0.4);
+  /* Height of the caret-line over body text — overwritten per element in JS
+     (clamp(14px, 1.1·font-size, 40px)) so the bar scales heading vs body. */
+  --cc-text-h: 20px;
 }
 
 .cc-pos {
@@ -1301,7 +1308,7 @@ html:not(.cc-active) [data-cursor="compare"] {
   height: 8px;
   border-radius: 999px;
   background: var(--cc-accent);
-  box-shadow: var(--cc-glow);
+  box-shadow: var(--cc-halo), var(--cc-glow);
   transform: translate(-50%, -50%);
   transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease,
     scale 0.15s ease;
@@ -1319,7 +1326,7 @@ html:not(.cc-active) [data-cursor="compare"] {
   border: 1.5px solid var(--cc-accent-soft);
   background: transparent;
   color: var(--cc-accent);
-  box-shadow: var(--cc-glow);
+  box-shadow: var(--cc-halo), var(--cc-glow);
   animation: cc-pop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
   white-space: nowrap;
   font-family: var(--font-mono);
@@ -1342,7 +1349,8 @@ html:not(.cc-active) [data-cursor="compare"] {
 .cc-layer[data-state="view"] .cc-ring,
 .cc-layer[data-state="play"] .cc-ring,
 .cc-layer[data-state="compare"] .cc-ring,
-.cc-layer[data-state="copy"] .cc-ring {
+.cc-layer[data-state="copy"] .cc-ring,
+.cc-layer[data-state="download"] .cc-ring {
   width: auto;
   height: 28px;
   padding: 0 11px;
@@ -1366,7 +1374,8 @@ html:not(.cc-active) [data-cursor="compare"] {
 .cc-layer[data-state="view"] .cc-dot,
 .cc-layer[data-state="play"] .cc-dot,
 .cc-layer[data-state="compare"] .cc-dot,
-.cc-layer[data-state="copy"] .cc-dot {
+.cc-layer[data-state="copy"] .cc-dot,
+.cc-layer[data-state="download"] .cc-dot {
   width: 4px;
   height: 4px;
 }
@@ -1421,6 +1430,21 @@ html:not(.cc-active) [data-cursor="compare"] {
   animation: none;
 }
 
+/* Body text: the trailing ring fades out and the precise dot stretches into a
+   caret-like vertical bar (azumbrunnen tradition). Driven off the dot so it
+   tracks the pointer exactly — like the spot a text caret would land. Height
+   comes from --cc-text-h (set per element in JS); the existing width/height
+   transition makes the dot↔bar morph smooth. */
+.cc-layer[data-state="text"] .cc-ring {
+  opacity: 0;
+  animation: none;
+}
+.cc-layer[data-state="text"] .cc-dot {
+  width: 2px;
+  height: var(--cc-text-h);
+  border-radius: 1px;
+}
+
 /* Press feedback: everything contracts slightly */
 .cc-layer[data-pressed] .cc-ring {
   scale: 0.88;
@@ -1464,7 +1488,7 @@ html:not(.cc-active) [data-cursor="compare"] {
   --cc-accent-faint: rgba(17, 17, 19, 0.06);
   --cc-pill-border: rgba(17, 17, 19, 0.35);
   --cc-contrast: #111113;
-  --cc-glow: none;
+  --cc-glow: 0 0 transparent;
 }
 /* Thin the ring to a hairline so it reads as a precise monochrome marker. */
 .cc-layer[data-theme="awl"] .cc-ring {

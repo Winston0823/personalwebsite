@@ -14,6 +14,7 @@ import {
   ArrowsLeftRight,
   X,
   Copy,
+  DownloadSimple,
 } from "@phosphor-icons/react";
 
 /**
@@ -59,7 +60,33 @@ type CursorState =
   | "compare" // image-compare drag slider
   | "close" // close buttons, overlay backdrop
   | "copy" // copy-to-clipboard (reserved — no target ships yet)
+  | "download" // résumé / file download triggers
+  | "text" // body text — dot collapses into a caret-like vertical line
   | "hidden";
+
+/** Tags that read as body text and get the caret-line cursor (azumbrunnen
+ *  tradition). Interactive text (links, buttons) carries its own data-cursor,
+ *  so closest() claims it first and it never reaches this check. */
+const TEXT_TAGS = new Set([
+  "P",
+  "H1",
+  "H2",
+  "H3",
+  "H4",
+  "H5",
+  "H6",
+  "LI",
+  "BLOCKQUOTE",
+  "FIGCAPTION",
+  "EM",
+  "STRONG",
+]);
+
+function isTextTarget(el: Element | null): boolean {
+  return (
+    !!el && TEXT_TAGS.has(el.tagName) && (el.textContent?.trim().length ?? 0) > 0
+  );
+}
 
 const LEARN_KEY = "winston-cursor-learned-v1";
 const LEARN_THRESHOLD = 3;
@@ -84,8 +111,12 @@ function readLearned(): Learned {
 const ICON_SIZE = 12;
 
 export default function CustomCursor() {
+  const layerRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
+  // Last text element the caret-line was sized to. getComputedStyle forces a
+  // sync layout, so we only re-measure when the pointer crosses into new text.
+  const lastTextEl = useRef<Element | null>(null);
   const [enabled, setEnabled] = useState(false);
   const [state, setState] = useState<CursorState>("hidden");
   const [pressed, setPressed] = useState(false);
@@ -140,6 +171,21 @@ export default function CustomCursor() {
           next = "hidden"; // let the browser cursor take over
         } else {
           next = (hit.getAttribute("data-cursor") as CursorState) || "default";
+        }
+        // No explicit affordance claimed the pointer, but we're over body text:
+        // collapse the dot into a caret-line sized to that text (clamped).
+        // Re-measure only when entering a NEW text element — measuring every
+        // move would force a layout flush per frame and lag the cursor.
+        if (next === "default" && isTextTarget(t)) {
+          next = "text";
+          if (t !== lastTextEl.current) {
+            lastTextEl.current = t;
+            const fs = parseFloat(getComputedStyle(t as Element).fontSize) || 18;
+            const h = Math.max(14, Math.min(40, fs * 1.1));
+            layerRef.current?.style.setProperty("--cc-text-h", `${h}px`);
+          }
+        } else {
+          lastTextEl.current = null;
         }
       }
       if (next !== stateRef.current) setState(next);
@@ -283,6 +329,13 @@ export default function CustomCursor() {
             <span>Copy</span>
           </>
         );
+      case "download":
+        return (
+          <>
+            <DownloadSimple size={ICON_SIZE} weight="bold" />
+            <span>Download</span>
+          </>
+        );
       // Icon-only rings — no label, glyph centered (styled like `button`).
       case "prev":
         return <CaretLeft size={ICON_SIZE + 2} weight="bold" />;
@@ -302,6 +355,7 @@ export default function CustomCursor() {
   // (z-80) — paint *over* the cursor, hiding it whenever a detail view is open.
   return createPortal(
     <div
+      ref={layerRef}
       className="cc-layer"
       data-state={state}
       data-theme={theme || undefined}
