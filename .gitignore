@@ -36,3 +36,6 @@ site-firstload.png
 site-screenshot.png
 .vercel
 .env*
+
+# Superpowers brainstorm mockups
+.superpowers/

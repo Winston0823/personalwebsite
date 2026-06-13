@@ -4,6 +4,8 @@ import { useEffect, useRef, useCallback, useState } from "react";
 import { WidgetInstance } from "@/lib/grid-types";
 import DetailContent from "./DetailContent";
 import anime from "animejs";
+import { DUR, EASE, STAGGER } from "@/lib/motion";
+import { emitGridRipple, RIPPLE, themeRipple } from "@/lib/grid-ripple";
 
 interface DetailOverlayProps {
   widget: WidgetInstance;
@@ -18,6 +20,10 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
   const [isClosing, setIsClosing] = useState(false);
   const isAnimating = useRef(false);
   const didOpen = useRef(false);
+  // Whether a child has requested the fullscreen case-study layout. Declared
+  // here (above handleClose) so the close handler can branch its exit path on
+  // it without a stale-closure read.
+  const [caseStudyMode, setCaseStudyMode] = useState(false);
 
   // Target panel dimensions — generous so the panel feels like it "pops out" past the widget
   const targetWidth = Math.min(window.innerWidth * 0.92, 1200);
@@ -62,6 +68,14 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
     anime.set(panel, { translateX: tx, translateY: ty, scaleX: sx, scaleY: sy });
     content.style.opacity = "0";
 
+    // Signature: the panel's emergence sends a wavefront through the dot grid
+    // from the exact spot the widget sat — the background acknowledges the open.
+    emitGridRipple(
+      originRect.left + originRect.width / 2,
+      originRect.top + originRect.height / 2,
+      RIPPLE.open,
+    );
+
     const tl = anime.timeline();
 
     // Backdrop: gentle ease-out, matched to the panel's settle time
@@ -79,8 +93,8 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
       translateY: 0,
       scaleX: 1,
       scaleY: 1,
-      duration: 700,
-      easing: "cubicBezier(0.16, 1, 0.3, 1)",
+      duration: DUR.narrative,
+      easing: EASE.reveal.anime,
     }, 0);
 
     // Content wrapper fades in once on open. Subsequent in-panel swaps
@@ -89,7 +103,7 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
       targets: content,
       opacity: [0, 1],
       duration: 480,
-      easing: "cubicBezier(0.22, 1, 0.36, 1)",
+      easing: EASE.pop.anime,
     }, 220);
 
     // Per-item stagger (only views with .detail-stagger get this — extra polish)
@@ -99,8 +113,8 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
         opacity: [0, 1],
         translateY: [14, 0],
         duration: 460,
-        delay: anime.stagger(55),
-        easing: "cubicBezier(0.16, 1, 0.3, 1)",
+        delay: anime.stagger(STAGGER.detail),
+        easing: EASE.reveal.anime,
       }, 320);
     }
 
@@ -129,7 +143,7 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
     if (sourceEl) sourceEl.removeAttribute("data-widget-expanded");
 
     const tl = anime.timeline({
-      easing: "cubicBezier(0.32, 0, 0.18, 1)",
+      easing: EASE.exit.anime,
     });
 
     // Content fades out first and faster than the panel, so by the time the
@@ -144,17 +158,34 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
       }, 0);
     }
 
-    // Panel: gentle scale-down + slight drop. Longer than before (320ms) so
-    // it reads as a settle rather than a snap. Opacity tail covers the last
-    // 60% of the duration to avoid the abrupt cut.
-    if (panel) {
+    // Panel close. In the common (popup) case the panel retraces its open
+    // FLIP in reverse — collapsing back into the widget it came from — so open
+    // and close are mirror images and the panel reads as the *same object*
+    // returning home. In fullscreen case-study mode the origin widget is a
+    // tiny target across the whole viewport, so retracting to it reads as a
+    // jarring suck-away; there we keep a gentle scale-down + drop instead.
+    if (panel && !caseStudyMode) {
+      const tx = originRect.left - targetLeft;
+      const ty = originRect.top - targetTop;
+      const sx = originRect.width / targetWidth;
+      const sy = originRect.height / targetHeight;
+      tl.add({
+        targets: panel,
+        translateX: [0, tx],
+        translateY: [0, ty],
+        scaleX: [1, sx],
+        scaleY: [1, sy],
+        opacity: [1, 0],
+        duration: DUR.slow,
+      }, 40);
+    } else if (panel) {
       tl.add({
         targets: panel,
         scaleX: [1, 0.965],
         scaleY: [1, 0.965],
         translateY: [0, 6],
         opacity: [1, 0],
-        duration: 360,
+        duration: DUR.base,
       }, 60);
     }
 
@@ -171,7 +202,7 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
       isAnimating.current = false;
       onClose();
     });
-  }, [isClosing, widget.id, onClose]);
+  }, [isClosing, widget.id, onClose, caseStudyMode, originRect, targetLeft, targetTop, targetWidth, targetHeight]);
 
   // Escape key handler
   useEffect(() => {
@@ -181,11 +212,6 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [handleClose]);
-
-  // Track whether a child has asked for the case-study layout. When true the
-  // panel goes fullscreen AND we hide the standard header so the hero image
-  // can paint to the very top of the panel.
-  const [caseStudyMode, setCaseStudyMode] = useState(false);
 
   // Listen for child components requesting a fullscreen panel (used by the
   // project case-study view). Animates panel between popup rect and full
@@ -198,6 +224,16 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
 
       const goFull = evt.detail === true;
       setCaseStudyMode(goFull);
+
+      // Entering a case study sends a wave in that project's accent (USC gold,
+      // sublime pink, AWL red) — the grid greets the project by name. Theme is
+      // read from the case study's [data-cursor-theme] root, already mounted.
+      if (goFull) {
+        const themed = panel.querySelector("[data-cursor-theme]");
+        const theme = themed?.getAttribute("data-cursor-theme") ?? null;
+        emitGridRipple(window.innerWidth / 2, window.innerHeight / 2, themeRipple(theme));
+      }
+
       anime.remove(panel);
       anime({
         targets: panel,
@@ -207,7 +243,7 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
         height: goFull ? window.innerHeight : targetHeight,
         borderRadius: goFull ? 0 : 24,
         duration: 520,
-        easing: "cubicBezier(0.22, 1, 0.36, 1)",
+        easing: EASE.pop.anime,
       });
     };
 

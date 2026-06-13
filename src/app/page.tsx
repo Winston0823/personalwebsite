@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useRef, useCallback, useMemo } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { WidgetInstance } from "@/lib/grid-types";
 import DetailOverlay from "@/components/detail/DetailOverlay";
 import {
   DndContext,
   DragEndEvent,
+  DragMoveEvent,
   DragOverEvent,
   DragStartEvent,
   DragOverlay,
@@ -25,6 +26,8 @@ import { useBreakpoint } from "@/hooks/useBreakpoint";
 import { GRID_COLS, WidgetType } from "@/lib/grid-types";
 import { widgetRegistry } from "@/lib/widget-registry";
 import { widgetComponents } from "@/lib/widget-components";
+import { recordDrop } from "@/lib/flip-drops";
+import { emitGridRipple, setGridGlow, clearGridGlow, RIPPLE } from "@/lib/grid-ripple";
 import anime from "animejs";
 
 const restrictToWindow: Modifier = ({ transform, activeNodeRect, windowRect }) => {
@@ -53,14 +56,26 @@ export default function Home() {
   const handleExpand = useCallback((widget: WidgetInstance, rect: DOMRect) => {
     setExpandedWidget(widget);
     setExpandOriginRect(rect);
-    // Cursor learn-then-quiet: one more completed "inspect"
-    window.dispatchEvent(new CustomEvent("cursor-action", { detail: "inspect" }));
   }, []);
 
   const handleCollapse = useCallback(() => {
     setExpandedWidget(null);
     setExpandOriginRect(null);
   }, []);
+
+  // Cold-open: as the grid first paints and the widgets stagger in, send one
+  // wavefront out from the center so the dot-grid background "wakes up" in
+  // concert with them — a coordinated power-on rather than three independent
+  // ambient effects starting cold. Delayed a beat so the grid's ripple
+  // listener is mounted; skipped on mobile (no dot grid) and under reduced
+  // motion (the ripple bus drops it grid-side).
+  useEffect(() => {
+    if (breakpoint === "mobile") return;
+    const t = window.setTimeout(() => {
+      emitGridRipple(window.innerWidth / 2, window.innerHeight * 0.42, RIPPLE.cold);
+    }, 220);
+    return () => window.clearTimeout(t);
+  }, [breakpoint]);
 
   const sensor = useSensor(PointerSensor, { activationConstraint: { distance: 8 } });
   const sensors = useSensors(sensor);
@@ -93,15 +108,32 @@ export default function Home() {
     document.body.dataset.ccTrash = String(overTrash);
   }
 
+  // Drag-follow glow: a warm pool of light tracks the grid under the dragged
+  // widget the whole time it's in the air, sized to the widget and turning the
+  // discard red while over the trash. Released in handleDragEnd, where the drop
+  // ripple takes over.
+  function handleDragMove(event: DragMoveEvent) {
+    const rect = event.active.rect.current.translated;
+    if (!rect) return;
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const radius = Math.max(rect.width, rect.height) * 0.7 + 70;
+    const overTrash = document.body.dataset.ccTrash === "true";
+    setGridGlow(cx, cy, {
+      radius,
+      strength: overTrash ? 0.85 : 0.7,
+      color: overTrash ? [255, 59, 48] : undefined,
+    });
+  }
+
   function handleDragEnd(event: DragEndEvent) {
+    clearGridGlow();
     const wasOverTrash = event.over?.id === TRASH_ZONE_ID;
     setIsOverTrash(false);
     setActiveDragType(null);
     dispatch({ type: "SET_DRAGGING", isDragging: false });
     delete document.body.dataset.ccDragging;
     delete document.body.dataset.ccTrash;
-    // Cursor learn-then-quiet: one more completed "pickup"
-    window.dispatchEvent(new CustomEvent("cursor-action", { detail: "pickup" }));
 
     const { active, delta } = event;
     const id = String(active.id);
@@ -125,10 +157,17 @@ export default function Home() {
       const col = Math.round((dropCenterX - gridRect.left) / cellSize - meta.defaultSize.cols / 2);
       const row = Math.round((dropCenterY - gridRect.top) / cellSize - meta.defaultSize.rows / 2);
 
+      // Spatial continuity: record where the drag ghost was released so the
+      // new widget can FLIP from the drop point into its settled cell.
+      const newId = `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      recordDrop(newId, activeRect);
+      // Grid acknowledges the landing.
+      emitGridRipple(dropCenterX, dropCenterY, RIPPLE.drop);
+
       dispatch({
         type: "ADD_WIDGET",
         widget: {
-          id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          id: newId,
           type,
           position: { col: Math.max(0, col), row: Math.max(0, row) },
           size: meta.defaultSize,
@@ -142,6 +181,9 @@ export default function Home() {
       const widgetEl = document.querySelector(`[data-widget-id="${id}"]`) as HTMLElement | null;
       if (widgetEl) {
         setIsConsuming(true);
+        // Grid recoils where the widget was discarded — a fast red collapse.
+        const wr = widgetEl.getBoundingClientRect();
+        emitGridRipple(wr.left + wr.width / 2, wr.top + wr.height / 2, RIPPLE.discard);
         const clipStages = [
           "polygon(0% 0%, 12% 0%, 25% 0%, 37% 0%, 50% 0%, 62% 0%, 75% 0%, 87% 0%, 100% 0%, 100% 100%, 0% 100%)",
           "polygon(0% 35%, 12% 30%, 25% 40%, 37% 33%, 50% 38%, 62% 31%, 75% 42%, 87% 34%, 100% 35%, 100% 100%, 0% 100%)",
@@ -201,6 +243,17 @@ export default function Home() {
       id: widget.id,
       position: target,
     });
+
+    // Grid acknowledges a reposition too — a touch softer than a fresh drop,
+    // since nothing was created, just moved. Emanates from where it was released.
+    const movedRect = active.rect.current.translated;
+    if (movedRect) {
+      emitGridRipple(
+        movedRect.left + movedRect.width / 2,
+        movedRect.top + movedRect.height / 2,
+        RIPPLE.move,
+      );
+    }
   }
 
   if (breakpoint === "mobile") {
@@ -231,6 +284,7 @@ export default function Home() {
       sensors={sensors}
       modifiers={modifiers}
       onDragStart={handleDragStart}
+      onDragMove={handleDragMove}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >

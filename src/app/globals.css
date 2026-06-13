@@ -24,6 +24,18 @@
   --text-caption: clamp(0.65rem, 0.8vw, 0.75rem);
   --text-micro: clamp(0.5rem, 0.7vw, 0.625rem);
   --text-widget-title: clamp(0.8125rem, 1vw, 0.9375rem);
+
+  /* --- Motion tokens — mirror src/lib/motion.ts. Keep the two in sync. --- */
+  /* Easing, named by intent (see motion.ts for the rationale). */
+  --ease-pop: cubic-bezier(0.22, 1, 0.36, 1); /* settle / snap — primary UI */
+  --ease-reveal: cubic-bezier(0.16, 1, 0.3, 1); /* content entrances */
+  --ease-exit: cubic-bezier(0.32, 0, 0.18, 1); /* closes */
+  /* Duration scale, named by role. */
+  --dur-instant: 120ms;
+  --dur-fast: 200ms;
+  --dur-base: 360ms;
+  --dur-slow: 600ms;
+  --dur-narrative: 760ms;
 }
 
 @theme inline {
@@ -196,6 +208,21 @@ body {
 .ghost-border {
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 12px;
+}
+
+/* Text-link motion affordance — a small lean toward the action on hover, on
+   the shared token timing. Opt-in (not every data-cursor="link" wants it; many
+   are cards/buttons with their own motion). Pairs with a color transition. */
+.link-nudge {
+  transition: transform var(--dur-fast) var(--ease-pop), color var(--dur-fast) ease;
+}
+.link-nudge:hover {
+  transform: translateX(3px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .link-nudge:hover {
+    transform: none;
+  }
 }
 
 /* Grid overlay lines */
@@ -530,10 +557,10 @@ body[data-detail-theme="minimal"] .detail-close-btn {
     0 4px 10px rgba(0, 0, 0, 0.18),
     inset 1px 1px 0 rgba(255, 255, 255, 0.16);
   transition:
-    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 420ms var(--ease-pop),
     opacity 180ms ease,
     border-color 0.3s ease,
-    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow 0.35s var(--ease-pop);
 }
 
 /* While the mouse is actively tilting the card, shorten the transform
@@ -546,7 +573,7 @@ body[data-detail-theme="minimal"] .detail-close-btn {
     transform 90ms ease-out,
     opacity 180ms ease,
     border-color 0.3s ease,
-    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow 0.35s var(--ease-pop);
 }
 
 .project-card:hover {
@@ -642,7 +669,7 @@ body[data-detail-theme="minimal"] .detail-close-btn {
   line-height: 1.5;
   transition:
     opacity 260ms ease 140ms,
-    max-height 380ms cubic-bezier(0.22, 1, 0.36, 1);
+    max-height 380ms var(--ease-pop);
 }
 
 .project-card:hover .card-description {
@@ -672,7 +699,7 @@ body[data-detail-theme="minimal"] .detail-close-btn {
   opacity: 0;
   transform: translate(-8px, -50%);
   /* Hold at opacity 0 while the panel is expanding (~720ms), then ease in. */
-  animation: filter-sidebar-in 380ms cubic-bezier(0.22, 1, 0.36, 1) 720ms forwards;
+  animation: filter-sidebar-in 380ms var(--ease-pop) 720ms forwards;
 }
 
 /* When the panel starts its close animation, fade the portaled sidebar
@@ -790,7 +817,7 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
 .hero-tilt-reset .hero-layer-bg,
 .hero-tilt-reset .hero-layer-mid,
 .hero-tilt-reset .hero-layer-fg {
-  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 520ms var(--ease-pop);
 }
 
 /* Skill pill */
@@ -1152,8 +1179,8 @@ body[data-detail-theme="sublime"] .detail-scroll {
   border-radius: var(--hf-radius);
   box-shadow: var(--hf-x) var(--hf-y) 0 0 color-mix(in oklab, var(--hf-color) 60%, #000);
   transition:
-    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+    transform 0.22s var(--ease-pop),
+    box-shadow 0.22s var(--ease-pop);
 }
 /* Lift straight up + grow while the block deepens — reads as peeling off the
    page. The block stays directly below the element (Ambit-style bottom shadow,
@@ -1189,8 +1216,8 @@ body[data-detail-theme="sublime"] .detail-scroll {
 .m-rise.is-in {
   opacity: 1;
   transform: none;
-  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.55s var(--ease-pop),
+    transform 0.55s var(--ease-pop);
 }
 @media (prefers-reduced-motion: reduce) {
   .m-rise { opacity: 1; transform: none; }
@@ -1327,7 +1354,7 @@ html:not(.cc-active) [data-cursor="compare"] {
   background: transparent;
   color: var(--cc-accent);
   box-shadow: var(--cc-halo), var(--cc-glow);
-  animation: cc-pop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: cc-pop 0.22s var(--ease-pop);
   white-space: nowrap;
   font-family: var(--font-mono);
   font-size: 10px;
@@ -1336,7 +1363,7 @@ html:not(.cc-active) [data-cursor="compare"] {
   text-transform: uppercase;
   line-height: 1;
   user-select: none;
-  transition: scale 0.18s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s ease;
+  transition: scale 0.18s var(--ease-pop), opacity 0.2s ease;
 }
 
 /* Pill states: ring expands into a frosted label */
@@ -1364,7 +1391,8 @@ html:not(.cc-active) [data-cursor="compare"] {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-/* The dot recedes while a pill is showing */
+/* The dot fully recedes while a pill is showing — the pill is the pointer now,
+   so a second dot parked over the label only muddies the text. */
 .cc-layer[data-state="widget"] .cc-dot,
 .cc-layer[data-state="widget-drag"] .cc-dot,
 .cc-layer[data-state="link"] .cc-dot,
@@ -1376,8 +1404,7 @@ html:not(.cc-active) [data-cursor="compare"] {
 .cc-layer[data-state="compare"] .cc-dot,
 .cc-layer[data-state="copy"] .cc-dot,
 .cc-layer[data-state="download"] .cc-dot {
-  width: 4px;
-  height: 4px;
+  opacity: 0;
 }
 
 /* Generic buttons + icon-only rings (prev / next / close): the ring grows and
@@ -1398,8 +1425,7 @@ html:not(.cc-active) [data-cursor="compare"] {
 .cc-layer[data-state="prev"] .cc-dot,
 .cc-layer[data-state="next"] .cc-dot,
 .cc-layer[data-state="close"] .cc-dot {
-  width: 4px;
-  height: 4px;
+  opacity: 0;
 }
 
 /* Mid-drag: ring hugs the dot */

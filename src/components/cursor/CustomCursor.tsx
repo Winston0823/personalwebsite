@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { LERP } from "@/lib/motion";
 import {
   CursorClick,
   HandGrabbing,
@@ -34,9 +35,8 @@ import {
  * a dnd-kit drag is the dragged element itself, so attributes can't be
  * trusted mid-drag).
  *
- * Learn-then-quiet: "Inspect" / "Pick up" labels show until the visitor has
- * performed each action LEARN_THRESHOLD times (tracked in localStorage via
- * `cursor-action` CustomEvents), then the pill decays to icons only.
+ * Pills always carry their label — the affordance text is the whole point of
+ * the cursor, so it stays predictable rather than decaying per-visitor.
  *
  * Touch devices: `(pointer: fine)` gates everything — no class on <html>,
  * no rendered cursor, native behavior untouched.
@@ -88,25 +88,8 @@ function isTextTarget(el: Element | null): boolean {
   );
 }
 
-const LEARN_KEY = "winston-cursor-learned-v1";
-const LEARN_THRESHOLD = 3;
 /** Per-frame lerp factor for the trailing ring (~60fps). */
-const RING_EASE = 0.18;
-
-type Learned = { inspect: number; pickup: number };
-
-function readLearned(): Learned {
-  try {
-    const raw = localStorage.getItem(LEARN_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      return { inspect: parsed.inspect ?? 0, pickup: parsed.pickup ?? 0 };
-    }
-  } catch {
-    /* private mode etc. — labels just stay on */
-  }
-  return { inspect: 0, pickup: 0 };
-}
+const RING_EASE = LERP.cursor;
 
 const ICON_SIZE = 12;
 
@@ -120,7 +103,6 @@ export default function CustomCursor() {
   const [enabled, setEnabled] = useState(false);
   const [state, setState] = useState<CursorState>("hidden");
   const [pressed, setPressed] = useState(false);
-  const [learned, setLearned] = useState<Learned>({ inspect: 0, pickup: 0 });
   // Per-project palette — mirrors the nearest [data-cursor-theme] ancestor so
   // the cursor can recolor itself to match a case study (e.g. USC gold).
   const [theme, setTheme] = useState<string | null>(null);
@@ -134,7 +116,6 @@ export default function CustomCursor() {
     if (!window.matchMedia("(pointer: fine)").matches) return;
 
     setEnabled(true);
-    setLearned(readLearned());
     document.documentElement.classList.add("cc-active");
 
     // Reduced motion: ring snaps to the pointer instead of trailing.
@@ -215,27 +196,11 @@ export default function CustomCursor() {
     const onDown = () => setPressed(true);
     const onUp = () => setPressed(false);
 
-    // Inspect / pickup completions, dispatched from page.tsx.
-    const onAction = (e: Event) => {
-      const kind = (e as CustomEvent<keyof Learned>).detail;
-      if (kind !== "inspect" && kind !== "pickup") return;
-      setLearned((prev) => {
-        const next = { ...prev, [kind]: prev[kind] + 1 };
-        try {
-          localStorage.setItem(LEARN_KEY, JSON.stringify(next));
-        } catch {
-          /* ignore */
-        }
-        return next;
-      });
-    };
-
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerdown", onDown, { passive: true });
     window.addEventListener("pointerup", onUp, { passive: true });
     document.documentElement.addEventListener("mouseleave", onLeave);
     window.addEventListener("blur", onLeave);
-    window.addEventListener("cursor-action", onAction);
 
     return () => {
       cancelAnimationFrame(raf);
@@ -245,14 +210,10 @@ export default function CustomCursor() {
       window.removeEventListener("pointerup", onUp);
       document.documentElement.removeEventListener("mouseleave", onLeave);
       window.removeEventListener("blur", onLeave);
-      window.removeEventListener("cursor-action", onAction);
     };
   }, []);
 
   if (!enabled) return null;
-
-  const inspectLearned = learned.inspect >= LEARN_THRESHOLD;
-  const pickupLearned = learned.pickup >= LEARN_THRESHOLD;
 
   const content = (() => {
     switch (state) {
@@ -260,17 +221,17 @@ export default function CustomCursor() {
         return (
           <>
             <CursorClick size={ICON_SIZE} weight="fill" />
-            {!inspectLearned && <span>Inspect</span>}
+            <span>Inspect</span>
             <span className="cc-sep" />
             <HandGrabbing size={ICON_SIZE} weight="fill" />
-            {!pickupLearned && <span>Pick up</span>}
+            <span>Pick up</span>
           </>
         );
       case "widget-drag":
         return (
           <>
             <HandGrabbing size={ICON_SIZE} weight="fill" />
-            {!pickupLearned && <span>Pick up</span>}
+            <span>Pick up</span>
           </>
         );
       case "link":

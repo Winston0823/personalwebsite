@@ -66,7 +66,7 @@ export default function TrashZone({ isDragging, isOver, isConsuming }: TrashZone
         zIndex: 45,
         opacity: isDragging ? 1 : 0,
         pointerEvents: isDragging ? "auto" : "none",
-        transition: "height 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease",
+        transition: "height var(--dur-base) var(--ease-pop), opacity 0.3s ease",
       }}
     >
       {/* SVG gooey filter definition */}

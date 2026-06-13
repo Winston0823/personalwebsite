@@ -62,7 +62,7 @@ export default function ContactDetail() {
         <a
           href={`mailto:${personalInfo.email}`}
           data-cursor="link"
-          className="flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
+          className="link-nudge flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
           style={{ fontSize: "var(--text-body)" }}
         >
           <span className="text-text-secondary">
@@ -76,7 +76,7 @@ export default function ContactDetail() {
             target="_blank"
             rel="noopener noreferrer"
             data-cursor="link"
-            className="flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
+            className="link-nudge flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
             style={{ fontSize: "var(--text-body)" }}
           >
             <span className="text-text-secondary">
@@ -91,7 +91,7 @@ export default function ContactDetail() {
             target="_blank"
             rel="noopener noreferrer"
             data-cursor="link"
-            className="flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
+            className="link-nudge flex items-center gap-3 text-text-primary hover:text-accent transition-colors"
             style={{ fontSize: "var(--text-body)" }}
           >
             <span className="text-text-secondary">

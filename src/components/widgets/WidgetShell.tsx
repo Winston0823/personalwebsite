@@ -4,6 +4,8 @@ import { useDraggable } from "@dnd-kit/core";
 import { WidgetInstance } from "@/lib/grid-types";
 import { ReactNode, useRef, useEffect, useState } from "react";
 import anime from "animejs";
+import { DUR, EASE, STAGGER } from "@/lib/motion";
+import { takeDrop } from "@/lib/flip-drops";
 
 interface WidgetShellProps {
   widget: WidgetInstance;
@@ -28,6 +30,11 @@ export default function WidgetShell({
 }: WidgetShellProps) {
   const shellRef = useRef<HTMLDivElement>(null);
   const [hasEntered, setHasEntered] = useState(skipEntrance);
+  // Cached drop-origin rect for the FLIP entrance. `undefined` = not yet
+  // checked; once checked it holds the rect (or null). Caching in a ref so the
+  // one-shot takeDrop() isn't lost to React StrictMode's double effect invoke —
+  // the first invoke consumes the rect, the second re-runs the FLIP from cache.
+  const flipFrom = useRef<{ left: number; top: number; width: number; height: number } | null | undefined>(undefined);
   const wasDragging = useRef(false);
   const [justDropped, setJustDropped] = useState(false);
   const { attributes, listeners, setNodeRef, transform, isDragging } =
@@ -48,8 +55,53 @@ export default function WidgetShell({
 
   // Entrance animation — only on initial page load
   useEffect(() => {
-    if (skipEntrance || !shellRef.current) return;
     const el = shellRef.current;
+    if (!el) return;
+
+    // Spatial continuity: a widget just dropped from the drawer FLIPs from the
+    // drop point into its settled cell, instead of popping in. Takes priority
+    // over (and replaces) the skip-entrance no-op for added widgets.
+    //
+    // Consume the one-shot drop rect exactly once, then cache it — so the FLIP
+    // still runs on StrictMode's second effect invoke (where takeDrop would
+    // otherwise return undefined and leave the widget frozen mid-shrink).
+    if (flipFrom.current === undefined) {
+      flipFrom.current = takeDrop(widget.id) ?? null;
+    }
+    const dropFrom = flipFrom.current;
+    if (dropFrom) {
+      const cell = el.getBoundingClientRect();
+      if (cell.width && cell.height) {
+        const tx = dropFrom.left - cell.left;
+        const ty = dropFrom.top - cell.top;
+        const sx = dropFrom.width / cell.width;
+        const sy = dropFrom.height / cell.height;
+        setHasEntered(true); // let anime's transform own the element (no wrapper transform)
+        const animation = anime({
+          targets: el,
+          translateX: [tx, 0],
+          translateY: [ty, 0],
+          scaleX: [sx, 1],
+          scaleY: [sy, 1],
+          opacity: [0.4, 1],
+          duration: DUR.slow,
+          easing: EASE.pop.anime,
+          // Hand the element back to React: clear the inline transform/opacity
+          // so a paused or completed FLIP never leaves it stuck scaled/faded.
+          complete: () => {
+            el.style.transform = "";
+            el.style.opacity = "";
+          },
+        });
+        return () => {
+          animation.pause();
+          el.style.transform = "";
+          el.style.opacity = "";
+        };
+      }
+    }
+
+    if (skipEntrance) return;
 
     el.style.opacity = "0";
     el.style.transform = "translateY(20px) scale(0.95)";
@@ -59,8 +111,8 @@ export default function WidgetShell({
       opacity: [0, 1],
       translateY: [20, 0],
       scale: [0.95, 1],
-      duration: 600,
-      delay: index * 80 + 100,
+      duration: DUR.slow,
+      delay: index * STAGGER.widget + 100,
       easing: "easeOutExpo",
       complete: () => setHasEntered(true),
     });
@@ -112,7 +164,7 @@ export default function WidgetShell({
     transition: isDragging || justDropped
       ? "box-shadow 0.2s ease"
       : hasEntered
-        ? "transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, filter 0.3s ease"
+        ? "transform 0.4s var(--ease-pop), box-shadow 0.3s ease, filter 0.3s ease"
         : "none",
   };
 
@@ -166,7 +218,7 @@ export default function WidgetShell({
         onMouseLeave={handleGlassLeave}
         style={{
           padding: "clamp(8px, 1vw, 16px)",
-          transition: isDragging ? "none" : "transform 0.18s cubic-bezier(0.22, 1, 0.36, 1)",
+          transition: isDragging ? "none" : "transform 0.18s var(--ease-pop)",
           willChange: "transform",
           ...(isDragging ? { animation: "widget-jiggle 0.25s ease-in-out infinite" } : {}),
         }}
