@@ -1100,7 +1100,7 @@ function MinimalCaseStudy({
       >
         <button
           onClick={onBack}
-          className="text-white/55 hover:text-white transition-colors cursor-pointer"
+          className="cs-back-top text-white/55 hover:text-white transition-colors cursor-pointer"
           style={{ fontFamily: "var(--font-mono)" }}
         >
           ← all projects
@@ -1767,8 +1767,13 @@ function ProjectGrid({
 
 /* ── Main Component ── */
 
-export default function ProjectsDetail() {
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+export default function ProjectsDetail({ initialProjectId }: { initialProjectId?: string }) {
+  // When opened from a mobile project card we deep-link straight into that
+  // project's case study (skipping the grid). Seed from the initializer so the
+  // grid never flashes for a frame before the swap.
+  const [selectedProject, setSelectedProject] = useState<Project | null>(
+    () => (initialProjectId ? projects.find((p) => p.id === initialProjectId) ?? null : null)
+  );
   const [filter, setFilter] = useState<FilterValue>("all");
   const rootRef = useRef<HTMLDivElement>(null);
 

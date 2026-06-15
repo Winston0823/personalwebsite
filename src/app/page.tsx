@@ -49,7 +49,7 @@ export default function Home() {
   const [expandOriginRect, setExpandOriginRect] = useState<DOMRect | null>(null);
   // Mobile opens details through a synthetic widget instance (type drives the
   // detail content); no grid position is needed.
-  const [mobileDetail, setMobileDetail] = useState<{ widget: WidgetInstance; rect: DOMRect } | null>(null);
+  const [mobileDetail, setMobileDetail] = useState<{ widget: WidgetInstance; rect: DOMRect; projectId?: string } | null>(null);
   const breakpoint = useBreakpoint();
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -260,10 +260,11 @@ export default function Home() {
     return (
       <main>
         <MobileLayout
-          onOpen={(type, rect) =>
+          onOpen={(type, rect, projectId) =>
             setMobileDetail({
               widget: { id: `m-${type}`, type, position: { col: 0, row: 0 }, size: widgetRegistry[type].defaultSize },
               rect,
+              projectId,
             })
           }
         />
@@ -271,6 +272,7 @@ export default function Home() {
           <DetailOverlay
             widget={mobileDetail.widget}
             originRect={mobileDetail.rect}
+            initialProjectId={mobileDetail.projectId}
             onClose={() => setMobileDetail(null)}
           />
         )}

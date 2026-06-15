@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { artworks } from "@/lib/detail-content";
+import { useBreakpoint } from "@/hooks/useBreakpoint";
+import ImageLightbox, { type LightboxItem } from "@/components/common/ImageLightbox";
 
 const ROW_UNIT = 8;
 const GAP = 12;
@@ -16,6 +18,10 @@ function getColCount(width: number) {
 export default function GalleryDetail() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(1200);
+  // On mobile, tapping a piece zooms it in a lightbox (matching the home
+  // preview) instead of opening the raw image in a new tab.
+  const isMobile = useBreakpoint() === "mobile";
+  const [lightbox, setLightbox] = useState<LightboxItem | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -61,19 +67,14 @@ export default function GalleryDetail() {
             Math.round((renderedHeight + GAP) / (ROW_UNIT + GAP))
           );
 
-          return (
-            <a
-              key={art.id}
-              href={art.image}
-              target="_blank"
-              rel="noreferrer"
-              data-cursor="view"
-              className="group relative block overflow-hidden rounded-xl bg-text-secondary/5 ring-1 ring-black/5 shadow-sm"
-              style={{
-                gridColumn: `span ${colSpan}`,
-                gridRow: `span ${rowSpan}`,
-              }}
-            >
+          const wrapperClass =
+            "group relative block overflow-hidden rounded-xl bg-text-secondary/5 ring-1 ring-black/5 shadow-sm";
+          const wrapperStyle = {
+            gridColumn: `span ${colSpan}`,
+            gridRow: `span ${rowSpan}`,
+          };
+          const inner = (
+            <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={art.image}
@@ -91,10 +92,34 @@ export default function GalleryDetail() {
                   {art.title}
                 </p>
               </div>
+            </>
+          );
+
+          return isMobile ? (
+            <button
+              key={art.id}
+              onClick={() => setLightbox({ image: art.image, title: art.title })}
+              className={`${wrapperClass} cursor-pointer text-left`}
+              style={wrapperStyle}
+            >
+              {inner}
+            </button>
+          ) : (
+            <a
+              key={art.id}
+              href={art.image}
+              target="_blank"
+              rel="noreferrer"
+              data-cursor="view"
+              className={wrapperClass}
+              style={wrapperStyle}
+            >
+              {inner}
             </a>
           );
         })}
       </div>
+      <ImageLightbox item={lightbox} onClose={() => setLightbox(null)} />
     </div>
   );
 }

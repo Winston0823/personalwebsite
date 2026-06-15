@@ -126,7 +126,7 @@ export default function CrtHero({
         </div>
 
         {/* Back */}
-        <button onClick={onBack} className="absolute top-5 left-6 z-40 text-white/75 hover:text-white transition-colors"
+        <button onClick={onBack} className="cs-back-top absolute top-5 left-6 z-40 text-white/75 hover:text-white transition-colors"
                 style={{ fontFamily: "var(--font-mono)", fontSize: "0.85rem", cursor: "pointer" }}>
           ← all projects
         </button>

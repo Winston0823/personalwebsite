@@ -291,7 +291,7 @@ export default function AwlCinematic({
 
         <button
           onClick={onBack}
-          className="absolute top-5 left-6 z-40 text-white/70 hover:text-white transition-colors cursor-pointer"
+          className="cs-back-top absolute top-5 left-6 z-40 text-white/70 hover:text-white transition-colors cursor-pointer"
           style={{ fontFamily: "var(--font-mono)", fontSize: "0.85rem" }}
         >
           ← all projects
