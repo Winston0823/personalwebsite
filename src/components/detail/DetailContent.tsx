@@ -11,6 +11,9 @@ import NowPlayingDetail from "./details/NowPlayingDetail";
 
 interface DetailContentProps {
   widgetType: WidgetType;
+  /* Optional deep-link target — used by mobile project cards to open a
+     specific project's case study directly. */
+  initialProjectId?: string;
 }
 
 const detailMap: Partial<Record<WidgetType, React.ComponentType>> = {
@@ -23,7 +26,11 @@ const detailMap: Partial<Record<WidgetType, React.ComponentType>> = {
   nowPlaying: NowPlayingDetail,
 };
 
-export default function DetailContent({ widgetType }: DetailContentProps) {
+export default function DetailContent({ widgetType, initialProjectId }: DetailContentProps) {
+  if (widgetType === "projects") {
+    return <ProjectsDetail initialProjectId={initialProjectId} />;
+  }
+
   const Component = detailMap[widgetType];
 
   if (!Component) return null;

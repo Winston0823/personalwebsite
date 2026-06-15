@@ -135,7 +135,7 @@ export default function UscCinematic({
       {/* Back button — pinned over the stage */}
       <button
         onClick={onBack}
-        className="fixed top-5 left-6 z-50 flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+        className="cs-back-top fixed top-5 left-6 z-50 flex items-center gap-1 cursor-pointer hover:opacity-80 transition-opacity"
         style={{ fontFamily: "var(--font-mono)", fontSize: "0.8rem", color: "rgba(255,255,255,0.8)", textShadow: "0 1px 6px rgba(0,0,0,0.8)" }}
       >
         ← all projects

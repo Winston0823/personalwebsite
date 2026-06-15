@@ -11,9 +11,12 @@ interface DetailOverlayProps {
   widget: WidgetInstance;
   originRect: DOMRect;
   onClose: () => void;
+  /* Mobile deep-link: open the projects overlay straight on this project's
+     case study instead of the grid. */
+  initialProjectId?: string;
 }
 
-export default function DetailOverlay({ widget, originRect, onClose }: DetailOverlayProps) {
+export default function DetailOverlay({ widget, originRect, onClose, initialProjectId }: DetailOverlayProps) {
   const backdropRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -23,13 +26,23 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
   // Whether a child has requested the fullscreen case-study layout. Declared
   // here (above handleClose) so the close handler can branch its exit path on
   // it without a stale-closure read.
-  const [caseStudyMode, setCaseStudyMode] = useState(false);
+  // Deep-linking from a mobile project card lands directly in the case study,
+  // so start in case-study mode (header hidden, floating close shown). The
+  // event that normally flips this fires from the child on mount — which on a
+  // deep-link races ahead of this parent's listener and gets missed.
+  const [caseStudyMode, setCaseStudyMode] = useState(!!initialProjectId);
+
+  // On mobile the detail panel is a full-screen page, not a floating card —
+  // a gutter'd popup reads as "still a widget" on a phone. On desktop it keeps
+  // the generous pop-out rect.
+  const isMobile = window.innerWidth <= 767;
+  const panelRadius = isMobile ? 0 : 24;
 
   // Target panel dimensions — generous so the panel feels like it "pops out" past the widget
-  const targetWidth = Math.min(window.innerWidth * 0.92, 1200);
-  const targetHeight = Math.min(window.innerHeight * 0.9, 900);
-  const targetLeft = (window.innerWidth - targetWidth) / 2;
-  const targetTop = (window.innerHeight - targetHeight) / 2;
+  const targetWidth = isMobile ? window.innerWidth : Math.min(window.innerWidth * 0.92, 1200);
+  const targetHeight = isMobile ? window.innerHeight : Math.min(window.innerHeight * 0.9, 900);
+  const targetLeft = isMobile ? 0 : (window.innerWidth - targetWidth) / 2;
+  const targetTop = isMobile ? 0 : (window.innerHeight - targetHeight) / 2;
 
   // Hide the source widget
   useEffect(() => {
@@ -57,7 +70,7 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
     panel.style.top = `${targetTop}px`;
     panel.style.width = `${targetWidth}px`;
     panel.style.height = `${targetHeight}px`;
-    panel.style.borderRadius = "24px";
+    panel.style.borderRadius = `${panelRadius}px`;
 
     const tx = originRect.left - targetLeft;
     const ty = originRect.top - targetTop;
@@ -241,7 +254,7 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
         top: goFull ? 0 : targetTop,
         width: goFull ? window.innerWidth : targetWidth,
         height: goFull ? window.innerHeight : targetHeight,
-        borderRadius: goFull ? 0 : 24,
+        borderRadius: goFull ? 0 : panelRadius,
         duration: 520,
         easing: EASE.pop.anime,
       });
@@ -308,7 +321,7 @@ export default function DetailOverlay({ widget, originRect, onClose }: DetailOve
             ref={contentRef}
             className={`detail-scroll flex-1 px-10 pb-16 min-h-0 ${caseStudyMode ? "pt-9" : "pt-5"}`}
           >
-            <DetailContent widgetType={widget.type} />
+            <DetailContent widgetType={widget.type} initialProjectId={initialProjectId} />
           </div>
         </div>
       </div>

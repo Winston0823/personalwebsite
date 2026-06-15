@@ -93,6 +93,52 @@ body {
   .name-poster {
     font-size: clamp(60px, 16vw, 92px);
   }
+
+  /* Mobile case studies are reached by deep-link from the home gallery and
+   * exit via the floating close (X), so the top-left "← all projects" back
+   * link is redundant chrome — hide it on phones. The bottom-of-page back
+   * links stay as end-of-page nav. */
+  .cs-back-top {
+    display: none;
+  }
+}
+
+/* Swipeable horizontal strips (e.g. the mobile Hiking photos) — clean edge,
+   no scrollbar chrome. */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Now-playing equalizer — bars bounce at staggered phases so it reads as
+   live audio rather than a static glyph. */
+.eq-bar {
+  width: 3px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--color-accent);
+  transform-origin: bottom;
+  animation: eq-bounce 850ms ease-in-out infinite;
+}
+@keyframes eq-bounce {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar { animation: none; transform: scaleY(0.6); }
+}
+
+/* Gallery lightbox enter */
+@keyframes lb-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes lb-pop {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* Liquid glass for edge-anchored panels (drawers) — no pseudo-element leak.
