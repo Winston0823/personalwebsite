@@ -30,6 +30,21 @@ const clash = localFont({
   display: "swap",
 });
 
+// Ambit's real type pairing, self-hosted from the Ambit app's own font files
+// (constants/theme.ts → Zodiak-Bold display, PlusJakartaSans body). Scoped to
+// the Ambit case study.
+const zodiak = localFont({
+  src: [{ path: "../../public/fonts/Zodiak-Bold.otf", weight: "700", style: "normal" }],
+  variable: "--font-zodiak",
+  display: "swap",
+});
+
+const jakarta = localFont({
+  src: [{ path: "../../public/fonts/PlusJakartaSans-Regular.otf", weight: "400", style: "normal" }],
+  variable: "--font-jakarta",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Winston Gu",
   description: "Developer & Designer",
@@ -41,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full ${plein.variable} ${switzer.variable} ${clash.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`h-full ${plein.variable} ${switzer.variable} ${clash.variable} ${zodiak.variable} ${jakarta.variable}`} suppressHydrationWarning>
       <head>
         {/* Adobe Fonts (Typekit) — Astronef Std Super, used by the AWL poster */}
         <link rel="stylesheet" href="https://use.typekit.net/ovr8aqn.css" />

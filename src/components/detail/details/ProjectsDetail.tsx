@@ -9,6 +9,7 @@ import SectionLabel from "./SectionLabel";
 import AwlCinematic from "./awl/AwlCinematic";
 import SublimeCinematic from "./sublime/SublimeCinematic";
 import UscCinematic from "./usc/UscCinematic";
+import AmbitCinematic from "./ambit/AmbitCinematic";
 import ComingSoonDetail from "./ComingSoonDetail";
 
 type FilterValue = "all" | "games" | "ui-ux" | "entrepreneurship";
@@ -1483,6 +1484,9 @@ function ProjectCaseStudy({
   }
   if (project.heroStyle === "usc") {
     return <UscCinematic project={project} onBack={onBack} />;
+  }
+  if (project.heroStyle === "ambit") {
+    return <AmbitCinematic project={project} onBack={onBack} />;
   }
   if (project.heroStyle === "minimal") {
     return <MinimalCaseStudy project={project} onBack={onBack} />;

@@ -1162,6 +1162,29 @@ body[data-detail-theme="sublime"] .detail-scroll {
   scroll-behavior: smooth;
 }
 
+/* ── Ambit theme (heroStyle "ambit") — Ambit ink ground ─────────────────── */
+body[data-detail-theme="ambit"] .detail-panel,
+body[data-detail-theme="ambit"] .detail-panel.is-settled {
+  background: #1c1c1a;
+  border-color: rgba(255, 255, 255, 0.06);
+  text-shadow: none;
+  box-shadow: 0 8px 60px rgba(0, 0, 0, 0.6), 0 2px 20px rgba(0, 0, 0, 0.4);
+}
+body[data-detail-theme="ambit"] .detail-panel::before,
+body[data-detail-theme="ambit"] .detail-panel::after {
+  display: none;
+}
+body[data-detail-theme="ambit"] .detail-close-btn {
+  right: 22px !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #fff !important;
+}
+body[data-detail-theme="ambit"] .detail-scroll {
+  padding: 0 !important;
+  scroll-behavior: smooth;
+}
+
 /* Scroll cue bob (shared, transform-only — no rotation). */
 @keyframes sublime-bob {
   0%, 100% { transform: translateY(-4px); }

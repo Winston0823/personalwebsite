@@ -126,7 +126,7 @@ export interface Project {
    *   - "awl": bespoke 3-act cinematic experience (heart-slice hero → demo-reel
    *     parallax → floating 3D katana). Project-specific to Assassin's Weakness
    *     is Love; folds the existing case-study prose into the katana act. */
-  heroStyle?: "full-bleed" | "editorial" | "minimal" | "awl" | "sublime" | "usc";
+  heroStyle?: "full-bleed" | "editorial" | "minimal" | "awl" | "sublime" | "usc" | "ambit";
   /** Path to a game-engine or platform icon (SVG) rendered to the LEFT of
    *  the editorial header title. E.g. "/icons/unity.svg". White or
    *  currentColor recommended so it reads on the dark detail panel. */
