@@ -6,7 +6,8 @@ export type WidgetType =
   | "nowPlaying"
   | "resume"
   | "contact"
-  | "gallery";
+  | "gallery"
+  | "hiking";
 
 export interface GridPosition {
   col: number;

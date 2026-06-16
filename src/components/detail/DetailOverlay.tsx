@@ -30,19 +30,23 @@ export default function DetailOverlay({ widget, originRect, onClose, initialProj
   // so start in case-study mode (header hidden, floating close shown). The
   // event that normally flips this fires from the child on mount — which on a
   // deep-link races ahead of this parent's listener and gets missed.
-  const [caseStudyMode, setCaseStudyMode] = useState(!!initialProjectId);
+  const [caseStudyMode, setCaseStudyMode] = useState(!!initialProjectId || widget.type === "hiking");
 
   // On mobile the detail panel is a full-screen page, not a floating card —
   // a gutter'd popup reads as "still a widget" on a phone. On desktop it keeps
   // the generous pop-out rect.
   const isMobile = window.innerWidth <= 767;
-  const panelRadius = isMobile ? 0 : 24;
+  // Some widgets are immersive experiences that should grow straight to full
+  // viewport in one FLIP, rather than popping out to a card first.
+  const opensFullscreen = widget.type === "hiking";
+  const fillViewport = isMobile || opensFullscreen;
+  const panelRadius = fillViewport ? 0 : 24;
 
   // Target panel dimensions — generous so the panel feels like it "pops out" past the widget
-  const targetWidth = isMobile ? window.innerWidth : Math.min(window.innerWidth * 0.92, 1200);
-  const targetHeight = isMobile ? window.innerHeight : Math.min(window.innerHeight * 0.9, 900);
-  const targetLeft = isMobile ? 0 : (window.innerWidth - targetWidth) / 2;
-  const targetTop = isMobile ? 0 : (window.innerHeight - targetHeight) / 2;
+  const targetWidth = fillViewport ? window.innerWidth : Math.min(window.innerWidth * 0.92, 1200);
+  const targetHeight = fillViewport ? window.innerHeight : Math.min(window.innerHeight * 0.9, 900);
+  const targetLeft = fillViewport ? 0 : (window.innerWidth - targetWidth) / 2;
+  const targetTop = fillViewport ? 0 : (window.innerHeight - targetHeight) / 2;
 
   // Hide the source widget
   useEffect(() => {

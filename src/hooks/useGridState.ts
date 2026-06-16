@@ -18,7 +18,7 @@ const STORAGE_VERSION_KEY = "portfolio-grid-state-version";
 // existing visitors' saved layouts (size/position adjustments, new widgets,
 // removed widgets). Visitors with a different stored version get the new
 // defaults on next load; their old layout is discarded.
-const STORAGE_VERSION = 2;
+const STORAGE_VERSION = 3;
 
 function isInBounds(position: GridPosition, size: WidgetSize): boolean {
   return (

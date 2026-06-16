@@ -7,6 +7,7 @@ import NowPlayingWidget from "@/components/widgets/NowPlayingWidget";
 import ResumeWidget from "@/components/widgets/ResumeWidget";
 import ContactWidget from "@/components/widgets/ContactWidget";
 import GalleryWidget from "@/components/widgets/GalleryWidget";
+import HikingWidget from "@/components/widgets/HikingWidget";
 
 export const widgetComponents: Record<WidgetType, React.ComponentType> = {
   name: NameWidget,
@@ -17,4 +18,5 @@ export const widgetComponents: Record<WidgetType, React.ComponentType> = {
   resume: ResumeWidget,
   contact: ContactWidget,
   gallery: GalleryWidget,
+  hiking: HikingWidget,
 };

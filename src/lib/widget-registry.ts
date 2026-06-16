@@ -16,4 +16,5 @@ export const widgetRegistry: Record<WidgetType, WidgetMeta> = {
   resume: { label: "Experience", defaultSize: { cols: 3, rows: 3 }, minSize: { cols: 2, rows: 2 }, maxSize: { cols: 4, rows: 5 } },
   contact: { label: "Contact", defaultSize: { cols: 3, rows: 2 }, minSize: { cols: 2, rows: 1 }, maxSize: { cols: 3, rows: 3 } },
   gallery: { label: "Gallery", defaultSize: { cols: 3, rows: 2 }, minSize: { cols: 2, rows: 2 }, maxSize: { cols: 5, rows: 4 } },
+  hiking: { label: "Hiking", defaultSize: { cols: 4, rows: 2 }, minSize: { cols: 3, rows: 2 }, maxSize: { cols: 5, rows: 3 } },
 };

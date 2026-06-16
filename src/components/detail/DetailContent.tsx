@@ -8,6 +8,7 @@ import ResumeDetail from "./details/ResumeDetail";
 import GalleryDetail from "./details/GalleryDetail";
 import ContactDetail from "./details/ContactDetail";
 import NowPlayingDetail from "./details/NowPlayingDetail";
+import HikingDetail from "./details/HikingDetail";
 
 interface DetailContentProps {
   widgetType: WidgetType;
@@ -24,6 +25,7 @@ const detailMap: Partial<Record<WidgetType, React.ComponentType>> = {
   gallery: GalleryDetail,
   contact: ContactDetail,
   nowPlaying: NowPlayingDetail,
+  hiking: HikingDetail,
 };
 
 export default function DetailContent({ widgetType, initialProjectId }: DetailContentProps) {
