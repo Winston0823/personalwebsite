@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/next";
 import GradientBackground from "@/components/background/GradientBackground";
 import DesktopChrome from "@/components/background/DesktopChrome";
 import "./globals.css";
@@ -65,6 +66,7 @@ export default function RootLayout({
         <GradientBackground />
         <DesktopChrome />
         <div className="relative z-10">{children}</div>
+        <Analytics />
       </body>
     </html>
   );
