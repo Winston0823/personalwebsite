@@ -16,6 +16,7 @@ import {
   X,
   Copy,
   DownloadSimple,
+  ArrowCounterClockwise,
 } from "@phosphor-icons/react";
 
 /**
@@ -61,6 +62,7 @@ type CursorState =
   | "close" // close buttons, overlay backdrop
   | "copy" // copy-to-clipboard (reserved — no target ships yet)
   | "download" // résumé / file download triggers
+  | "reset" // reset-widgets control in the grid's top-right corner
   | "text" // body text — dot collapses into a caret-like vertical line
   | "hidden";
 
@@ -295,6 +297,13 @@ export default function CustomCursor() {
           <>
             <DownloadSimple size={ICON_SIZE} weight="bold" />
             <span>Download</span>
+          </>
+        );
+      case "reset":
+        return (
+          <>
+            <ArrowCounterClockwise size={ICON_SIZE} weight="bold" />
+            <span>Reset widgets</span>
           </>
         );
       // Icon-only rings — no label, glyph centered (styled like `button`).

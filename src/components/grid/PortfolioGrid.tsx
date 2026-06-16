@@ -3,6 +3,7 @@
 import { GRID_COLS, GRID_ROWS, GridAction, GridState } from "@/lib/grid-types";
 import GridOverlay from "./GridOverlay";
 import TrashZone from "./TrashZone";
+import ResetButton from "./ResetButton";
 import WidgetShell from "../widgets/WidgetShell";
 import { widgetComponents } from "@/lib/widget-components";
 import { Dispatch, RefObject, useRef } from "react";
@@ -16,6 +17,7 @@ interface PortfolioGridProps {
   isConsuming: boolean;
   onExpand?: (widget: WidgetInstance, rect: DOMRect) => void;
   expandedWidgetId?: string | null;
+  onReset: () => void;
 }
 
 export default function PortfolioGrid({
@@ -26,6 +28,7 @@ export default function PortfolioGrid({
   isConsuming,
   onExpand,
   expandedWidgetId,
+  onReset,
 }: PortfolioGridProps) {
   // Track initial widget IDs — only those get entrance animations
   const initialIds = useRef<Set<string> | null>(null);
@@ -53,6 +56,7 @@ export default function PortfolioGrid({
         }}
       >
         <GridOverlay visible={state.isDragging} />
+        <ResetButton onReset={onReset} />
         {state.widgets.map((widget, i) => {
           const Component = widgetComponents[widget.type];
           return (

@@ -1446,7 +1446,8 @@ html:not(.cc-active) [data-cursor="compare"] {
 .cc-layer[data-state="play"] .cc-ring,
 .cc-layer[data-state="compare"] .cc-ring,
 .cc-layer[data-state="copy"] .cc-ring,
-.cc-layer[data-state="download"] .cc-ring {
+.cc-layer[data-state="download"] .cc-ring,
+.cc-layer[data-state="reset"] .cc-ring {
   width: auto;
   height: 28px;
   padding: 0 11px;
@@ -1472,7 +1473,8 @@ html:not(.cc-active) [data-cursor="compare"] {
 .cc-layer[data-state="play"] .cc-dot,
 .cc-layer[data-state="compare"] .cc-dot,
 .cc-layer[data-state="copy"] .cc-dot,
-.cc-layer[data-state="download"] .cc-dot {
+.cc-layer[data-state="download"] .cc-dot,
+.cc-layer[data-state="reset"] .cc-dot {
   opacity: 0;
 }
 
@@ -1523,6 +1525,31 @@ html:not(.cc-active) [data-cursor="compare"] {
 .cc-layer[data-state="hidden"] .cc-dot {
   opacity: 0;
   animation: none;
+}
+
+/* Reset control — lives in the grid's top-right corner cell. Quiet by default
+   (muted glyph, no chrome), brightening to the accent on hover. The custom
+   cursor names the action, so the button stays minimal. */
+.reset-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: var(--color-muted, #6b7280);
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  opacity: 0.45;
+  transition: opacity 0.3s ease, color 0.3s ease, transform 0.3s var(--ease-pop);
+}
+.reset-button:hover {
+  opacity: 1;
+  color: var(--cc-accent, #3884ff);
+  transform: rotate(-32deg);
+}
+.reset-button:active {
+  transform: rotate(-90deg) scale(0.9);
 }
 
 /* Body text: the trailing ring fades out and the precise dot stretches into a

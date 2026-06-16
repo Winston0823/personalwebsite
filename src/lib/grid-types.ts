@@ -35,7 +35,8 @@ export type GridAction =
   | { type: "MOVE_WIDGET"; id: string; position: GridPosition }
   | { type: "ADD_WIDGET"; widget: WidgetInstance }
   | { type: "REMOVE_WIDGET"; id: string }
-  | { type: "SET_DRAGGING"; isDragging: boolean };
+  | { type: "SET_DRAGGING"; isDragging: boolean }
+  | { type: "RESET" };
 
 export const GRID_COLS = 16;
 export const GRID_ROWS = 8;

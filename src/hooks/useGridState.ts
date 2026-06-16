@@ -18,7 +18,7 @@ const STORAGE_VERSION_KEY = "portfolio-grid-state-version";
 // existing visitors' saved layouts (size/position adjustments, new widgets,
 // removed widgets). Visitors with a different stored version get the new
 // defaults on next load; their old layout is discarded.
-const STORAGE_VERSION = 3;
+const STORAGE_VERSION = 4;
 
 function isInBounds(position: GridPosition, size: WidgetSize): boolean {
   return (
@@ -72,6 +72,10 @@ function gridReducer(state: GridState, action: GridAction): GridState {
       };
     case "SET_DRAGGING":
       return { ...state, isDragging: action.isDragging };
+    case "RESET":
+      // Restore the default layout — repositions moved widgets and brings back
+      // any that were discarded. Fresh object refs so widgets remount.
+      return { ...state, widgets: defaultWidgets.map((w) => ({ ...w })) };
     default:
       return state;
   }
@@ -207,5 +211,17 @@ export function useGridState() {
     [state.widgets]
   );
 
-  return { state, dispatch, findOpenPosition, findNearestOpenPosition };
+  // Restore the default layout and clear the persisted state. The persist
+  // effect will re-save the defaults on the next tick, so visitors get a clean
+  // slate without a version bump.
+  const reset = useCallback(() => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // Storage unavailable — in-memory reset still applies.
+    }
+    dispatch({ type: "RESET" });
+  }, []);
+
+  return { state, dispatch, findOpenPosition, findNearestOpenPosition, reset };
 }

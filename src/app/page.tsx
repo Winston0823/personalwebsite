@@ -40,7 +40,7 @@ const restrictToWindow: Modifier = ({ transform, activeNodeRect, windowRect }) =
 };
 
 export default function Home() {
-  const { state, dispatch, findNearestOpenPosition } = useGridState();
+  const { state, dispatch, findNearestOpenPosition, reset } = useGridState();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [isOverTrash, setIsOverTrash] = useState(false);
   const [isConsuming, setIsConsuming] = useState(false);
@@ -299,6 +299,7 @@ export default function Home() {
           isConsuming={isConsuming}
           onExpand={handleExpand}
           expandedWidgetId={expandedWidget?.id}
+          onReset={reset}
         />
         <DrawerHandle isOpen={drawerOpen} onClick={() => setDrawerOpen((prev) => !prev)} />
         {drawerOpen && (
