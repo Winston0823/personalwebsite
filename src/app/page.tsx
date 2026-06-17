@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { WidgetInstance } from "@/lib/grid-types";
-import DetailOverlay from "@/components/detail/DetailOverlay";
 import {
   DndContext,
   DragEndEvent,
@@ -29,6 +29,13 @@ import { widgetComponents } from "@/lib/widget-components";
 import { recordDrop } from "@/lib/flip-drops";
 import { emitGridRipple, setGridGlow, clearGridGlow, RIPPLE } from "@/lib/grid-ripple";
 import anime from "animejs";
+
+// DetailOverlay pulls in the entire case-study tree (all cinematics, the large
+// ProjectsDetail, the 3D canvas wrappers). It only renders on click, so it's
+// code-split out of the initial bundle and prefetched on idle (see Home) — the
+// first open is therefore instant, with no visual or behavioural change.
+const loadDetailOverlay = () => import("@/components/detail/DetailOverlay");
+const DetailOverlay = dynamic(loadDetailOverlay, { ssr: false });
 
 const restrictToWindow: Modifier = ({ transform, activeNodeRect, windowRect }) => {
   if (!activeNodeRect || !windowRect) return transform;
@@ -76,6 +83,17 @@ export default function Home() {
     }, 220);
     return () => window.clearTimeout(t);
   }, [breakpoint]);
+
+  // Warm the lazy DetailOverlay chunk once the page is idle, so the first widget
+  // expand opens instantly (no fetch latency on click). Purely a prefetch — no
+  // effect on what renders.
+  useEffect(() => {
+    const w = window as typeof window & {
+      requestIdleCallback?: (cb: () => void) => void;
+    };
+    if (w.requestIdleCallback) w.requestIdleCallback(() => void loadDetailOverlay());
+    else window.setTimeout(() => void loadDetailOverlay(), 1500);
+  }, []);
 
   const sensor = useSensor(PointerSensor, { activationConstraint: { distance: 8 } });
   const sensors = useSensors(sensor);
