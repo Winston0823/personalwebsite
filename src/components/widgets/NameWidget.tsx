@@ -45,10 +45,18 @@ export default function NameWidget() {
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    // Weak devices get the settled static mark too — this skips downloading
-    // vara + hanzi-writer + the hanzi stroke data (all lazy-imported inside
-    // loop() below) AND the per-frame handwriting animation.
-    if (prefersReduced || isPerfLite()) {
+    // Weak devices: render only the English signature as a static SVG — the
+    // exact settled end-state of the vara animation — so we skip downloading
+    // vara + hanzi-writer + the hanzi stroke data (all lazy-imported in loop()
+    // below) AND the per-frame handwriting animation.
+    if (isPerfLite()) {
+      renderCursive(stage);
+      return () => {
+        stage.replaceChildren();
+      };
+    }
+
+    if (prefersReduced) {
       renderStatic(stage);
       return () => {
         stage.replaceChildren();
@@ -294,6 +302,23 @@ export default function NameWidget() {
       </div>
     </div>
   );
+}
+
+/** Lite mark: only the English signature — the settled end-state of the vara
+ *  handwriting animation — served as a static SVG (no libs, no animation,
+ *  centered to match where the live animation sits). */
+function renderCursive(stage: HTMLDivElement) {
+  const wrap = document.createElement("div");
+  wrap.style.cssText =
+    "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;";
+  const img = document.createElement("img");
+  img.src = "/winston-signature.svg";
+  img.alt = "";
+  img.setAttribute("aria-hidden", "true");
+  img.style.cssText =
+    "width:92%;height:86%;object-fit:contain;object-position:center;";
+  wrap.appendChild(img);
+  stage.appendChild(wrap);
 }
 
 /** Settled, motion-free mark for prefers-reduced-motion users. */
