@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "@/lib/motion";
+import { isPerfLite } from "@/lib/perf-tier";
 import {
   GRID_RIPPLE_EVENT,
   GRID_GLOW_EVENT,
@@ -73,7 +74,13 @@ export default function DotGridBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const dpr = window.devicePixelRatio || 1;
+    // Weak devices: thin out the grid (fewer dots = fewer per-frame iterations),
+    // pin DPR to 1 (a full-screen canvas at 2x is 4x the fill cost), and skip
+    // the per-dot radial-gradient halo below (object churn + extra fills).
+    const lite = isPerfLite();
+    const spacing = lite ? 64 : DOT_SPACING;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, lite ? 1 : 2);
     dprRef.current = dpr;
 
     function resize() {
@@ -89,16 +96,16 @@ export default function DotGridBackground() {
 
     function buildDots(w: number, h: number) {
       const dots: typeof dotsRef.current = [];
-      const cols = Math.ceil(w / DOT_SPACING) + 1;
-      const rows = Math.ceil(h / DOT_SPACING) + 1;
-      const offsetX = (w - (cols - 1) * DOT_SPACING) / 2;
-      const offsetY = (h - (rows - 1) * DOT_SPACING) / 2;
+      const cols = Math.ceil(w / spacing) + 1;
+      const rows = Math.ceil(h / spacing) + 1;
+      const offsetX = (w - (cols - 1) * spacing) / 2;
+      const offsetY = (h - (rows - 1) * spacing) / 2;
 
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           dots.push({
-            x: offsetX + c * DOT_SPACING,
-            y: offsetY + r * DOT_SPACING,
+            x: offsetX + c * spacing,
+            y: offsetY + r * spacing,
             currentScale: 0,
             currentOpacity: BASE_OPACITY,
           });
@@ -256,8 +263,10 @@ export default function DotGridBackground() {
         const radius = DOT_BASE_RADIUS + (DOT_MAX_RADIUS - DOT_BASE_RADIUS) * drawScale;
         const cR = colR | 0, cG = colG | 0, cB = colB | 0;
 
-        // Radial glow effect — only when meaningfully scaled
-        if (drawScale > 0.05) {
+        // Radial glow effect — only when meaningfully scaled. Skipped on weak
+        // devices: createRadialGradient allocates a gradient object per dot per
+        // frame and adds a second (large) fill pass — the grid's heaviest cost.
+        if (!lite && drawScale > 0.05) {
           const gradient = ctx.createRadialGradient(
             dot.x, dot.y, 0,
             dot.x, dot.y, radius * 2.5

@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float } from "@react-three/drei";
 import * as THREE from "three";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /* ── Procedural 3D heart ─────────────────────────────────────────────────────
    An extruded heart silhouette rendered with a glossy, lit material so it reads
@@ -87,7 +88,7 @@ export default function HeartCanvas() {
     <Canvas
       camera={{ position: [0, 0, 4.2], fov: 45 }}
       gl={{ antialias: true, alpha: true }}
-      dpr={[1, 1.5]}
+      dpr={[1, isPerfLite() ? 1 : 1.5]}
       style={{ pointerEvents: "none", background: "transparent" }}
     >
       {/* Lighting rig — key, warm fill, red rim from behind, spec highlight. */}

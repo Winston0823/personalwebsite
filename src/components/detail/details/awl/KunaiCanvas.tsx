@@ -4,6 +4,7 @@ import { useMemo, useRef, type MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /* Procedural kunai (throwing knife): a diamond blade, wrapped grip, and ring
    pommel, with a faint blue edge accent matching the game's VFX. Scroll progress
@@ -117,7 +118,7 @@ export default function KunaiCanvas({
     <Canvas
       camera={{ position: [0, 0, 5], fov: 45 }}
       gl={{ antialias: true, alpha: true }}
-      dpr={[1, 1.5]}
+      dpr={[1, isPerfLite() ? 1 : 1.5]}
       style={{ pointerEvents: "none", background: "transparent" }}
     >
       {/* Mostly ambient + a baked light-panel environment for reflections. */}

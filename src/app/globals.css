@@ -1644,3 +1644,60 @@ html:not(.cc-active) [data-cursor="compare"] {
     animation: none;
   }
 }
+
+/* ============================================================
+   PERF-LITE — weak-device degradations. See src/lib/perf-tier.ts.
+   `backdrop-filter` over the continuously-animating gradient backdrop
+   re-rasterizes EVERY glass surface each frame — the dominant GPU cost
+   on low-end laptops. On `perf-lite` we drop the live blur and swap in an
+   opaque frosted fill so cards stay legible (--color-glass-bg is only 3%
+   white, invisible without the blur). JS effects (gradient drift, dot-grid
+   density + DPR) read isPerfLite() and degrade in tandem.
+   ============================================================ */
+html.perf-lite .glass {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.5) 0%,
+      rgba(255, 255, 255, 0.16) 30%,
+      transparent 50%
+    ),
+    rgba(244, 244, 247, 0.82);
+}
+
+html.perf-lite .glass-hover:hover {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.6) 0%,
+      rgba(255, 255, 255, 0.22) 30%,
+      transparent 50%
+    ),
+    rgba(248, 248, 250, 0.9);
+}
+
+html.perf-lite .glass-plain {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgba(244, 244, 247, 0.95);
+}
+
+html.perf-lite .filter-sidebar {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgba(28, 28, 30, 0.96);
+}
+
+html.perf-lite .card-info .tag-pill,
+html.perf-lite .case-hero .tag-pill {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgba(90, 92, 100, 0.62);
+}
+
+html.perf-lite .cc-layer[data-state] .cc-ring {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}

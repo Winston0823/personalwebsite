@@ -4,6 +4,7 @@ import { useMemo, useRef, type MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, ContactShadows, Environment, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /* Procedural katana, upgraded from primitive boxes: the blade is an extruded
    silhouette with a real tapered kissaki (tip) and a fuller groove; the fittings
@@ -159,7 +160,7 @@ export default function KatanaCanvas({
     <Canvas
       camera={{ position: [0, 0, 5], fov: 45 }}
       gl={{ antialias: true, alpha: true }}
-      dpr={[1, 1.5]}
+      dpr={[1, isPerfLite() ? 1 : 1.5]}
       style={{ pointerEvents: "none" }}
     >
       {/* Mostly ambient + a baked environment of soft light panels for the metal

@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import GradientBackground from "@/components/background/GradientBackground";
 import DesktopChrome from "@/components/background/DesktopChrome";
+import { PERF_TIER_SCRIPT } from "@/lib/perf-tier";
 import "./globals.css";
 
 const plein = localFont({
@@ -59,6 +60,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full ${plein.variable} ${switzer.variable} ${clash.variable} ${zodiak.variable} ${jakarta.variable}`} suppressHydrationWarning>
       <head>
+        {/* Tag weak devices (perf-lite) before first paint so the heavy
+            always-on effects degrade synchronously rather than after hydration. */}
+        <script dangerouslySetInnerHTML={{ __html: PERF_TIER_SCRIPT }} />
         {/* Adobe Fonts (Typekit) — Astronef Std Super, used by the AWL poster */}
         <link rel="stylesheet" href="https://use.typekit.net/ovr8aqn.css" />
       </head>

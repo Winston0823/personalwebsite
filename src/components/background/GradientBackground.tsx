@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { isPerfLite } from "@/lib/perf-tier";
 
 interface BlobConfig {
   className: string;
@@ -126,6 +127,12 @@ export default function GradientBackground() {
   const rafId = useRef<number>(0);
 
   useEffect(() => {
+    // Weak devices: render the blobs completely static. Both the autonomous
+    // drift and the mouse parallax recomposite five large blurred layers every
+    // frame, so on perf-lite we skip the rAF loop and the mousemove listener
+    // entirely — the gradient is still there, it just doesn't move.
+    if (isPerfLite()) return;
+
     // Autonomous drift runs continuously now so the background feels alive
     // even when the cursor is still. Mouse parallax is layered on top of
     // the drift baseline. Respect prefers-reduced-motion: skip the drift

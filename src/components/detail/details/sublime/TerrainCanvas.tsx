@@ -3,6 +3,7 @@
 import { useMemo, type MutableRefObject } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /* Procedural low-poly mountains the camera flies over on scroll — the serene
    counterpart to AWL's katana beat. Terrain is built once (displaced plane with
@@ -123,7 +124,7 @@ export default function TerrainCanvas({
     <Canvas
       camera={{ fov: 55, near: 0.1, far: 420, position: [0, 22, 70] }}
       gl={{ antialias: true, alpha: true }}
-      dpr={[1, 1.5]}
+      dpr={[1, isPerfLite() ? 1 : 1.5]}
       style={{ pointerEvents: "none" }}
     >
       {/* Distance fades into the panel colour */}
