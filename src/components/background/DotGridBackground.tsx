@@ -114,6 +114,34 @@ export default function DotGridBackground() {
       dotsRef.current = dots;
     }
 
+    // Weak devices: draw a single static resting grid — no rAF, no mousemove
+    // redraws, no ripples/glow. The dots remain as ambient texture but cost
+    // nothing per frame (the live spotlight is the canvas's main ongoing cost).
+    if (lite) {
+      const drawStatic = () => {
+        if (!canvas || !ctx) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.scale(dprRef.current, dprRef.current);
+        ctx.fillStyle = `rgba(${DOT_COLOR.r}, ${DOT_COLOR.g}, ${DOT_COLOR.b}, ${BASE_OPACITY})`;
+        const dots = dotsRef.current;
+        for (let i = 0; i < dots.length; i++) {
+          ctx.beginPath();
+          ctx.arc(dots[i].x, dots[i].y, DOT_BASE_RADIUS, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      };
+      const onResize = () => {
+        resize();
+        drawStatic();
+      };
+      resize();
+      drawStatic();
+      window.addEventListener("resize", onResize);
+      return () => window.removeEventListener("resize", onResize);
+    }
+
     let running = false;
     const SETTLE_EPS = 0.005;
     // Squared influence radius — avoids per-dot sqrt during the cull check

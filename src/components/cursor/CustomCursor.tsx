@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { LERP } from "@/lib/motion";
+import { isPerfLite } from "@/lib/perf-tier";
 import {
   CursorClick,
   HandGrabbing,
@@ -116,6 +117,10 @@ export default function CustomCursor() {
   useEffect(() => {
     // Mouse/trackpad only — touch gets native behavior.
     if (!window.matchMedia("(pointer: fine)").matches) return;
+    // Weak devices: skip the custom cursor entirely. It runs a permanent rAF
+    // lerp loop and repaints a portaled layer on every pointer move — pure
+    // overhead the native cursor avoids. Restores the OS cursor on perf-lite.
+    if (isPerfLite()) return;
 
     setEnabled(true);
     document.documentElement.classList.add("cc-active");

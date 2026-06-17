@@ -1701,3 +1701,71 @@ html.perf-lite .cc-layer[data-state] .cc-ring {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
+
+/* Lite-mode indicator + toggle (bottom-left desktop chrome). Muted by default,
+   brightens on hover; turns accent when lite is active so the state is obvious. */
+.perf-toggle {
+  position: fixed;
+  bottom: clamp(12px, 1.6vw, 22px);
+  left: clamp(12px, 1.6vw, 22px);
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px 6px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity var(--dur-fast) var(--ease-pop),
+    background var(--dur-fast) ease, transform var(--dur-fast) var(--ease-pop);
+}
+
+.perf-toggle:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.perf-toggle__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  background: transparent;
+  transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease;
+}
+
+.perf-toggle__state {
+  opacity: 0.55;
+}
+
+/* Active (lite on) — brighter, accent dot + state. */
+.perf-toggle[data-lite] {
+  opacity: 0.82;
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.perf-toggle[data-lite]:hover {
+  opacity: 1;
+}
+
+.perf-toggle[data-lite] .perf-toggle__dot {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 6px rgba(0, 122, 255, 0.5);
+}
+
+.perf-toggle[data-lite] .perf-toggle__state {
+  color: var(--color-accent);
+  opacity: 1;
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { isPerfLite } from "@/lib/perf-tier";
 
 const TICKER_TEXT =
   "available summer 2027 · ui/ux engineer · creative developer · let's build something · ";
@@ -30,7 +31,9 @@ export default function CornerTicker() {
     const el = svgRef.current;
     if (!el || dims.w === 0) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
+    // Skip the infinite rotation on reduced-motion and on weak devices — the
+    // ticker stays as static curved text rather than running a forever animation.
+    if (reduce || isPerfLite()) return;
     const anim = el.animate(
       [
         { transform: "translate(-50%, -50%) rotate(0deg)" },

@@ -3,6 +3,7 @@
 import { useBreakpoint } from "@/hooks/useBreakpoint";
 import DotGridBackground from "@/components/background/DotGridBackground";
 import CornerTicker from "@/components/background/CornerTicker";
+import PerfModeControl from "@/components/background/PerfModeControl";
 
 /* Ambient desktop chrome — the reactive dot-grid canvas and the rotating
    corner ticker. Both are pointer/cursor flourishes with no payoff on touch:
@@ -16,6 +17,7 @@ export default function DesktopChrome() {
     <>
       <DotGridBackground />
       <CornerTicker />
+      <PerfModeControl />
     </>
   );
 }
