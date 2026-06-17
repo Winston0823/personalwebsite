@@ -7,6 +7,7 @@ import HeartSliceHero from "./HeartSliceHero";
 import AwlProse from "./AwlProse";
 import Reveal from "../../shared/Reveal";
 import InView from "../../shared/InView";
+import { isPerfLite } from "@/lib/perf-tier";
 
 // R3F must stay out of SSR (and the main bundle). Loaded only once the AWL
 // page mounts.
@@ -325,9 +326,13 @@ export default function AwlCinematic({
         <div className="sticky top-0 h-screen w-full overflow-hidden">
           {/* 3D katana (background, non-interactive). Lazy-mounted so its WebGL
               context + render loop only exist while the section is near view. */}
-          <InView className="absolute inset-0 pointer-events-none">
-            <KatanaCanvas progressRef={progressRef} />
-          </InView>
+          {/* Lite skips the 3D katana (WebGL loop) — the dark stage + label
+              still carry the section. */}
+          {!isPerfLite() && (
+            <InView className="absolute inset-0 pointer-events-none">
+              <KatanaCanvas progressRef={progressRef} />
+            </InView>
+          )}
 
           {/* Vertical section label on the far edge */}
           <div

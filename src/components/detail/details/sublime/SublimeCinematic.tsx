@@ -11,6 +11,7 @@ import Reveal from "../../shared/Reveal";
 import InView from "../../shared/InView";
 import TrailerButton from "../awl/TrailerButton";
 import UiCarousel from "./UiCarousel";
+import { isPerfLite } from "@/lib/perf-tier";
 
 const TerrainCanvas = dynamic(() => import("./TerrainCanvas"), { ssr: false });
 
@@ -263,9 +264,13 @@ export default function SublimeCinematic({
         style={{ height: "190vh" }}
       >
         <div className="sticky top-0 h-screen w-full overflow-hidden">
-          <InView className="absolute inset-0 pointer-events-none">
-            <TerrainCanvas progressRef={terrainProgressRef} />
-          </InView>
+          {/* Lite skips the 3D terrain flyover (WebGL loop) — dark stage +
+              copy still carry the section. */}
+          {!isPerfLite() && (
+            <InView className="absolute inset-0 pointer-events-none">
+              <TerrainCanvas progressRef={terrainProgressRef} />
+            </InView>
+          )}
           <div className="absolute inset-0 flex items-center pointer-events-none">
             <div style={{ paddingLeft: "max(1.5rem, calc((100vw - 1040px) / 2))", paddingRight: "1.5rem", maxWidth: "560px" }}>
               <Reveal>

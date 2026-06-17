@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /* A shrunken, self-contained port of the real site's PixelRevealOverlay.
    The photoreal car is painted to a canvas; moving the cursor erases 14→8px
@@ -39,6 +40,7 @@ export default function PixelLiquidDemo({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    if (isPerfLite()) return; // lite renders a static <img> instead (below)
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -173,6 +175,20 @@ export default function PixelLiquidDemo({
       window.removeEventListener("mousemove", onMove);
     };
   }, [photorealSrc]);
+
+  // Lite: a flat photoreal still — no per-frame canvas pixel sim, no cursor rAF.
+  if (isPerfLite()) {
+    // eslint-disable-next-line @next/next/no-img-element
+    return (
+      <img
+        src={photorealSrc}
+        className={className}
+        alt=""
+        aria-hidden="true"
+        style={{ objectFit: "cover", width: "100%", height: "100%" }}
+      />
+    );
+  }
 
   return <canvas ref={canvasRef} className={className} aria-hidden="true" />;
 }

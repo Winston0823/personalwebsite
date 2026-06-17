@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /* Act 1 — "Lights out". An F1 start-light gantry stutters on, light by light,
    over the holographic wireframe of the car. When armed, the visitor drops the
@@ -36,7 +37,7 @@ export default function LaunchReveal({
 
   // Reduced motion → skip the whole sequence.
   useEffect(() => {
-    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    if (typeof window !== "undefined" && (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || isPerfLite())) {
       launch();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

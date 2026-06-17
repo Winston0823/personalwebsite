@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { hikingPhotos, hikingBlurb, hikingEyebrow } from "@/lib/hiking-content";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /* Full-screen water surface — the expanded form of the hiking widget.
    A ping-pong wave-equation height field (WebGL2) refracts a creek scene with
@@ -117,6 +118,10 @@ export default function HikingDetail() {
     const root = rootRef.current;
     const canvas = canvasRef.current;
     if (!root || !canvas) return;
+    // Lite: skip the entire WebGL sim+composite rig. The dark panel + copy
+    // overlay below stand in as a static hero (WebGL works — we opt out for
+    // cost, so no "needs WebGL" message either).
+    if (isPerfLite()) return;
 
     let renderer: THREE.WebGLRenderer;
     try {
@@ -354,9 +359,11 @@ export default function HikingDetail() {
             {hikingBlurb}
           </p>
         </div>
-        <div style={{ position: "absolute", bottom: "clamp(20px, 4vw, 40px)", left: 0, right: 0, textAlign: "center", fontFamily: "var(--font-mono)", fontSize: 11.5, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", textShadow: "0 1px 12px rgba(0,0,0,0.5)" }}>
-          click to drop a stone &nbsp;·&nbsp; move to stir the surface
-        </div>
+        {!isPerfLite() && (
+          <div style={{ position: "absolute", bottom: "clamp(20px, 4vw, 40px)", left: 0, right: 0, textAlign: "center", fontFamily: "var(--font-mono)", fontSize: 11.5, letterSpacing: "0.14em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", textShadow: "0 1px 12px rgba(0,0,0,0.5)" }}>
+            click to drop a stone &nbsp;·&nbsp; move to stir the surface
+          </div>
+        )}
       </div>
     </div>
   );

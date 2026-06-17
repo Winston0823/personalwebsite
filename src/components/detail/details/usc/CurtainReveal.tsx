@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /* Act 1 — the interactive gate. Two cardinal-velvet curtain panels hang shut
    over a black stage; the gold wordmark glows through the seam. The visitor
@@ -34,7 +35,7 @@ export default function CurtainReveal({
   // Open instantly for reduced-motion users — never gate content behind motion.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || isPerfLite()) {
       openAll();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

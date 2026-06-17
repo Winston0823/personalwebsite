@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Project } from "@/lib/detail-types";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /* ① High-res → CRT hero, scroll-scrubbed (no cursor interaction).
 
@@ -46,7 +47,7 @@ export default function CrtHero({
 
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setReduced(true);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || isPerfLite()) setReduced(true);
   }, []);
 
   // Scroll scrub → push progress into the `--p` CSS var the visuals read.

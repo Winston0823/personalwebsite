@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /* Act 1 — "Lights out", as a torn-paper reveal.
 
@@ -81,7 +82,7 @@ export default function PaperTearReveal({
 
   useEffect(() => {
     mountAt.current = performance.now();
-    if (typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    if (typeof window !== "undefined" && (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches || isPerfLite())) {
       launch();
       return;
     }

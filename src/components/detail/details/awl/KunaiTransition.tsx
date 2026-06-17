@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import InView from "../../shared/InView";
+import { isPerfLite } from "@/lib/perf-tier";
 
 // R3F kept out of SSR + the main bundle.
 const KunaiCanvas = dynamic(() => import("./KunaiCanvas"), { ssr: false });
@@ -59,9 +60,12 @@ export default function KunaiTransition() {
         marginTop: "5vh", // small gap after Process; Build sits close below
       }}
     >
-      <InView className="pointer-events-none" style={{ width: "100%", height: "100%" }}>
-        <KunaiCanvas progressRef={progressRef} />
-      </InView>
+      {/* Purely decorative (aria-hidden) — dropped entirely on lite. */}
+      {!isPerfLite() && (
+        <InView className="pointer-events-none" style={{ width: "100%", height: "100%" }}>
+          <KunaiCanvas progressRef={progressRef} />
+        </InView>
+      )}
     </div>
   );
 }
