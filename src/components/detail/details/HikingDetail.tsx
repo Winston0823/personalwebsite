@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import * as THREE from "three";
 import { hikingPhotos, hikingBlurb, hikingEyebrow } from "@/lib/hiking-content";
 import { isPerfLite } from "@/lib/perf-tier";
@@ -331,6 +332,73 @@ export default function HikingDetail() {
       renderer.dispose();
     };
   }, []);
+
+  // Lite: a normal lightweight photo gallery instead of the WebGL water scene —
+  // the same photos, lazy-loaded and optimised, on the same dark theme.
+  if (isPerfLite()) {
+    return (
+      <div
+        ref={rootRef}
+        data-cursor-theme="sublime"
+        style={{ position: "fixed", inset: 0, overflow: "auto", background: "#0c1518", color: "#fff" }}
+      >
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "clamp(40px, 6vw, 88px) clamp(24px, 5vw, 56px)" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 12 }}>
+            {hikingEyebrow}
+          </div>
+          <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "clamp(40px, 6vw, 84px)", lineHeight: 0.92, letterSpacing: "-0.03em", margin: 0 }}>
+            Hiking
+          </h1>
+          <p style={{ marginTop: 16, maxWidth: "44ch", fontFamily: "var(--font-sans)", fontSize: 16, lineHeight: 1.6, color: "rgba(255,255,255,0.82)" }}>
+            {hikingBlurb}
+          </p>
+
+          <div
+            style={{
+              marginTop: "clamp(28px, 4vw, 48px)",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 260px), 1fr))",
+              gap: "clamp(12px, 1.5vw, 20px)",
+            }}
+          >
+            {hikingPhotos.map((p) => (
+              <figure
+                key={p.src}
+                style={{
+                  position: "relative",
+                  margin: 0,
+                  aspectRatio: "3 / 4",
+                  borderRadius: 16,
+                  overflow: "hidden",
+                  background: "rgba(255,255,255,0.04)",
+                  boxShadow: "0 18px 36px -22px rgba(0,0,0,0.6)",
+                }}
+              >
+                <Image src={p.src} alt={p.alt} fill sizes="(max-width: 720px) 90vw, 340px" style={{ objectFit: "cover" }} />
+                <figcaption
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    padding: "28px 14px 12px",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 11,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    color: "rgba(255,255,255,0.92)",
+                    background: "linear-gradient(to top, rgba(0,0,0,0.45), transparent)",
+                  }}
+                >
+                  {p.label}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
