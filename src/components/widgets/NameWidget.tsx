@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { isPerfLite } from "@/lib/perf-tier";
 
 /**
  * Name widget — a bilingual handwritten signature.
@@ -44,7 +45,10 @@ export default function NameWidget() {
       "(prefers-reduced-motion: reduce)",
     ).matches;
 
-    if (prefersReduced) {
+    // Weak devices get the settled static mark too — this skips downloading
+    // vara + hanzi-writer + the hanzi stroke data (all lazy-imported inside
+    // loop() below) AND the per-frame handwriting animation.
+    if (prefersReduced || isPerfLite()) {
       renderStatic(stage);
       return () => {
         stage.replaceChildren();
