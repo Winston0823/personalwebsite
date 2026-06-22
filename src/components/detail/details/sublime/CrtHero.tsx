@@ -84,9 +84,9 @@ export default function CrtHero({
     <section
       ref={sectionRef}
       className="relative w-full bg-black"
-      style={{ height: reduced ? "100vh" : "240vh", ["--p" as string]: 0 } as React.CSSProperties}
+      style={{ height: reduced ? "100dvh" : "240vh", ["--p" as string]: 0 } as React.CSSProperties}
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
+      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
         {/* Screen — shrinks (scale) + gains curvature with p. Children are plain
             (cached) image textures, so the per-frame scale is a pure GPU
             transform with no re-raster. */}

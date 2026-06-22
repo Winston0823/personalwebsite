@@ -54,7 +54,7 @@ export default function VistaReveal({
       } as React.CSSProperties}
     >
       {/* Pinned, full-viewport stage */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
+      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
         {/* Oversized image pans slower than scroll (parallax) */}
         <div
           className="absolute"

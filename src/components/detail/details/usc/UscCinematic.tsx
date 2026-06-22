@@ -5,6 +5,7 @@ import { Project } from "@/lib/detail-types";
 import PaperTearReveal from "./PaperTearReveal";
 import LayerShowcase from "./LayerShowcase";
 import UscProse from "./UscProse";
+import MobileSectionNav from "@/components/common/MobileSectionNav";
 
 /* heroStyle: "usc" — "Lights Out".
    Act 1: an F1 start-light gantry stutters on over the wireframe car; drop the
@@ -132,6 +133,9 @@ export default function UscCinematic({
         })}
       </nav>
 
+      {/* Mobile section nav — bottom pill → sheet */}
+      <MobileSectionNav items={navItems} activeId={activeId} onJump={scrollToId} accent={ACCENT} show={opened} />
+
       {/* Back button — pinned over the stage */}
       <button
         onClick={onBack}
@@ -142,7 +146,7 @@ export default function UscCinematic({
       </button>
 
       {/* ACT 1 — lights-out launch gate */}
-      <section className="relative w-full overflow-hidden" style={{ height: "100vh" }}>
+      <section className="relative w-full overflow-hidden" style={{ height: "100dvh" }}>
         <PaperTearReveal
           photorealSrc="/images/usc-racing/hero-photoreal.png"
           videoSrc="/usc-start-lights.mp4"

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import GradientBackground from "@/components/background/GradientBackground";
@@ -50,6 +50,13 @@ const jakarta = localFont({
 export const metadata: Metadata = {
   title: "Winston Gu",
   description: "Developer & Designer",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Tint the mobile browser chrome to the site background.
+  themeColor: "#f5f5f7",
 };
 
 export default function RootLayout({

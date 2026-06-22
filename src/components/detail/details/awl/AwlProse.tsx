@@ -381,14 +381,21 @@ export default function AwlProse({
                 <div className="min-w-0">
                   <H3>Where it landed</H3>
                   <Body>{project.outcome}</Body>
+                  {/* Inline trailer on mobile (the floating one is desktop-only). */}
+                  {trailerHref && (
+                    <div className="sm:hidden mt-5">
+                      <TrailerButton href={trailerHref} size={56} />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Trailer affordance floats over the footage on the right, like a
-                play overlay on a video poster. */}
+            {/* Trailer affordance floats over the footage on the right (desktop),
+                like a play overlay on a video poster. */}
             {trailerHref && (
               <div
+                className="hidden sm:block"
                 style={{
                   position: "absolute",
                   top: "50%",

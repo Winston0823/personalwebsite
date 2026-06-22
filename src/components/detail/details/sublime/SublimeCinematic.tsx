@@ -11,7 +11,8 @@ import Reveal from "../../shared/Reveal";
 import InView from "../../shared/InView";
 import TrailerButton from "../awl/TrailerButton";
 import UiCarousel from "./UiCarousel";
-import { isPerfLite } from "@/lib/perf-tier";
+import MobileSectionNav from "@/components/common/MobileSectionNav";
+import { usePrefersStatic } from "@/hooks/usePrefersStatic";
 
 const TerrainCanvas = dynamic(() => import("./TerrainCanvas"), { ssr: false });
 
@@ -100,6 +101,7 @@ export default function SublimeCinematic({
   const navElsRef = useRef<{ id: string; label: string; el: HTMLElement }[]>([]);
   const [navItems, setNavItems] = useState<{ id: string; label: string }[]>([]);
   const [activeId, setActiveId] = useState("");
+  const staticMode = usePrefersStatic();
 
   let n = 0;
   const next = () => String(++n).padStart(2, "0");
@@ -215,6 +217,9 @@ export default function SublimeCinematic({
         })}
       </nav>
 
+      {/* Mobile section nav — bottom pill → sheet */}
+      <MobileSectionNav items={navItems} activeId={activeId} onJump={scrollToId} accent={ACCENT} />
+
       {/* ① CRT hero (keeps the broadcast motif) */}
       <CrtHero project={project} onBack={onBack} />
 
@@ -263,10 +268,10 @@ export default function SublimeCinematic({
         className="relative bg-[#0a0b0d] scroll-mt-24"
         style={{ height: "190vh" }}
       >
-        <div className="sticky top-0 h-screen w-full overflow-hidden">
-          {/* Lite skips the 3D terrain flyover (WebGL loop) — dark stage +
-              copy still carry the section. */}
-          {!isPerfLite() && (
+        <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
+          {/* Reduced-motion / lite skips the 3D terrain flyover (WebGL loop) —
+              dark stage + copy still carry the section. */}
+          {!staticMode && (
             <InView className="absolute inset-0 pointer-events-none">
               <TerrainCanvas progressRef={terrainProgressRef} />
             </InView>
@@ -361,11 +366,17 @@ export default function SublimeCinematic({
                 <div className="min-w-0">
                   <H3>Where it landed</H3>
                   <Body>{project.outcome}</Body>
+                  {/* Inline trailer on mobile (the floating one is desktop-only). */}
+                  {trailerHref && (
+                    <div className="sm:hidden mt-5">
+                      <TrailerButton href={trailerHref} size={56} />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
             {trailerHref && (
-              <div style={{ position: "absolute", top: "50%", left: "75%", transform: "translate(-50%, -50%)", zIndex: 2 }}>
+              <div className="hidden sm:block" style={{ position: "absolute", top: "50%", left: "75%", transform: "translate(-50%, -50%)", zIndex: 2 }}>
                 <TrailerButton href={trailerHref} size={144} />
               </div>
             )}

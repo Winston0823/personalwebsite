@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import InView from "../../shared/InView";
-import { isPerfLite } from "@/lib/perf-tier";
+import { usePrefersStatic } from "@/hooks/usePrefersStatic";
 
 // R3F kept out of SSR + the main bundle.
 const KunaiCanvas = dynamic(() => import("./KunaiCanvas"), { ssr: false });
@@ -16,6 +16,7 @@ const KunaiCanvas = dynamic(() => import("./KunaiCanvas"), { ssr: false });
 export default function KunaiTransition() {
   const bandRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
+  const staticMode = usePrefersStatic();
 
   useEffect(() => {
     const band = bandRef.current;
@@ -61,7 +62,7 @@ export default function KunaiTransition() {
       }}
     >
       {/* Purely decorative (aria-hidden) — dropped entirely on lite. */}
-      {!isPerfLite() && (
+      {!staticMode && (
         <InView className="pointer-events-none" style={{ width: "100%", height: "100%" }}>
           <KunaiCanvas progressRef={progressRef} />
         </InView>

@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { Project } from "@/lib/detail-types";
+import MobileSectionNav from "@/components/common/MobileSectionNav";
 import HeartSliceHero from "./HeartSliceHero";
 import AwlProse from "./AwlProse";
 import Reveal from "../../shared/Reveal";
 import InView from "../../shared/InView";
-import { isPerfLite } from "@/lib/perf-tier";
+import { usePrefersStatic } from "@/hooks/usePrefersStatic";
 
 // R3F must stay out of SSR (and the main bundle). Loaded only once the AWL
 // page mounts.
@@ -86,6 +87,7 @@ export default function AwlCinematic({
   const [sliced, setSliced] = useState(false);
   const [navItems, setNavItems] = useState<{ id: string; label: string }[]>([]);
   const [activeId, setActiveId] = useState<string>("");
+  const staticMode = usePrefersStatic();
 
   const metrics = [
     { label: "Role", value: project.role },
@@ -249,9 +251,12 @@ export default function AwlCinematic({
         })}
       </nav>
 
+      {/* Mobile section nav — bottom pill → sheet */}
+      <MobileSectionNav items={navItems} activeId={activeId} onJump={scrollToId} accent={ACCENT} show={sliced} />
+
       {/* ── Act 1 + 2: sticky stage. Demo reel underneath; heart-slice overlay
           covers it until the cut reveals it. Act 3 parallax-scrolls over it. ── */}
-      <section className="sticky top-0 overflow-hidden bg-[#050505]" style={{ height: "100vh", zIndex: 0 }}>
+      <section className="sticky top-0 overflow-hidden bg-[#050505]" style={{ height: "100dvh", zIndex: 0 }}>
         <video
           src="/awl-demo.mp4"
           className="absolute inset-0 w-full h-full object-cover"
@@ -323,12 +328,12 @@ export default function AwlCinematic({
         className="relative bg-[#050505]"
         style={{ height: "190vh", zIndex: 10 }}
       >
-        <div className="sticky top-0 h-screen w-full overflow-hidden">
+        <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
           {/* 3D katana (background, non-interactive). Lazy-mounted so its WebGL
               context + render loop only exist while the section is near view. */}
-          {/* Lite skips the 3D katana (WebGL loop) — the dark stage + label
-              still carry the section. */}
-          {!isPerfLite() && (
+          {/* Reduced-motion / lite skips the 3D katana (WebGL loop) — the dark
+              stage + label still carry the section. */}
+          {!staticMode && (
             <InView className="absolute inset-0 pointer-events-none">
               <KatanaCanvas progressRef={progressRef} />
             </InView>

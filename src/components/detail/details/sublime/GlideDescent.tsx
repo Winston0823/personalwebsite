@@ -52,7 +52,7 @@ export default function GlideDescent() {
       className="relative w-full"
       style={{ height: "220vh", ["--p" as string]: 0 } as React.CSSProperties}
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden">
+      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
         {/* Sky — deep indigo aloft warming toward a low horizon */}
         <div
           className="absolute inset-0"

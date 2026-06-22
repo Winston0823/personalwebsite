@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { isPerfLite } from "@/lib/perf-tier";
+import { usePrefersStatic } from "@/hooks/usePrefersStatic";
 
 // R3F heart — client-only, kept out of SSR + the main bundle.
 const HeartCanvas = dynamic(() => import("./HeartCanvas"), { ssr: false });
@@ -139,6 +139,7 @@ export default function HeartSliceHero({ onSliced }: HeartSliceHeroProps) {
   const [heartMounted, setHeartMounted] = useState(true);
   // Drives the heart's fade + scale entrance.
   const [ready, setReady] = useState(false);
+  const staticMode = usePrefersStatic();
   const draggingRef = useRef(false);
   const startRef = useRef<Pt | null>(null);
   // Keep the latest onSliced without re-running the staged-reveal effect.
@@ -238,11 +239,15 @@ export default function HeartSliceHero({ onSliced }: HeartSliceHeroProps) {
 
     const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
     const center: Pt = [dims.w / 2, dims.h / 2];
-    const heartRadius = Math.min(dims.w, dims.h) * 0.28;
-    const hitsHeart = distPointToSegment(center, a, b) < heartRadius + 30;
+    // Touch is much more forgiving than a cursor — bigger hit area + shorter
+    // minimum swipe, since finger drags are coarser and often shorter.
+    const touch = e.pointerType === "touch";
+    const heartRadius = Math.min(dims.w, dims.h) * (touch ? 0.42 : 0.3);
+    const hitsHeart = distPointToSegment(center, a, b) < heartRadius + (touch ? 64 : 36);
+    const minLen = touch ? 46 : 84;
 
     // Too short or missed the heart → discard the slash, let them try again.
-    if (len < 90 || !hitsHeart) {
+    if (len < minLen || !hitsHeart) {
       setSlash(null);
       return;
     }
@@ -382,7 +387,7 @@ export default function HeartSliceHero({ onSliced }: HeartSliceHeroProps) {
             "opacity 700ms ease-out, transform 900ms cubic-bezier(0.16,1,0.3,1)",
         }}
       >
-        {heartMounted && (isPerfLite() ? <StaticHeart /> : <HeartCanvas />)}
+        {heartMounted && (staticMode ? <StaticHeart /> : <HeartCanvas />)}
       </div>
 
       {/* Live slash feedback */}
