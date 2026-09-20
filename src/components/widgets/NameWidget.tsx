@@ -13,7 +13,7 @@ export default function NameWidget() {
       <div className="relative z-10 flex flex-col h-full">
         {/* Role tagline — foreground identity, kept from the original poster. */}
         <p
-          className="font-semibold uppercase text-text-primary whitespace-nowrap"
+          className="font-semibold uppercase text-text-primary whitespace-nowrap text-center"
           style={{ fontSize: "11px", letterSpacing: "0.14em" }}
         >
           Game Designer

@@ -54,7 +54,7 @@ export function Hairline({ className = "" }: { className?: string }) {
   return (
     <div
       aria-hidden="true"
-      className={`h-px w-full bg-white/10 ${className}`}
+      className={`detail-rule ${className}`}
     />
   );
 }

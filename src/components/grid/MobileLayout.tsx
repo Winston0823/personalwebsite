@@ -405,7 +405,7 @@ export default function MobileLayout({
               onClick={() => goHobby(-1)}
               aria-label="Previous hobby"
               className="grid place-items-center rounded-full cursor-pointer"
-              style={{ width: 46, height: 46, background: "rgba(255,255,255,0.7)", border: "1px solid rgba(46,51,54,0.16)", color: "var(--color-text-primary)", boxShadow: "0 4px 12px -8px rgba(20,30,60,0.4)" }}
+              style={{ width: 46, height: 46, background: "var(--color-glass-bg)", border: "1px solid var(--color-hairline-strong)", color: "var(--color-text-primary)", boxShadow: "0 1px 2px rgba(43,59,61,0.06)" }}
             >
               <ArrowLeft size={18} weight="bold" />
             </button>
@@ -420,7 +420,7 @@ export default function MobileLayout({
               onClick={() => goHobby(1)}
               aria-label="Next hobby"
               className="grid place-items-center rounded-full cursor-pointer"
-              style={{ width: 46, height: 46, background: "rgba(255,255,255,0.7)", border: "1px solid rgba(46,51,54,0.16)", color: "var(--color-text-primary)", boxShadow: "0 4px 12px -8px rgba(20,30,60,0.4)" }}
+              style={{ width: 46, height: 46, background: "var(--color-glass-bg)", border: "1px solid var(--color-hairline-strong)", color: "var(--color-text-primary)", boxShadow: "0 1px 2px rgba(43,59,61,0.06)" }}
             >
               <ArrowRight size={18} weight="bold" />
             </button>
@@ -462,8 +462,8 @@ export default function MobileLayout({
             fontFamily: "var(--font-mono)",
             fontSize: "0.8rem",
             color: "var(--color-text-primary)",
-            background: "rgba(255,255,255,0.7)",
-            border: "1px solid rgba(46,51,54,0.16)",
+            background: "var(--color-glass-bg)",
+            border: "1px solid var(--color-hairline-strong)",
             padding: "12px 26px",
             boxShadow: "0 6px 16px -10px rgba(20,30,60,0.4)",
           }}
@@ -474,7 +474,7 @@ export default function MobileLayout({
       </section>
 
       {/* 6 ── NOW PLAYING — slim accent */}
-      <div className="m-rise flex items-center gap-3 rounded-2xl px-4 py-3" style={{ background: "rgba(255,255,255,0.45)", border: "1px solid rgba(255,255,255,0.65)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}>
+      <div className="m-rise flex items-center gap-3 rounded-2xl px-4 py-3" style={{ background: "var(--color-glass-bg)", border: "1px solid var(--color-hairline)" }}>
         <div className="shrink-0 overflow-hidden rounded-lg flex items-center justify-center" style={{ width: 44, height: 44, background: "linear-gradient(135deg,#c94b4b,#f0a35e)" }}>
           {track.albumArt ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -506,7 +506,7 @@ export default function MobileLayout({
         <a
           href={`mailto:${personalInfo.email}`}
           className="mt-4 inline-flex w-fit items-center gap-2 rounded-full font-semibold"
-          style={{ background: "var(--color-accent)", color: "#fff", fontSize: "0.9rem", padding: "10px 22px", boxShadow: "0 12px 26px -10px rgba(0,122,255,0.6)" }}
+          style={{ background: "var(--color-accent)", color: "#fff", fontSize: "0.9rem", padding: "10px 22px", boxShadow: "0 2px 6px rgba(43,59,61,0.16)" }}
         >
           Say Hello
           <ArrowRight size={16} weight="bold" />
@@ -555,10 +555,10 @@ function SocialPill({ href, label, children }: { href: string; label: string; ch
       style={{
         width: 44,
         height: 44,
-        background: "rgba(255,255,255,0.7)",
-        border: "1px solid rgba(46,51,54,0.16)",
+        background: "var(--color-glass-bg)",
+        border: "1px solid var(--color-hairline-strong)",
         color: "var(--color-text-primary)",
-        boxShadow: "0 4px 12px -8px rgba(20,30,60,0.4)",
+        boxShadow: "0 1px 2px rgba(43,59,61,0.06)",
       }}
     >
       {children}

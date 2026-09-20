@@ -1,13 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --color-bg: #F5F5F7;
-  --color-text-primary: #2E3336;
-  --color-text-secondary: #5B6063;
-  --color-accent: #007AFF;
-  --color-accent-hover: #0066DD;
-  --color-glass-bg: rgba(255, 255, 255, 0.03);
-  --color-glass-bg-hover: rgba(255, 255, 255, 0.08);
+  /* Palette from the supplied three-swatch reference: pale sage / sea green /
+     dark slate teal. The sage is the page ground and the slate is the ink —
+     the mid green is the accent. Only the card surface and the hairlines are
+     derived, because the reference has no near-white or border value. */
+  --color-bg: #A8BFB0;          /* ref swatch 1, literal */
+  --color-text-primary: #2B3B3D; /* ref swatch 3, literal */
+  --color-text-secondary: #5A6E6C;
+  /* Accent for TEXT is the mid green darkened to clear 4.5:1 on the card
+     surface; --color-accent-bright is the literal ref swatch, used for fills
+     and marks where contrast isn't a legibility question. */
+  --color-accent: #4E7566;
+  --color-accent-hover: #3A5B4E;
+  --color-accent-bright: #6F9A8B; /* ref swatch 2, literal */
+  /* Card surfaces are fully opaque. The names stay `glass-*` so the ~30
+     call sites don't churn, but nothing here is translucent any more. */
+  --color-glass-bg: #F3F6F3;
+  --color-glass-bg-hover: #FFFFFF;
+  --color-hairline: #93AC9D;
+  --color-hairline-strong: #7E9A8A;
+  /* Software marks in the Skills marquee — the pale sage of ref swatch 1. */
+  --color-logo: #A8BFB0;
   /* Warm cream used for polaroid-style matting around inline artifacts
      (editorial header poster card, narrative-block sketches). */
   --color-cream-paper: #f5f3ee;
@@ -17,7 +31,7 @@
     "Cascadia Mono", "Roboto Mono", monospace;
   --grid-gap: clamp(4px, 0.5vw, 8px);
   --grid-padding: clamp(8px, 1vw, 16px);
-  --widget-radius: clamp(14px, 1.5vw, 22px);
+  --widget-radius: clamp(10px, 1vw, 14px);
   --text-heading: clamp(1.75rem, 3.5vw, 3rem);
   --text-subheading: clamp(0.95rem, 1.2vw, 1.125rem);
   --text-body: clamp(0.8rem, 1vw, 0.875rem);
@@ -44,13 +58,21 @@
   --color-text-secondary: var(--color-text-secondary);
   --color-accent: var(--color-accent);
   --color-accent-hover: var(--color-accent-hover);
-  --font-sans: var(--font-switzer), -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Arial", sans-serif;
-  --font-rounded: var(--font-switzer), ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-display: var(--font-plein), "Plein", -apple-system, BlinkMacSystemFont, sans-serif;
+  --color-accent-bright: var(--color-accent-bright);
+  --color-hairline: var(--color-hairline);
+  --color-hairline-strong: var(--color-hairline-strong);
+  --color-logo: var(--color-logo);
+  --font-sans: var(--font-supreme), -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Arial", sans-serif;
+  --font-rounded: var(--font-supreme), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: var(--font-chubbo), Georgia, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
+  font-weight: 700;
+  /* Chubbo is wide and high-contrast; it needs negative tracking at display
+     sizes to stop the counters from drifting apart. */
+  letter-spacing: -0.02em;
 }
 
 html {
@@ -66,10 +88,10 @@ body {
   touch-action: none;
   background: var(--color-bg);
   color: var(--color-text-primary);
-  /* Body / normal text uses the system monospace stack — same family used
-   *  by the minimal-style case studies. Headings (h1–h6) keep the sans
-   *  display font defined above. */
-  font-family: var(--font-mono);
+  /* Body / normal text is Supreme. The system mono stack is still available
+   *  as --font-mono for the minimal-style case studies that opt into it. */
+  font-family: var(--font-sans);
+  font-weight: 400;
 }
 
 /* Name widget poster — desktop uses container-query sizing so it scales
@@ -151,119 +173,68 @@ body {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* Liquid glass for edge-anchored panels (drawers) — no pseudo-element leak.
- * Drawer sits over the dashboard, so the background needs real opacity
- * plus a heavier blur to actually obscure the widgets behind it. The 3%
- * white tint we used for inline cards isn't enough at this surface. */
+/* ---------------------------------------------------------------------------
+ * SURFACES — solid paper, borderless, lifted by shadow.
+ *
+ * This block used to be the liquid-glass system: translucent fills,
+ * backdrop-filter, a refraction ring (::before) and a specular catch-light
+ * (::after) on every card. All of it is gone. Cards are opaque stock with no
+ * border at all — depth comes from a soft blurred drop shadow and from
+ * spacing, not from simulated material or an outline.
+ *
+ * The `.glass*` class names are kept so the ~30 existing call sites don't
+ * churn — read them as "card surface", not as glass.
+ * ------------------------------------------------------------------------ */
+
+/* Edge-anchored panels (drawers). Fully opaque — it sits over the dashboard
+ * and must actually occlude it, which is what the 24px blur was faking. */
 .glass-plain {
-  background: rgba(245, 245, 247, 0.78);
-  -webkit-backdrop-filter: blur(24px) saturate(140%);
-  backdrop-filter: blur(24px) saturate(140%);
+  background: var(--color-glass-bg);
   border-radius: var(--widget-radius);
-  border: 0.5px solid rgba(255, 255, 255, 0.55);
   box-shadow:
-    /* outer drop shadow for depth */
-    -4px 0 24px rgba(0, 0, 0, 0.08),
-    -1px 0 4px rgba(0, 0, 0, 0.04),
-    /* top-left specular highlight */
-    inset 1px 1px 0 0 rgba(255, 255, 255, 0.6),
-    /* bottom-right inner shadow for liquid depth */
-    inset -1px -1px 2px 0 rgba(0, 0, 0, 0.04);
+    -2px 0 4px rgba(43, 59, 61, 0.06),
+    -16px 0 48px -8px rgba(43, 59, 61, 0.22);
 }
 
-/* Liquid glass widget card */
+/* Widget card */
 .glass {
   position: relative;
-  background:
-    /* top highlight band — bright white fading down */
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.12) 0%,
-      rgba(255, 255, 255, 0.03) 30%,
-      transparent 50%
-    ),
-    /* base tint — slightly darker than pure transparent for liquid feel */
-    var(--color-glass-bg);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  background: var(--color-glass-bg);
   border-radius: var(--widget-radius);
-  border: 0.5px solid rgba(255, 255, 255, 0.35);
+  /* No border. The card is lifted off the sage ground by a two-part shadow:
+     a tight contact shadow that seats the edge, plus a wide soft cast that
+     does the actual separating. Both tinted with the slate ink rather than
+     neutral black so the shade belongs to the palette. */
   box-shadow:
-    /* outer drop shadow — floating depth */
-    0 2px 20px rgba(0, 0, 0, 0.08),
-    0 1px 6px rgba(0, 0, 0, 0.06),
-    /* top-left specular inset — bright white catch light */
-    inset 1px 1px 1px 0 rgba(255, 255, 255, 0.5),
-    /* bottom-right inner shadow — liquid darkening */
-    inset -1px -1px 3px 0 rgba(0, 0, 0, 0.05),
-    /* soft bottom inner shadow — pooled depth */
-    inset 0 -2px 6px 0 rgba(0, 0, 0, 0.04);
-  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    0 1px 2px rgba(43, 59, 61, 0.06),
+    0 10px 28px -8px rgba(43, 59, 61, 0.20);
+  transition:
+    background var(--dur-fast) var(--ease-pop),
+    transform var(--dur-fast) var(--ease-pop),
+    box-shadow var(--dur-fast) var(--ease-pop);
 }
 
-/* Outer border — bright continuous white stroke with warm-to-cool refraction */
-.glass::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: calc(var(--widget-radius) + 1px);
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.6) 0%,
-    rgba(255, 255, 255, 0.25) 30%,
-    rgba(200, 210, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.2) 70%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Inner specular highlight — bright top-left catch light */
+/* The refraction ring and specular highlight are retired. Explicitly zeroed
+   rather than deleted so any stale rule elsewhere can't resurrect them. */
+.glass::before,
 .glass::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: var(--widget-radius);
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.18) 15%,
-    rgba(255, 255, 255, 0.03) 40%,
-    transparent 60%,
-    rgba(0, 0, 0, 0.02) 100%
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 0;
+  content: none;
 }
 
-/* Glass hover state */
+/* Hover: the card rises and its cast shadow spreads and softens, the way a
+   real lift reads. Translate, not scale. */
 .glass-hover:hover {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.15) 0%,
-      rgba(255, 255, 255, 0.05) 30%,
-      transparent 50%
-    ),
-    var(--color-glass-bg-hover);
-  transform: scale(1.025);
+  background: var(--color-glass-bg-hover);
+  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgba(43, 59, 61, 0.07),
+    0 20px 44px -10px rgba(43, 59, 61, 0.26);
 }
 
 /* Ghost border for nested elements */
 .ghost-border {
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
+  border: 1px solid var(--color-hairline);
+  border-radius: 10px;
 }
 
 /* Text-link motion affordance — a small lean toward the action on hover, on
@@ -283,7 +254,7 @@ body {
 
 /* Grid overlay lines */
 .grid-line {
-  border: 1px dashed rgba(0, 122, 255, 0.15);
+  border: 1px dashed var(--color-hairline-strong);
   border-radius: 8px;
 }
 
@@ -296,34 +267,9 @@ body {
    liquid-glass chrome so the user gets clear visual feedback that letting
    go will remove the widget. Transitions gently in/out. */
 .glass.is-discarding {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 80, 70, 0.18) 0%,
-      rgba(255, 80, 70, 0.08) 40%,
-      rgba(255, 80, 70, 0.04) 100%
-    ),
-    rgba(255, 59, 48, 0.08);
-  border-color: rgba(255, 59, 48, 0.45);
   box-shadow:
-    0 8px 28px rgba(255, 59, 48, 0.25),
-    0 2px 10px rgba(255, 59, 48, 0.18),
-    inset 1px 1px 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 0 24px rgba(255, 59, 48, 0.1);
-  transition:
-    background 200ms ease,
-    border-color 200ms ease,
-    box-shadow 220ms ease;
-}
-
-/* Re-tint the pseudo-border stroke so the red reads all the way to the edge */
-.glass.is-discarding::before {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 120, 110, 0.7) 0%,
-    rgba(255, 80, 70, 0.35) 50%,
-    rgba(255, 100, 90, 0.45) 100%
-  );
+    0 0 0 2px var(--color-accent),
+    0 10px 28px -8px rgba(43, 59, 61, 0.20);
 }
 
 /* Blob animation keyframes */
@@ -381,7 +327,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 60;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(43, 59, 61, 0.42);
   opacity: 0;
   pointer-events: none;
   will-change: opacity;
@@ -397,22 +343,26 @@ body {
   overflow: visible;
   transform-origin: top left;
   will-change: transform;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.14) 0%,
-      rgba(255, 255, 255, 0.04) 25%,
-      transparent 50%
-    ),
-    rgba(0, 0, 0, 0.6);
-  text-shadow: 0 0 8px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.1);
-  color: white;
-  border: 0.5px solid rgba(255, 255, 255, 0.4);
+
+  /* Inspect chrome flows through these four tokens. The default is the same
+     paper surface the dashboard cards use; the bespoke case-study themes
+     (minimal / awl / usc) override the tokens rather than re-declaring every
+     rule, which is what used to happen. */
+  --detail-surface: var(--color-glass-bg);
+  --detail-ink: var(--color-text-primary);
+  --detail-ink-soft: var(--color-text-secondary);
+  --detail-accent: var(--color-accent);
+  --detail-rule: var(--color-hairline);
+
+  background: var(--detail-surface);
+  color: var(--detail-ink);
+  /* No text-shadow: that existed to keep white text legible on translucent
+     dark glass. On an opaque surface it just smears the type. */
+  text-shadow: none;
+  border: none;
   box-shadow:
-    0 8px 60px rgba(0, 0, 0, 0.12),
-    0 2px 20px rgba(0, 0, 0, 0.08),
-    inset 1px 1px 1px 0 rgba(255, 255, 255, 0.5),
-    inset -1px -1px 3px 0 rgba(0, 0, 0, 0.05);
+    0 2px 6px rgba(43, 59, 61, 0.08),
+    0 28px 64px -16px rgba(43, 59, 61, 0.30);
 }
 
 /* While closing, strip expensive paints so the fade/scale is GPU-only.
@@ -430,42 +380,35 @@ body {
   will-change: transform, opacity;
 }
 
+/* Applied once the open animation finishes. This used to repaint the dark
+   liquid glass here — which is why every inspect flipped to black a beat
+   AFTER it opened, regardless of theme. It now settles onto the same paper
+   surface it opened with, so the rule only carries the transition. */
 .detail-panel.is-settled {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.14) 0%,
-      rgba(255, 255, 255, 0.04) 25%,
-      transparent 50%
-    ),
-    rgba(0, 0, 0, 0.6);
+  background: var(--detail-surface);
   transition: background 0.25s ease-out;
 }
 
-/* Minimal case-study theme — solid near-black panel without the glass
-   gradient or chrome. Activated when a "minimal" heroStyle project mounts
-   and sets body[data-detail-theme="minimal"]. */
-body[data-detail-theme="minimal"] .detail-panel,
-body[data-detail-theme="minimal"] .detail-panel.is-settled {
-  background: #0a0a0a;
-  border-color: rgba(255, 255, 255, 0.08);
-  text-shadow: none;
-  box-shadow:
-    0 8px 60px rgba(0, 0, 0, 0.5),
-    0 2px 20px rgba(0, 0, 0, 0.4);
-}
-body[data-detail-theme="minimal"] .detail-panel::before,
-body[data-detail-theme="minimal"] .detail-panel::after {
-  display: none;
-}
+/* The inspect panel is ALWAYS the paper surface. There used to be five
+   per-theme dark repaints here (minimal / awl / usc / sublime / ambit); a
+   widget inspect could inherit one — Hiking sets data-detail-theme="sublime"
+   — and the panel would go black. Removed: the panel no longer changes colour
+   for any theme. The case-study sections paint their own full-bleed
+   backgrounds inside it, which is why they still read as dark.
+   Only structural per-theme rules (close-button placement, edge-to-edge
+   scroll padding) survive below. */
 
 /* Pull the floating close button inward so it visually mirrors the
    "← all projects" back link, which sits at the right edge of the
    minimal layout's centered 880px column. */
 body[data-detail-theme="minimal"] .detail-close-btn {
   right: max(40px, calc((100% - 880px) / 2)) !important;
-  background: transparent !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+/* The minimal reader paints its own dark ground edge-to-edge, so drop the
+   panel's scroll padding — the component re-supplies it inside the ground. */
+body[data-detail-theme="minimal"] .detail-scroll {
+  padding: 0 !important;
 }
 
 /* Scroll area: vertical scrolls, horizontal uses `clip` so cards can paint past
@@ -478,62 +421,27 @@ body[data-detail-theme="minimal"] .detail-close-btn {
   overflow-clip-margin: 48px;
 }
 
-.detail-panel::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.6) 0%,
-    rgba(255, 255, 255, 0.25) 30%,
-    rgba(200, 210, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.2) 70%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 0;
-}
-
+/* The panel's refraction ring and specular catch-light are retired, exactly
+   as they were on the dashboard cards. */
+.detail-panel::before,
 .detail-panel::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.18) 15%,
-    rgba(255, 255, 255, 0.03) 40%,
-    transparent 60%
-  );
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 0;
+  content: none;
 }
 
-/* Override text colors & sizes inside detail panel — Apple-style white on glass */
+/* Text inside the inspect resolves from the theme tokens above. The kicker
+   used to be a glowing #A8D0FF — a lit halo only makes sense on dark glass. */
 .detail-panel .text-accent {
   font-size: 0.9rem !important;
   font-weight: 700;
   letter-spacing: 0.15em;
-  color: #A8D0FF;
-  text-shadow: 0 0 14px rgba(120, 180, 255, 0.55), 0 0 4px rgba(120, 180, 255, 0.35);
+  color: var(--detail-accent);
+  text-shadow: none;
 }
 .detail-panel .text-text-primary {
-  color: rgba(255, 255, 255, 1) !important;
+  color: var(--detail-ink) !important;
 }
 .detail-panel .text-text-secondary {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: var(--detail-ink-soft) !important;
 }
 .detail-panel {
   --text-body: 0.95rem;
@@ -549,16 +457,24 @@ body[data-detail-theme="minimal"] .detail-close-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.7);
+  border: none;
+  background: color-mix(in srgb, var(--detail-ink) 8%, transparent);
+  color: var(--detail-ink-soft);
   cursor: pointer;
-  transition: color 0.2s, background 0.2s;
+  transition: color var(--dur-fast) var(--ease-pop), background var(--dur-fast) var(--ease-pop);
 }
 
 .detail-close-btn:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.12);
+  color: var(--detail-ink);
+  background: color-mix(in srgb, var(--detail-ink) 14%, transparent);
+}
+
+/* Editorial section rule inside an inspect. Was a Tailwind `bg-white/10`,
+   which vanished the moment the panel stopped being dark. */
+.detail-rule {
+  height: 1px;
+  width: 100%;
+  background: var(--detail-rule);
 }
 
 /* Stagger children animation helper */
@@ -600,18 +516,17 @@ body[data-detail-theme="minimal"] .detail-close-btn {
   --scale: 1;
   position: relative;
   z-index: 1;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: none;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--color-glass-bg);
   overflow: hidden;
   cursor: pointer;
   transform-style: preserve-3d;
   transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--scale));
   contain: layout paint;
   box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.28),
-    0 4px 10px rgba(0, 0, 0, 0.18),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.16);
+    0 2px 6px rgba(43, 59, 61, 0.08),
+    0 14px 32px -8px rgba(43, 59, 61, 0.24);
   transition:
     transform 420ms var(--ease-pop),
     opacity 180ms ease,
@@ -634,11 +549,9 @@ body[data-detail-theme="minimal"] .detail-close-btn {
 
 .project-card:hover {
   z-index: 3;
-  border-color: rgba(255, 255, 255, 0.35);
   box-shadow:
-    0 20px 44px rgba(0, 0, 0, 0.36),
-    0 8px 16px rgba(0, 0, 0, 0.22),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.24);
+    0 4px 10px rgba(43, 59, 61, 0.10),
+    0 26px 52px -10px rgba(43, 59, 61, 0.30);
 }
 
 /* Card image fills entire card */
@@ -733,7 +646,9 @@ body[data-detail-theme="minimal"] .detail-close-btn {
   opacity: 1;
 }
 
-/* Filter sidebar — pinned to the left edge of the screen, Apple-vibe hairlines */
+/* Filter sidebar — pinned to the left edge of the screen. White frosted
+   glass: it floats over project artwork, so the blur is doing real legibility
+   work here rather than being decoration. */
 .filter-sidebar {
   position: fixed;
   z-index: 80;
@@ -742,14 +657,13 @@ body[data-detail-theme="minimal"] .detail-close-btn {
   width: clamp(140px, 13vw, 184px);
   padding: 6px 0;
   border-radius: 18px;
-  background: rgba(28, 28, 30, 0.72);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  backdrop-filter: blur(24px) saturate(180%);
-  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  background: rgba(248, 250, 248, 0.82);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.45),
-    0 6px 16px rgba(0, 0, 0, 0.25),
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.18);
+    0 2px 6px rgba(43, 59, 61, 0.06),
+    0 16px 40px -8px rgba(43, 59, 61, 0.22);
   display: flex;
   flex-direction: column;
   opacity: 0;
@@ -789,7 +703,10 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.45);
+  /* Darker than --color-text-secondary: the frosted ground can sit over a
+     near-black project card, where the standard secondary only reaches
+     ~3.4:1. These two rules are the sidebar's only sub-AA risks. */
+  color: #40514F;
   padding: 10px 16px 8px;
 }
 
@@ -801,9 +718,9 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
 
 /* Hairline divider between sections */
 .filter-section__divider {
-  height: 0.5px;
+  height: 1px;
   margin: 6px 16px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(43, 59, 61, 0.10);
 }
 
 .filter-item {
@@ -811,7 +728,7 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
   padding: 8px 16px;
   font-size: 0.86rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--color-text-secondary);
   text-align: left;
   background: transparent;
   border: none;
@@ -830,17 +747,18 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
   font-size: 0.78rem;
   letter-spacing: 0.12em;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--color-text-primary);
   padding: 12px 16px;
 }
 
 .filter-item:hover {
-  color: rgba(255, 255, 255, 0.96);
-  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-text-primary);
+  background: rgba(43, 59, 61, 0.05);
 }
 
 .filter-item.active {
-  color: var(--color-accent);
+  /* accent-hover rather than accent — see the note on __label above. */
+  color: var(--color-accent-hover);
   font-weight: 600;
 }
 
@@ -880,10 +798,10 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
 .skill-pill {
   padding: 6px 14px;
   border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
+  border: none;
+  background: color-mix(in srgb, var(--detail-ink, var(--color-text-primary)) 7%, transparent);
   font-size: 0.85rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--detail-ink, var(--color-text-primary));
   white-space: nowrap;
 }
 
@@ -902,24 +820,20 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
   font-size: 0.8rem;
 }
 
-/* Liquid-glass tag pills — scoped to the project card overlay and the case-study
-   hero band only. Other tag-pills (case-study body, gallery, etc.) stay solid. */
+/* Tag pills over imagery — solid ink chips. These were frosted-glass; a chip
+   sitting on an arbitrary photo needs its own opaque ground to stay legible,
+   which is exactly what the blur was approximating. */
 .card-info .tag-pill,
 .case-hero .tag-pill {
-  background: rgba(255, 255, 255, 0.14);
-  color: rgba(255, 255, 255, 0.96);
-  border: 0.5px solid rgba(255, 255, 255, 0.28);
-  -webkit-backdrop-filter: blur(10px) saturate(140%);
-  backdrop-filter: blur(10px) saturate(140%);
-  box-shadow:
-    inset 0 0.5px 0 rgba(255, 255, 255, 0.4),
-    0 1px 4px rgba(0, 0, 0, 0.25);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  background: rgba(43, 59, 61, 0.92);
+  color: #F3F6F3;
+  border: 1px solid rgba(244, 242, 237, 0.18);
+  box-shadow: none;
+  text-shadow: none;
 }
 
 .detail-panel .skill-pill {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
+  background: color-mix(in srgb, var(--detail-ink) 8%, transparent);
 }
 
 /* Dim grid widgets when detail is open */
@@ -1003,24 +917,9 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
    Bespoke 3-act experience: heart-slice hero → demo-reel parallax → katana.
    ───────────────────────────────────────────────────────────────────────── */
 
-/* Solid black panel, no glass chrome — same treatment as the minimal theme
-   but with the close button pinned to the far edge for a full-bleed feel. */
-body[data-detail-theme="awl"] .detail-panel,
-body[data-detail-theme="awl"] .detail-panel.is-settled {
-  background: #050505;
-  border-color: rgba(255, 255, 255, 0.06);
-  text-shadow: none;
-  box-shadow: 0 8px 60px rgba(0, 0, 0, 0.6), 0 2px 20px rgba(0, 0, 0, 0.4);
-}
-body[data-detail-theme="awl"] .detail-panel::before,
-body[data-detail-theme="awl"] .detail-panel::after {
-  display: none;
-}
+/* Close button pinned to the far edge for a full-bleed feel. */
 body[data-detail-theme="awl"] .detail-close-btn {
   right: 22px !important;
-  background: rgba(0, 0, 0, 0.45) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  color: #fff !important;
 }
 /* The scroll container clips horizontally by default (overflow-x: clip) which
    would chop the sliding background halves before they exit. While AWL is
@@ -1075,17 +974,6 @@ body[data-detail-theme="awl"] .detail-scroll {
    then a "two cars, one hero" layer demo and design-decision narrative. Black
    panel, gold accents.
    ───────────────────────────────────────────────────────────────────────── */
-body[data-detail-theme="usc"] .detail-panel,
-body[data-detail-theme="usc"] .detail-panel.is-settled {
-  background: #050505;
-  border-color: rgba(227, 181, 61, 0.1);
-  text-shadow: none;
-  box-shadow: 0 8px 60px rgba(0, 0, 0, 0.6), 0 2px 20px rgba(0, 0, 0, 0.4);
-}
-body[data-detail-theme="usc"] .detail-panel::before,
-body[data-detail-theme="usc"] .detail-panel::after {
-  display: none;
-}
 body[data-detail-theme="usc"] .detail-close-btn {
   right: 22px !important;
   background: rgba(0, 0, 0, 0.45) !important;
@@ -1149,22 +1037,8 @@ body[data-detail-theme="usc"] .detail-scroll {
    Atmospheric counterweight to AWL: a glide clip freezes and paint-blooms into
    the cover painting, then a quiet painterly descent. Warmer near-black panel.
    ───────────────────────────────────────────────────────────────────────── */
-body[data-detail-theme="sublime"] .detail-panel,
-body[data-detail-theme="sublime"] .detail-panel.is-settled {
-  background: #0a0b0d;
-  border-color: rgba(255, 255, 255, 0.06);
-  text-shadow: none;
-  box-shadow: 0 8px 60px rgba(0, 0, 0, 0.6), 0 2px 20px rgba(0, 0, 0, 0.4);
-}
-body[data-detail-theme="sublime"] .detail-panel::before,
-body[data-detail-theme="sublime"] .detail-panel::after {
-  display: none;
-}
 body[data-detail-theme="sublime"] .detail-close-btn {
   right: 22px !important;
-  background: rgba(0, 0, 0, 0.45) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  color: #fff !important;
 }
 /* Sublime owns the full panel edge-to-edge; drop the scroll padding. */
 body[data-detail-theme="sublime"] .detail-scroll {
@@ -1172,23 +1046,9 @@ body[data-detail-theme="sublime"] .detail-scroll {
   scroll-behavior: smooth;
 }
 
-/* ── Ambit theme (heroStyle "ambit") — Ambit ink ground ─────────────────── */
-body[data-detail-theme="ambit"] .detail-panel,
-body[data-detail-theme="ambit"] .detail-panel.is-settled {
-  background: #1c1c1a;
-  border-color: rgba(255, 255, 255, 0.06);
-  text-shadow: none;
-  box-shadow: 0 8px 60px rgba(0, 0, 0, 0.6), 0 2px 20px rgba(0, 0, 0, 0.4);
-}
-body[data-detail-theme="ambit"] .detail-panel::before,
-body[data-detail-theme="ambit"] .detail-panel::after {
-  display: none;
-}
+/* ── Ambit theme (heroStyle "ambit") — layout only ──────────────────────── */
 body[data-detail-theme="ambit"] .detail-close-btn {
   right: 22px !important;
-  background: rgba(0, 0, 0, 0.45) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  color: #fff !important;
 }
 body[data-detail-theme="ambit"] .detail-scroll {
   padding: 0 !important;
@@ -1387,9 +1247,9 @@ html:not(.cc-active) [data-cursor="compare"] {
      them once. --cc-accent drives dot/ring/icons; --cc-contrast is the pill
      label/icon color on filled pills; --cc-glow is the dot/ring halo. */
   --cc-accent: var(--color-accent);
-  --cc-accent-soft: rgba(0, 122, 255, 0.45);
-  --cc-accent-faint: rgba(0, 122, 255, 0.08);
-  --cc-pill-border: rgba(0, 122, 255, 0.35);
+  --cc-accent-soft: rgba(78, 117, 102, 0.45);
+  --cc-accent-faint: rgba(78, 117, 102, 0.08);
+  --cc-pill-border: rgba(78, 117, 102, 0.35);
   --cc-contrast: var(--color-accent);
   --cc-glow: 0 0 transparent;
   /* Contrast halo so the accent cursor reads on ANY background — a hard 1px
@@ -1697,7 +1557,7 @@ html.perf-lite .glass-plain {
 html.perf-lite .filter-sidebar {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
-  background: rgba(28, 28, 30, 0.96);
+  background: #F8FAF8;
 }
 
 html.perf-lite .card-info .tag-pill,
@@ -1772,10 +1632,129 @@ html.perf-lite .cc-layer[data-state] .cc-ring {
 .perf-toggle[data-lite] .perf-toggle__dot {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  box-shadow: 0 0 6px rgba(0, 122, 255, 0.5);
+  box-shadow: 0 0 6px rgba(78, 117, 102, 0.5);
 }
 
 .perf-toggle[data-lite] .perf-toggle__state {
   color: var(--color-accent);
   opacity: 1;
+}
+
+/* ---------------------------------------------------------------------------
+ * Skills widget — auto-scrolling software marquee.
+ *
+ * The logos are recoloured with `mask-image` rather than `fill`, because they
+ * are rendered as <img> and an <img> does not inherit `currentColor` from the
+ * page — the SVG is an isolated document. Masking paints OUR colour through
+ * the glyph's silhouette, so it works for every mark regardless of what fill
+ * the source file declares.
+ * ------------------------------------------------------------------------ */
+.skill-marquee {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  /* Fade the strip out at both edges so logos enter and leave rather than
+     being chopped off by the card. */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+
+.skill-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: skill-marquee-scroll 28s linear infinite;
+}
+
+/* Two identical groups sit side by side and the track slides exactly one
+   group's width (-50% of the track), so the loop point is seamless. */
+.skill-marquee__group {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.2vw, 26px);
+  padding-right: clamp(14px, 2.2vw, 26px);
+  flex: 0 0 auto;
+}
+
+@keyframes skill-marquee-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+.skill-marquee:hover .skill-marquee__track {
+  animation-play-state: paused;
+}
+
+.skill-marquee--lg .skill-marquee__logo {
+  width: 36px;
+  height: 36px;
+}
+
+.skill-marquee--lg .skill-marquee__group {
+  gap: 40px;
+  padding-right: 40px;
+}
+
+.skill-marquee__logo {
+  width: clamp(18px, 2vw, 24px);
+  height: clamp(18px, 2vw, 24px);
+  flex: 0 0 auto;
+  /* The mark itself: sage fill, punched through by the glyph silhouette. */
+  background-color: var(--color-logo);
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-image: var(--logo-src);
+  mask-image: var(--logo-src);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-marquee__track { animation: none; }
+}
+
+
+/* Skills inspect — the discipline list. Two columns so a long list reads as a
+   scannable index rather than a wall, collapsing to one on narrow panels. */
+.skill-group {
+  display: grid;
+  grid-template-columns: minmax(7rem, 9rem) 1fr;
+  gap: 8px 28px;
+  align-items: start;
+}
+
+.skill-group__label {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--detail-accent, var(--color-accent));
+  padding-top: 0.35rem;
+}
+
+.skill-group__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill-group__item {
+  padding: 0.35rem 0;
+  font-size: 0.98rem;
+  line-height: 1.4;
+  color: var(--detail-ink, var(--color-text-primary));
+  border-bottom: 1px solid color-mix(in srgb, var(--detail-rule, var(--color-hairline)) 60%, transparent);
+}
+
+@media (max-width: 640px) {
+  .skill-group {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .skill-group__label { padding-top: 0; }
 }

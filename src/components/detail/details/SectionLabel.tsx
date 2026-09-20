@@ -6,7 +6,7 @@
    so the surrounding layout differs — but this accent kicker is the common
    thread that ties them back to the case-study pages.
 
-   Style is the case-study label: uppercase, accent blue, wide 0.22em tracking.
+   Style is the case-study label: uppercase, accent, wide 0.22em tracking.
    (.detail-panel .text-accent in globals.css resolves color/glow/size.)
 
    `rule` adds the editorial leading hairline used by the case-study header —

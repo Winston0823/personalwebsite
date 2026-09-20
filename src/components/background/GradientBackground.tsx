@@ -19,7 +19,7 @@ interface BlobConfig {
 
 const blobs: BlobConfig[] = [
   {
-    comment: "Blue wash — upper left",
+    comment: "Sea-green wash — upper left",
     className: "absolute rounded-full",
     style: {
       width: "65vw",
@@ -27,7 +27,7 @@ const blobs: BlobConfig[] = [
       top: "-15%",
       left: "-10%",
       background:
-        "radial-gradient(circle, rgba(0,122,255,0.18) 0%, rgba(0,122,255,0) 70%)",
+        "radial-gradient(circle, rgba(111,154,139,0.30) 0%, rgba(111,154,139,0) 70%)",
       filter: "blur(40px)",
       opacity: 1,
     },
@@ -38,7 +38,7 @@ const blobs: BlobConfig[] = [
     driftRadiusY: 28,
   },
   {
-    comment: "Lavender wash — upper right",
+    comment: "Slate wash — upper right",
     className: "absolute rounded-full",
     style: {
       width: "55vw",
@@ -46,7 +46,7 @@ const blobs: BlobConfig[] = [
       top: "-5%",
       right: "-10%",
       background:
-        "radial-gradient(circle, rgba(160,120,220,0.14) 0%, rgba(160,120,220,0) 70%)",
+        "radial-gradient(circle, rgba(43,59,61,0.16) 0%, rgba(43,59,61,0) 70%)",
       filter: "blur(45px)",
       opacity: 1,
     },
@@ -57,7 +57,7 @@ const blobs: BlobConfig[] = [
     driftRadiusY: 30,
   },
   {
-    comment: "Peach wash — center right",
+    comment: "Pale sage wash — center right",
     className: "absolute rounded-full",
     style: {
       width: "50vw",
@@ -65,7 +65,7 @@ const blobs: BlobConfig[] = [
       top: "35%",
       right: "0%",
       background:
-        "radial-gradient(circle, rgba(255,160,120,0.12) 0%, rgba(255,160,120,0) 70%)",
+        "radial-gradient(circle, rgba(168,191,176,0.34) 0%, rgba(168,191,176,0) 70%)",
       filter: "blur(45px)",
       opacity: 1,
     },
@@ -76,7 +76,7 @@ const blobs: BlobConfig[] = [
     driftRadiusY: 26,
   },
   {
-    comment: "Sky wash — lower left",
+    comment: "Sea-green wash — lower left",
     className: "absolute rounded-full",
     style: {
       width: "60vw",
@@ -84,7 +84,7 @@ const blobs: BlobConfig[] = [
       bottom: "-15%",
       left: "-5%",
       background:
-        "radial-gradient(circle, rgba(90,180,250,0.15) 0%, rgba(90,180,250,0) 70%)",
+        "radial-gradient(circle, rgba(111,154,139,0.24) 0%, rgba(111,154,139,0) 70%)",
       filter: "blur(40px)",
       opacity: 1,
     },
@@ -95,7 +95,7 @@ const blobs: BlobConfig[] = [
     driftRadiusY: 32,
   },
   {
-    comment: "Mint wash — bottom center",
+    comment: "Slate wash — bottom center",
     className: "absolute rounded-full",
     style: {
       width: "50vw",
@@ -103,7 +103,7 @@ const blobs: BlobConfig[] = [
       bottom: "0%",
       left: "30%",
       background:
-        "radial-gradient(circle, rgba(120,220,200,0.12) 0%, rgba(120,220,200,0) 70%)",
+        "radial-gradient(circle, rgba(43,59,61,0.12) 0%, rgba(43,59,61,0) 70%)",
       filter: "blur(42px)",
       opacity: 1,
     },
@@ -213,7 +213,13 @@ export default function GradientBackground() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+    // The wash is atmosphere now, not the subject. Cards above it are opaque,
+    // so the blobs only need to keep the ground from reading as flat fill —
+    // hence the heavy opacity knock-down. One number to tune.
+    <div
+      className="fixed inset-0 z-0 overflow-hidden pointer-events-none"
+      style={{ opacity: 0.3 }}
+    >
       {blobs.map((blob, i) => (
         <div
           key={i}

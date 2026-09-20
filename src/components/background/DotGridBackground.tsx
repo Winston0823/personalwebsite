@@ -6,7 +6,7 @@ import { isPerfLite } from "@/lib/perf-tier";
 import {
   GRID_RIPPLE_EVENT,
   GRID_GLOW_EVENT,
-  GLOW_WARM,
+  GLOW_LIGHT,
   type GridRippleDetail,
   type GridGlowDetail,
 } from "@/lib/grid-ripple";
@@ -17,7 +17,10 @@ const DOT_MAX_RADIUS = 5; // active dot size at cursor center
 const INFLUENCE_RADIUS = 180; // px — how far the spotlight reaches
 const BASE_OPACITY = 0.08; // barely visible when inactive
 const MAX_OPACITY = 0.35; // fully active
-const DOT_COLOR = { r: 180, g: 172, b: 164 }; // warm grey
+// Slate, from the ink end of the palette. Was a warm grey (180,172,164),
+// which sat almost exactly on the sage ground's own value once the page
+// went green — the spotlight was still running, you just couldn't see it.
+const DOT_COLOR = { r: 58, g: 78, b: 79 };
 const LERP_SPEED = 0.08; // smooth follow speed
 
 // Event ripples — a wavefront that briefly lifts dots as it passes, applied
@@ -63,7 +66,7 @@ export default function DotGridBackground() {
   const ripplesRef = useRef<Ripple[]>([]);
   // Drag glow: `target` is set by drag events; `state` is the smoothed pool the
   // renderer actually draws (lerps position + amplitude for soft track/fade).
-  const glowTargetRef = useRef<GlowTarget>({ active: false, x: -1000, y: -1000, radius: GLOW_RADIUS, strength: GLOW_STRENGTH, color: GLOW_WARM });
+  const glowTargetRef = useRef<GlowTarget>({ active: false, x: -1000, y: -1000, radius: GLOW_RADIUS, strength: GLOW_STRENGTH, color: GLOW_LIGHT });
   const glowStateRef = useRef({ x: -1000, y: -1000, amp: 0 });
   const rafRef = useRef<number>(0);
   const dprRef = useRef(1);
@@ -388,7 +391,7 @@ export default function DotGridBackground() {
         g.y = d.y;
         g.radius = d.radius ?? GLOW_RADIUS;
         g.strength = d.strength ?? GLOW_STRENGTH;
-        g.color = d.color ?? GLOW_WARM;
+        g.color = d.color ?? GLOW_LIGHT;
         ensureRunning();
       }
     }

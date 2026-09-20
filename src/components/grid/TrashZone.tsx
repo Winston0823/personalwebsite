@@ -94,7 +94,6 @@ export default function TrashZone({ isDragging, isOver, isConsuming }: TrashZone
           background: isOver
             ? "rgba(255, 59, 48, 0.25)"
             : "rgba(255, 59, 48, 0.12)",
-          backdropFilter: "blur(12px)",
           // Split into individual sides so React doesn't warn about mixing
           // `border` (shorthand) with `borderBottom: none`.
           borderTopWidth: "1px",

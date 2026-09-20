@@ -42,14 +42,15 @@ export default function DrawerHandle({ onClick, isOpen = false }: DrawerHandlePr
         "rounded-l-xl rounded-r-none",
         // layout for label + chevron
         "flex items-center justify-center gap-2",
-        // surface — accent-tinted glass at rest, more saturated on hover
-        "bg-accent/45 hover:bg-accent/85 focus-visible:bg-accent/85",
-        "backdrop-blur-md",
+        // surface — solid, but neutral at rest so a 10px slab of saturated
+        // accent isn't the loudest thing on a calm page. Commits to the
+        // accent only once you reach for it.
+        "bg-[#7E9A8A] hover:bg-accent focus-visible:bg-accent",
         // border — hairline on the left edge to feel like a real tab
-        "border border-r-0 border-white/25",
-        // soft accent glow so it's visible against the bg without shouting
-        "shadow-[0_0_18px_-2px_rgba(0,122,255,0.45),0_2px_10px_rgba(0,0,0,0.12)]",
-        "hover:shadow-[0_0_28px_-2px_rgba(0,122,255,0.7),0_4px_16px_rgba(0,0,0,0.18)]",
+        "border border-r-0 border-black/10",
+        // tight shadow, no glow
+        "shadow-[0_1px_3px_rgba(43,59,61,0.12)]",
+        "hover:shadow-[0_3px_10px_rgba(43,59,61,0.18)]",
         // motion — restrained Google-style ease, no spring
         "transition-[width,background-color,box-shadow] duration-[220ms] ease-[cubic-bezier(0.2,0,0,1)]",
         // focus ring — 2px accent halo, no offset (tab is flush to viewport edge)

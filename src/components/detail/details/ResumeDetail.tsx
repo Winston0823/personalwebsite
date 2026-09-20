@@ -72,7 +72,7 @@ export default function ResumeDetail() {
                 {exp.company}
                 {exp.location ? ` · ${exp.location}` : ""}
               </p>
-              <ul className="flex flex-col gap-1.5 mt-1 list-disc pl-5 marker:text-white/40">
+              <ul className="flex flex-col gap-1.5 mt-1 list-disc pl-5 marker:text-text-secondary/50">
                 {exp.bullets.map((bullet, i) => (
                   <li
                     key={i}

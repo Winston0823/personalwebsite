@@ -1029,9 +1029,10 @@ function MinimalCaseStudy({
   project: Project;
   onBack: () => void;
 }) {
-  // Body data-attribute swaps the .detail-panel background to solid black
-  // (rule in globals.css). Cleaned up on unmount so subsequent projects
-  // revert to the standard glass panel.
+  // Marks the panel as being in case-study mode. This used to also repaint
+  // the panel black; now it only drives layout (close-button placement and
+  // edge-to-edge scroll padding) — the dark ground is painted by this
+  // component itself, above.
   useEffect(() => {
     document.body.setAttribute("data-detail-theme", "minimal");
     return () => {
@@ -1085,6 +1086,18 @@ function MinimalCaseStudy({
       className="text-white"
       style={{
         fontFamily: "var(--font-mono)",
+        // This view paints its OWN dark ground. It used to rely on
+        // body[data-detail-theme="minimal"] repainting the whole inspect
+        // panel black — that theming is gone (a widget inspect could inherit
+        // it and turn dark), so the case study now supplies its background
+        // the same way the AWL / Sublime / USC / Ambit readers already do.
+        background: "#0a0a0a",
+        // The panel's own scroll padding is dropped for this theme (see
+        // globals.css) so the ground reaches the panel edges instead of
+        // floating as a dark card on white; we re-supply that padding here,
+        // inside the dark ground.
+        padding: "36px 40px 64px",
+        minHeight: "100%",
         // The panel padding already supplies horizontal breathing room;
         // we just need a centered narrow column for the editorial measure.
       }}

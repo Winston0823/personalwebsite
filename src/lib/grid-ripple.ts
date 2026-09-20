@@ -39,12 +39,15 @@ export type RippleOpts = Omit<GridRippleDetail, "x" | "y">;
  * grid reads as intentional, not a single repeated wave.
  *  - open: a confident accent-tinted bloom as a detail panel emerges.
  *  - drop / move: soft, quiet — a widget landed or shifted, nothing created.
- *  - discard: a fast, tight, RED collapse — destruction, not creation.
+ *  - discard: a fast, tight, RED collapse — destruction, not creation. This
+ *    is the one tint deliberately OFF the site palette: destructive-means-red
+ *    is a stronger signal than palette consistency, and it matches the trash
+ *    zone it fires from.
  *  - cold: the first-paint "wake".
  * Themed case studies ripple in their own accent via themeRipple().
  */
 export const RIPPLE = {
-  open: { strength: 1.2, color: [56, 132, 255] as RGB },
+  open: { strength: 1.2, color: [111, 154, 139] as RGB },
   drop: { strength: 0.9 },
   move: { strength: 0.8 },
   discard: { strength: 1.15, color: [255, 59, 48] as RGB, speed: 1.35, width: 48, life: 850 },
@@ -83,9 +86,11 @@ export function emitGridRipple(x: number, y: number, opts: RippleOpts = {}): voi
 
 export const GRID_GLOW_EVENT = "dotgrid:glow";
 
-/** Warm near-white — the grid catching light under the widget, NOT the blue
- *  accent. Tweak here to retune the drag glow's hue. */
-export const GLOW_WARM: RGB = [236, 228, 212];
+/** Near-white — the grid catching light under the dragged widget. Pale rather
+ *  than accent-tinted: this reads as illumination, not as a coloured state.
+ *  Matches --color-glass-bg so the pool looks like the card's own spill.
+ *  Tweak here to retune the drag glow's hue. */
+export const GLOW_LIGHT: RGB = [243, 246, 243];
 
 export interface GridGlowDetail {
   /** false tells the grid to fade the glow out. */

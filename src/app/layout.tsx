@@ -6,21 +6,24 @@ import DesktopChrome from "@/components/background/DesktopChrome";
 import { PERF_TIER_SCRIPT } from "@/lib/perf-tier";
 import "./globals.css";
 
-const plein = localFont({
+// Display face — Chubbo (Fontshare), variable 200-700. Carries every heading,
+// eyebrow label, and the name poster.
+const chubbo = localFont({
   src: [
-    { path: "../../public/fonts/Plein-Bold.woff2", weight: "700", style: "normal" },
-    { path: "../../public/fonts/Plein-Bold.woff", weight: "700", style: "normal" },
+    { path: "../../public/fonts/Chubbo-Variable.woff2", weight: "200 700", style: "normal" },
   ],
-  variable: "--font-plein",
+  variable: "--font-chubbo",
   display: "swap",
 });
 
-const switzer = localFont({
+// Text face — Supreme (Fontshare), variable 100-800. Body copy, UI labels,
+// everything that isn't display.
+const supreme = localFont({
   src: [
-    { path: "../../public/fonts/Switzer-Regular.woff2", weight: "400", style: "normal" },
-    { path: "../../public/fonts/Switzer-Regular.woff", weight: "400", style: "normal" },
+    { path: "../../public/fonts/Supreme-Variable.woff2", weight: "100 800", style: "normal" },
+    { path: "../../public/fonts/Supreme-VariableItalic.woff2", weight: "100 800", style: "italic" },
   ],
-  variable: "--font-switzer",
+  variable: "--font-supreme",
   display: "swap",
 });
 
@@ -56,7 +59,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   // Tint the mobile browser chrome to the site background.
-  themeColor: "#f5f5f7",
+  themeColor: "#A8BFB0",
 };
 
 export default function RootLayout({
@@ -65,7 +68,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full ${plein.variable} ${switzer.variable} ${clash.variable} ${zodiak.variable} ${jakarta.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`h-full ${chubbo.variable} ${supreme.variable} ${clash.variable} ${zodiak.variable} ${jakarta.variable}`} suppressHydrationWarning>
       <head>
         {/* Tag weak devices (perf-lite) before first paint so the heavy
             always-on effects degrade synchronously rather than after hydration. */}

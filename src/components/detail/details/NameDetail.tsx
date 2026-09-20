@@ -81,7 +81,7 @@ export default function NameDetail() {
             rel="noopener noreferrer"
             data-cursor="link"
             className="flex items-center justify-center w-10 h-10 rounded-full text-text-secondary hover:text-text-primary transition-colors"
-            style={{ border: "1px solid rgba(255, 255, 255, 0.12)", background: "rgba(255, 255, 255, 0.04)" }}
+            style={{ border: "1px solid var(--detail-rule)", background: "color-mix(in srgb, var(--detail-ink) 5%, transparent)" }}
           >
             <LinkedInIcon />
           </a>
@@ -93,7 +93,7 @@ export default function NameDetail() {
             rel="noopener noreferrer"
             data-cursor="link"
             className="flex items-center justify-center w-10 h-10 rounded-full text-text-secondary hover:text-text-primary transition-colors"
-            style={{ border: "1px solid rgba(255, 255, 255, 0.12)", background: "rgba(255, 255, 255, 0.04)" }}
+            style={{ border: "1px solid var(--detail-rule)", background: "color-mix(in srgb, var(--detail-ink) 5%, transparent)" }}
           >
             <GitHubIcon />
           </a>

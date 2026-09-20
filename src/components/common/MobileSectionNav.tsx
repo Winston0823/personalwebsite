@@ -22,11 +22,11 @@ const THEMES = {
     scrim: "rgba(0,0,0,0.45)",
   },
   light: {
-    pillBg: "rgba(255,255,255,0.88)",
+    pillBg: "#F3F6F3",
     border: "rgba(0,0,0,0.12)",
     text: "var(--color-text-primary)",
     inactive: "rgba(46,51,54,0.55)",
-    sheetBg: "rgba(255,255,255,0.96)",
+    sheetBg: "#F3F6F3",
     sheetBorder: "rgba(0,0,0,0.1)",
     rowBorder: "rgba(0,0,0,0.06)",
     activeBg: "rgba(0,0,0,0.04)",
@@ -90,7 +90,6 @@ export default function MobileSectionNav({
             style={{
               background: t.sheetBg,
               border: `1px solid ${t.sheetBorder}`,
-              backdropFilter: "blur(12px)",
               WebkitBackdropFilter: "blur(12px)",
               boxShadow: "0 20px 50px -16px rgba(0,0,0,0.45)",
             }}
@@ -132,7 +131,6 @@ export default function MobileSectionNav({
           style={{
             background: t.pillBg,
             border: `1px solid ${t.border}`,
-            backdropFilter: "blur(10px)",
             WebkitBackdropFilter: "blur(10px)",
             padding: "0.6rem 1rem",
             boxShadow: "0 12px 30px -14px rgba(0,0,0,0.45)",
