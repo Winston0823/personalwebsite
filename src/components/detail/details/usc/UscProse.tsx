@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Project } from "@/lib/detail-types";
 import { isPerfLite } from "@/lib/perf-tier";
 import Reveal from "../../shared/Reveal";
@@ -45,6 +45,32 @@ function DecisionBlock({
   useEffect(() => setLite(isPerfLite()), []);
   const showVideo = Boolean(video) && !lite;
   const media = video ?? image;
+
+  // The clip is cut to start exactly on the ASCII dissolve, so it must not be
+  // already running by the time the reader arrives — autoplay would leave them
+  // watching a static hold. Start it from frame 0 when it scrolls into view,
+  // and rewind when it leaves so scrolling back replays the transition.
+  const videoRef = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el || !showVideo) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.currentTime = 0;
+          void el.play().catch(() => {});
+        } else {
+          el.pause();
+          el.currentTime = 0;
+        }
+      },
+      // Wait until a good part of the frame is on screen — firing at 0 would
+      // burn the dissolve while the block is still a sliver at the edge.
+      { threshold: 0.55 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [showVideo]);
   return (
     <Reveal
       id={anchor}
@@ -81,13 +107,13 @@ function DecisionBlock({
           >
             {showVideo && video ? (
               <video
+                ref={videoRef}
                 src={video}
                 className="absolute inset-0 w-full h-full object-cover"
-                autoPlay
                 loop
                 muted
                 playsInline
-                preload="metadata"
+                preload="auto"
                 aria-label={imageAlt ?? ""}
               />
             ) : (
