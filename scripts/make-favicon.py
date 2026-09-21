@@ -22,13 +22,24 @@ SRC = "public/images/cat-mark.png"
 PAPER = (243, 246, 243, 255)   # --color-glass-bg
 INK = (58, 91, 78, 255)        # --color-accent-hover
 
+# LITERAL=True keeps the drawing on a transparent ground, no paper backing.
+#
+# The source ink is the site's sage, rgb(168,191,175). On a transparent icon
+# that has to survive BOTH tab themes, the usable range is bounded at each
+# end: the raw sage is 1.96:1 on a light tab bar, and darkening it far enough
+# to fix that eventually kills it on a dark one. Holding hue and saturation
+# and scaling HLS lightness by 0.65 lands on the crossover — 4.07:1 on white,
+# 3.96:1 on Chrome's dark strip, i.e. about as good as it gets on both.
+LITERAL = True
+SAGE = (99, 134, 110, 255)     # #63866E — the source sage, darkened to 0.65 lightness
+
 src = Image.open(SRC).convert("RGBA")
 src = src.crop(src.getbbox())
 
 # Repaint to the ink colour, keeping the original alpha as the stroke mask so
 # the hand-drawn antialiasing is preserved rather than re-traced.
 _alpha = src.getchannel("A")
-src = Image.new("RGBA", src.size, INK)
+src = Image.new("RGBA", src.size, SAGE if LITERAL else INK)
 src.putalpha(_alpha)
 
 
@@ -54,13 +65,13 @@ def build(px: int, margin: float, dilate: int = 0, gamma: float = 1.0) -> Image.
         lut = [min(255, round(255 * (v / 255) ** gamma)) for v in range(256)]
         mark.putalpha(a.point(lut))
 
-    canvas = Image.new("RGBA", (px, px), PAPER)
+    canvas = Image.new("RGBA", (px, px), (0, 0, 0, 0) if LITERAL else PAPER)
     canvas.alpha_composite(mark, ((px - mark.width) // 2, (px - mark.height) // 2))
     return canvas
 
 
-build(512, 0.08).save("src/app/icon.png")
-build(180, 0.10).save("src/app/apple-icon.png")
+build(512, 0.03).save("src/app/icon.png")
+build(180, 0.05).save("src/app/apple-icon.png")
 
 # Each .ico member is rendered at its own size with its own stroke weight.
 # Values chosen by rendering a sweep and comparing (qa/fav-sweep*.png): a
@@ -68,9 +79,9 @@ build(180, 0.10).save("src/app/apple-icon.png")
 # two passes close up the eyes and merge the ears into a blob. Only 16px is
 # small enough to also want the alpha gamma boost.
 ico = [
-    build(16, 0.05, dilate=1, gamma=0.85),
-    build(32, 0.06, dilate=1),
-    build(48, 0.06, dilate=1),
+    build(16, 0.02, dilate=1, gamma=0.85),
+    build(32, 0.03, dilate=1),
+    build(48, 0.03, dilate=1),
 ]
 ico[2].save("src/app/favicon.ico", format="ICO",
             sizes=[(48, 48), (32, 32), (16, 16)],
