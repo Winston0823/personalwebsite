@@ -530,18 +530,6 @@ export const artworks: Artwork[] = [
     height: 3508,
   },
   {
-    id: "art-male-figure",
-    title: "Male Figure Drawing",
-    description: "",
-    date: "2025-02",
-    medium: "Graphite on Paper",
-    tools: [],
-    category: "illustration",
-    image: "/images/artworks/male-figure-drawing.jpg",
-    width: 1280,
-    height: 1707,
-  },
-  {
     id: "art-noise-of-night",
     title: "Noise of Night",
     description: "",
