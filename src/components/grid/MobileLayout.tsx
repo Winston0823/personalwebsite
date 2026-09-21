@@ -5,8 +5,9 @@ import Image from "next/image";
 import { WidgetType } from "@/lib/grid-types";
 import ImageLightbox from "@/components/common/ImageLightbox";
 import NameSignature from "@/components/common/NameSignature";
+import SoftwareMarquee from "@/components/common/SoftwareMarquee";
 import MobileSectionNav from "@/components/common/MobileSectionNav";
-import { GithubLogo, LinkedinLogo, EnvelopeSimple, MusicNotes, ArrowRight, ArrowLeft, ArrowUpRight } from "@phosphor-icons/react";
+import { GithubLogo, LinkedinLogo, EnvelopeSimple, MusicNotes, ArrowRight, ArrowLeft } from "@phosphor-icons/react";
 
 // Section targets for the mobile bottom nav.
 const HOME_SECTIONS = [
@@ -100,12 +101,9 @@ const hobbies: Hobby[] = [
 /* Unified section header — type-forward to match the hero: a quiet mono index
    (accent, echoing the hero's mono titles) beside a Plein display heading. No
    eyebrow. Used on every section so they read consistently. */
-function SectionHead({ index, children }: { index: string; children: React.ReactNode }) {
+function SectionHead({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-baseline gap-3">
-      <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.78rem", fontWeight: 600, letterSpacing: "0.04em", color: "var(--color-accent)" }}>
-        {index}
-      </span>
+    <div className="flex items-baseline">
       <h2
         className="leading-[0.95]"
         style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "clamp(40px, 12vw, 58px)", letterSpacing: "-0.03em", color: "var(--color-text-primary)" }}
@@ -232,16 +230,21 @@ export default function MobileLayout({
         sizes={lead ? "(max-width: 480px) 92vw, 440px" : "(max-width: 480px) 44vw, 210px"}
         className="object-cover"
       />
-      <span className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.16) 48%, transparent 72%)" }} />
+      {/* The full-card gradient scrim is gone — the caption now sits on its
+          own tinted frosted plate (see .work-plate), so the artwork above it
+          stays unmuddied. */}
       {p.comingSoon && (
         <span className="absolute top-2.5 left-2.5 inline-flex items-center gap-1 rounded-full px-2 py-0.5 uppercase" style={{ fontFamily: "var(--font-mono)", fontSize: "0.5rem", letterSpacing: "0.14em", color: "#1a1a1a", background: "rgba(233,201,138,0.95)", fontWeight: 600 }}>
           <span style={{ width: 3, height: 3, borderRadius: 9999, background: "#1a1a1a" }} />
           Soon
         </span>
       )}
-      <span className={lead ? "absolute left-4 right-4 bottom-4 text-white" : "absolute left-3 right-3 bottom-3 text-white"}>
+      <span
+        className="work-plate absolute inset-x-0 bottom-0 block text-white"
+        style={{ padding: lead ? "12px 16px 13px" : "9px 11px 10px" }}
+      >
         <span className="block font-bold tracking-tight leading-tight" style={{ fontFamily: "var(--font-display)", fontSize: lead ? "1.3rem" : "0.92rem" }}>{p.title}</span>
-        <span className="block mt-0.5" style={{ fontFamily: "var(--font-mono)", fontSize: lead ? "0.66rem" : "0.58rem", opacity: 0.86 }}>{p.role}</span>
+        <span className="block mt-0.5" style={{ fontFamily: "var(--font-sans)", fontSize: lead ? "0.7rem" : "0.6rem", opacity: 0.88 }}>{p.role}</span>
       </span>
     </button>
   );
@@ -333,7 +336,13 @@ export default function MobileLayout({
               }}
             />
             <div className="relative w-full flex flex-col items-center">
-              <NameSignature className="relative w-full overflow-hidden" style={{ height: "clamp(108px, 19vh, 168px)" }} />
+              <NameSignature
+                className="relative w-full overflow-hidden"
+                style={{ height: "clamp(108px, 19vh, 168px)" }}
+                /* Mobile only: the slate default read as washed-out grey
+                   against the sage hero. Desktop keeps the slate. */
+                ink="#3A5B4E"
+              />
               <div className="flex flex-col items-center gap-1.5" style={{ marginTop: "0.25rem" }}>
                 {["Game Designer", "UIUX Engineer", "Product Designer"].map((t) => (
                   <span
@@ -352,7 +361,7 @@ export default function MobileLayout({
 
       {/* 2 ── WORK — project gallery (its own section, below the hero) */}
       <section id="home-work" className="m-rise flex flex-col scroll-mt-4">
-        <SectionHead index="01">work.</SectionHead>
+        <SectionHead>work.</SectionHead>
         {/* Lead project full-width, the rest masonry-packed at native cover
             shape — split across two columns so differing heights interlock
             cleanly with no gaps (alt-index keeps higher-priority tiles on top). */}
@@ -372,7 +381,7 @@ export default function MobileLayout({
       {/* 3 ── HOBBIES — paged card carousel: vertical title on the left, photos
           on the right. Arrows page between hobby cards (hiking, tennis…). */}
       <section id="home-hiking" className="m-rise flex flex-col scroll-mt-4">
-        <SectionHead index="02">hobbies.</SectionHead>
+        <SectionHead>hobbies.</SectionHead>
 
         <div className="mt-5">
           {/* Card */}
@@ -430,19 +439,26 @@ export default function MobileLayout({
 
       {/* 4 ── SKILLS — headed section */}
       <section id="home-skills" className="m-rise flex flex-col scroll-mt-4">
-        <SectionHead index="03">skills.</SectionHead>
+        <SectionHead>skills.</SectionHead>
         <div className="mt-5 flex flex-wrap gap-2">
-          {skills.map((s) => (
-            <span key={s.name} style={{ fontFamily: "var(--font-mono)", fontSize: "0.75rem", color: "#374151", background: "rgba(46,51,54,0.06)", border: "1px solid rgba(46,51,54,0.08)", padding: "6px 11px", borderRadius: 9999 }}>
-              {s.name}
-            </span>
-          ))}
+          {skills
+            .filter((s) => s.category !== "tools")
+            .map((s) => (
+              <span key={s.name} style={{ fontFamily: "var(--font-sans)", fontSize: "0.75rem", color: "var(--color-text-primary)", background: "rgba(43,59,61,0.06)", padding: "6px 11px", borderRadius: 9999 }}>
+                {s.name}
+              </span>
+            ))}
+        </div>
+        {/* Software rides the same auto-scrolling marquee as the desktop
+            widget and the Skills inspect, so all three stay in step. */}
+        <div className="mt-4">
+          <SoftwareMarquee size="sm" />
         </div>
       </section>
 
       {/* 5 ── GALLERY — big title, tap-to-zoom thumbnails, View all below */}
       <section id="home-gallery" className="m-rise flex flex-col scroll-mt-4">
-        <SectionHead index="04">gallery.</SectionHead>
+        <SectionHead>gallery.</SectionHead>
         <div className="mt-5 grid grid-cols-2 gap-2.5">
           {galleryArt.map((a) => (
             <button
@@ -457,7 +473,7 @@ export default function MobileLayout({
         </div>
         <button
           onClick={open("gallery")}
-          className="mt-5 self-center inline-flex items-center justify-center gap-1.5 rounded-full cursor-pointer"
+          className="mt-5 self-center inline-flex items-center justify-center rounded-full cursor-pointer"
           style={{
             fontFamily: "var(--font-mono)",
             fontSize: "0.8rem",
@@ -469,7 +485,6 @@ export default function MobileLayout({
           }}
         >
           View all artwork
-          <ArrowUpRight size={15} weight="bold" />
         </button>
       </section>
 
@@ -499,32 +514,36 @@ export default function MobileLayout({
 
       {/* 7 ── CONNECT + LINKS — headed section */}
       <section id="home-contact" className="m-rise flex flex-col scroll-mt-4">
-        <SectionHead index="05">connect.</SectionHead>
-        <a href={`mailto:${personalInfo.email}`} className="mt-4" style={{ fontFamily: "var(--font-mono)", fontSize: "0.9rem", color: "var(--color-text-primary)" }}>
-          {personalInfo.email}
-        </a>
-        <a
-          href={`mailto:${personalInfo.email}`}
-          className="mt-4 inline-flex w-fit items-center gap-2 rounded-full font-semibold"
-          style={{ background: "var(--color-accent)", color: "#fff", fontSize: "0.9rem", padding: "10px 22px", boxShadow: "0 2px 6px rgba(43,59,61,0.16)" }}
-        >
-          Say Hello
-          <ArrowRight size={16} weight="bold" />
-        </a>
-        <div className="mt-5 flex gap-2.5">
-          {personalInfo.social.github && (
-            <SocialPill href={personalInfo.social.github} label="GitHub">
-              <GithubLogo size={20} weight="fill" />
+        <SectionHead>connect.</SectionHead>
+        {/* CTA and the social pills share one row. The email address used to
+            sit above them as plain text; it's redundant now — both "Say Hello"
+            and the envelope pill are the same mailto. */}
+        <div className="mt-4 flex items-center gap-2.5">
+          <a
+            href={`mailto:${personalInfo.email}`}
+            className="contact-cta inline-flex shrink-0 items-center gap-2 rounded-full font-semibold"
+            style={{ background: "var(--color-accent)", color: "#fff", fontSize: "0.9rem", boxShadow: "0 2px 6px rgba(43,59,61,0.16)" }}
+          >
+            Say Hello
+            <ArrowRight size={16} weight="bold" />
+          </a>
+          {/* Pills push to the right edge so the row reads CTA · · · links
+              rather than one undifferentiated cluster. */}
+          <div className="ml-auto flex shrink-0 gap-2.5">
+            {personalInfo.social.github && (
+              <SocialPill href={personalInfo.social.github} label="GitHub">
+                <GithubLogo size={20} weight="fill" />
+              </SocialPill>
+            )}
+            {personalInfo.social.linkedin && (
+              <SocialPill href={personalInfo.social.linkedin} label="LinkedIn">
+                <LinkedinLogo size={20} weight="fill" />
+              </SocialPill>
+            )}
+            <SocialPill href={`mailto:${personalInfo.email}`} label="Email">
+              <EnvelopeSimple size={20} weight="regular" />
             </SocialPill>
-          )}
-          {personalInfo.social.linkedin && (
-            <SocialPill href={personalInfo.social.linkedin} label="LinkedIn">
-              <LinkedinLogo size={20} weight="fill" />
-            </SocialPill>
-          )}
-          <SocialPill href={`mailto:${personalInfo.email}`} label="Email">
-            <EnvelopeSimple size={20} weight="regular" />
-          </SocialPill>
+          </div>
         </div>
       </section>
 
@@ -551,10 +570,8 @@ function SocialPill({ href, label, children }: { href: string; label: string; ch
       target={href.startsWith("mailto:") ? undefined : "_blank"}
       rel="noopener noreferrer"
       aria-label={label}
-      className="grid place-items-center rounded-full transition-colors"
+      className="contact-pill grid place-items-center rounded-full transition-colors"
       style={{
-        width: 44,
-        height: 44,
         background: "var(--color-glass-bg)",
         border: "1px solid var(--color-hairline-strong)",
         color: "var(--color-text-primary)",

@@ -22,16 +22,24 @@ import { isPerfLite } from "@/lib/perf-tier";
 const DWELL = 2900; // hold a finished name before it dissolves (ms)
 const DISSOLVE = 800; // ink fade-out (ms)
 const GAP = 600; // blank beat between the two names (ms)
-const INK = "#7A828A"; // soft slate handwriting ink
+/* Default handwriting ink — soft slate. The desktop widget keeps this.
+ * vara and hanzi-writer both want a concrete colour string, so callers that
+ * want the palette green pass it in rather than the component reaching for a
+ * CSS token itself. */
+const INK = "#7A828A";
 
 let varaSeq = 0;
 
 export default function NameSignature({
   className = "relative w-full h-full overflow-hidden",
   style,
+  ink = INK,
 }: {
   className?: string;
   style?: CSSProperties;
+  /** Stroke colour for both the cursive and the hanzi passes. Mobile passes
+   *  the palette's dark green; the desktop widget keeps the slate default. */
+  ink?: string;
 }) {
   const stageRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +58,7 @@ export default function NameSignature({
     }
 
     if (prefersReduced) {
-      renderStatic(stage);
+      renderStatic(stage, ink);
       return () => {
         stage.replaceChildren();
       };
@@ -154,7 +162,7 @@ export default function NameSignature({
             {
               fontSize: 46,
               strokeWidth: 2.2,
-              color: INK,
+              color: ink,
               duration: 2400,
               textAlign: "center",
               autoAnimation: true,
@@ -180,7 +188,7 @@ export default function NameSignature({
             height: size,
             padding: Math.round(size * 0.05),
             showCharacter: false,
-            strokeColor: INK,
+            strokeColor: ink,
             strokeAnimationSpeed: 1.1,
             delayBetweenStrokes: 55,
             charDataLoader: hanzi.hanziLoader,
@@ -252,11 +260,11 @@ function renderCursive(stage: HTMLDivElement) {
 }
 
 /** Settled, motion-free mark for prefers-reduced-motion users. */
-function renderStatic(stage: HTMLDivElement) {
+function renderStatic(stage: HTMLDivElement, ink: string) {
   const wrap = document.createElement("div");
   wrap.style.cssText =
     "position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:" +
-    INK +
+    ink +
     ";";
   const zh = document.createElement("div");
   zh.textContent = "顾文俊";

@@ -1758,3 +1758,44 @@ html.perf-lite .cc-layer[data-state] .cc-ring {
   }
   .skill-group__label { padding-top: 0; }
 }
+
+/* Mobile connect row — "Say Hello" and the three social pills share one line.
+   Sized in CSS rather than inline so the narrowest phones can tighten up:
+   at 44px pills + 22px CTA padding the row overflows a 320px viewport by
+   ~11px. */
+.contact-cta {
+  padding: 10px 22px;
+}
+.contact-pill {
+  width: 44px;
+  height: 44px;
+}
+@media (max-width: 359px) {
+  .contact-cta {
+    padding: 10px 16px;
+  }
+  .contact-pill {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Mobile work tile caption — tinted frosted glass plate.
+   Blur earns its place here: the plate sits directly on project artwork, so
+   it needs a ground of its own. The tint is heavy enough (0.72) that white
+   text clears 4.5:1 even over a pure-white image; the blur is what keeps it
+   reading as glass rather than a flat bar. */
+.work-plate {
+  background: rgba(22, 30, 32, 0.72);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+/* perf-lite skips backdrop-filter everywhere; compensate with more tint so
+   the caption stays legible without the blur doing any work. */
+html.perf-lite .work-plate {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: rgba(22, 30, 32, 0.86);
+}
