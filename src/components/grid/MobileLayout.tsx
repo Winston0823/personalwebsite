@@ -6,6 +6,7 @@ import { WidgetType } from "@/lib/grid-types";
 import ImageLightbox from "@/components/common/ImageLightbox";
 import NameSignature from "@/components/common/NameSignature";
 import SoftwareMarquee from "@/components/common/SoftwareMarquee";
+import { thumbSrc } from "@/lib/artwork-src";
 import MobileSectionNav from "@/components/common/MobileSectionNav";
 import { GithubLogo, LinkedinLogo, EnvelopeSimple, MusicNotes, ArrowRight, ArrowLeft } from "@phosphor-icons/react";
 
@@ -467,7 +468,7 @@ export default function MobileLayout({
               className="relative overflow-hidden rounded-xl cursor-pointer"
               style={{ aspectRatio: "1", boxShadow: "0 10px 24px -16px rgba(20,30,60,0.4)" }}
             >
-              <Image src={a.image} alt={a.title} fill sizes="46vw" className="object-cover" />
+              <Image src={thumbSrc(a.image)} alt={a.title} fill sizes="46vw" className="object-cover" />
             </button>
           ))}
         </div>

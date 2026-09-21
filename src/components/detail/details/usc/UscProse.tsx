@@ -1,7 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Project } from "@/lib/detail-types";
+import { isPerfLite } from "@/lib/perf-tier";
 import Reveal from "../../shared/Reveal";
 
 /* Act 3 — the write-up, in the team's own first-person voice. Each block is a
@@ -20,6 +22,7 @@ function DecisionBlock({
   paragraphs,
   image,
   imageAlt,
+  video,
   anchor,
   label,
 }: {
@@ -28,9 +31,20 @@ function DecisionBlock({
   paragraphs: ReactNode[];
   image?: string;
   imageAlt?: string;
+  /** Screen recording shown instead of the still. Muted, looping, inline —
+   *  decoration, so it carries no controls and never blocks the reader. */
+  video?: string;
   anchor: string;
   label: string;
 }) {
+  // Weak devices get the still instead of a looping screen recording — the
+  // same trade the rest of the case study makes (see PixelLiquidDemo). Gated
+  // behind mount so the server render and first client render agree; the
+  // video element is never created on lite, so the file isn't fetched.
+  const [lite, setLite] = useState(false);
+  useEffect(() => setLite(isPerfLite()), []);
+  const showVideo = Boolean(video) && !lite;
+  const media = video ?? image;
   return (
     <Reveal
       id={anchor}
@@ -49,7 +63,7 @@ function DecisionBlock({
           {title}
         </h3>
       </div>
-      <div className={image ? "grid grid-cols-1 md:grid-cols-2 gap-6 items-center" : ""}>
+      <div className={media ? "grid grid-cols-1 md:grid-cols-2 gap-6 items-center" : ""}>
         <div className="flex flex-col gap-3">
           {paragraphs.map((p, i) => (
             <p
@@ -60,13 +74,32 @@ function DecisionBlock({
             </p>
           ))}
         </div>
-        {image && (
+        {media && (
           <div
             className="hard-frame relative w-full overflow-hidden rounded-xl"
             style={{ aspectRatio: "16 / 9" }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={image} alt={imageAlt ?? ""} className="absolute inset-0 w-full h-full object-cover" loading="lazy" decoding="async" />
+            {showVideo && video ? (
+              <video
+                src={video}
+                className="absolute inset-0 w-full h-full object-cover"
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                aria-label={imageAlt ?? ""}
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={image}
+                alt={imageAlt ?? ""}
+                className="absolute inset-0 w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
           </div>
         )}
       </div>
@@ -107,17 +140,15 @@ export default function UscProse({ project }: { project: Project }) {
         index="01"
         title="Ten divisions, ten personalities."
         paragraphs={[
-          <>While there are 10 different subdivisions in our team, we had to show that we
-          are one &mdash; while still showing our subtle differences through copy, images,
-          and signature coloring.</>,
-          <>The CTA is consistent: one bright yellow button that contrasts hard against the
-          existing black-and-white palette.</>,
-          <>Every title is personalized so the reader remembers it. A recruiting page should
-          feel like it was made by the people who&rsquo;d actually be your teammates &mdash;
-          Aero literally opens with <Em>&ldquo;WE MAKE AIR DO WHAT WE WANT.&rdquo;</Em></>,
+          <>Ten subdivisions had to read as one team while keeping their own voice through
+          copy, images, and signature color.</>,
+          <>The CTA never changes: one bright yellow button against the black-and-white
+          palette. Titles are personalized, so Aero opens with
+          <Em>&ldquo;WE MAKE AIR DO WHAT WE WANT.&rdquo;</Em></>,
         ]}
+        video="/usc-ascii-carousel.mp4"
         image="/images/usc-racing/usc-racing-aero.png"
-        imageAlt="Aerodynamics division page"
+        imageAlt="A division page's hero photos dissolving into a tinted ASCII glyph field and back"
         anchor="usc-divisions"
         label="Divisions"
       />
@@ -126,15 +157,12 @@ export default function UscProse({ project }: { project: Project }) {
         index="02"
         title="Specs as glass, not tables."
         paragraphs={[
-          <>Numbers are what win sponsors over &mdash; 0&ndash;40 in 3.2 seconds, 80 kW,
-          600 volts, 230 kilograms. That&rsquo;s the proof we actually build something
-          serious.</>,
-          <>But nobody&rsquo;s ever been wowed by a spec table. So instead of rows buried in
-          a footer, the numbers float over the car as frosted-glass cards in mono type
-          &mdash; less datasheet, more live telemetry.</>,
-          <>The specs become part of the cinematic instead of a chore to scroll past. They
-          sit in the world, reinforcing the &ldquo;this is real engineering&rdquo; story the
-          render is already selling.</>,
+          <>Numbers are what win sponsors over: <Em>0&ndash;40 in 3.2 seconds</Em>, 80 kW,
+          600 volts, 230 kilograms.</>,
+          <>Nobody has ever been wowed by a spec table, so the numbers float over the car as
+          frosted-glass cards in mono type. They read as live telemetry instead of a
+          datasheet, and become part of the cinematic rather than a chore to scroll
+          past.</>,
         ]}
         image="/images/usc-racing/usc-racing-sponsorship.png"
         imageAlt="Sponsorship page with telemetry-style stats"
@@ -146,15 +174,11 @@ export default function UscProse({ project }: { project: Project }) {
         index="03"
         title="Motion that respects the reader."
         paragraphs={[
-          <>Motion is the fastest way to look expensive &mdash; and the fastest way to make
-          someone seasick. We wanted the site to feel engineered, not like a theme-park
-          ride.</>,
-          <>So every effect earns its place: the whole page glides on one smooth-scroll,
-          sections ease in as you reach them, and anything still half-finished stays behind a
-          flag so the live site never ships unpolished.</>,
-          <>Flip on reduced motion and it all quietly steps aside. It should feel considered
-          at any scroll speed &mdash; and stay usable for anyone who&rsquo;d rather it hold
-          still.</>,
+          <>Motion is the fastest way to look expensive, and the fastest way to make someone
+          seasick.</>,
+          <>So every effect earns its place: the page glides on one smooth-scroll, sections
+          ease in as you reach them, and unfinished work stays behind a flag. Turn on
+          reduced motion and all of it quietly steps aside.</>,
         ]}
         anchor="usc-motion"
         label="Motion"

@@ -65,14 +65,9 @@ export default function LayerShowcase() {
           className="text-white/70 mt-3 max-w-2xl"
           style={{ fontFamily: "var(--font-sans)", fontSize: "1.02rem", lineHeight: 1.65 }}
         >
-          Having a cool formula car is what defines the team&rsquo;s success. But to
-          accurately display who we are, I decided to design more than just a showcase of
-          our work &mdash; a true insight into what we like and could create. Our hero
-          shows the photoreal render the world sees, and an interactive hover that reveals
-          the holographic wireframe of the parts underneath. As you move across it, the
-          render <em>pixel-dissolves</em> into the wireframe, melting into the engineering
-          side of our team. Same framing, same camera, so the dissolve lands
-          pixel-for-pixel.
+          The hero shows the photoreal render the world sees. Hover it and the render
+          <em> pixel-dissolves</em> into the holographic wireframe of the parts underneath.
+          Same framing, same camera, so the dissolve lands pixel-for-pixel.
         </p>
       </Reveal>
 

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { artworks } from "@/lib/detail-content";
 import { useBreakpoint } from "@/hooks/useBreakpoint";
 import ImageLightbox, { type LightboxItem } from "@/components/common/ImageLightbox";
+import { thumbSrc } from "@/lib/artwork-src";
 
 const ROW_UNIT = 8;
 const GAP = 12;
@@ -77,7 +78,7 @@ export default function GalleryDetail() {
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={art.image}
+                src={thumbSrc(art.image)}
                 alt={art.title}
                 loading="lazy"
                 decoding="async"
