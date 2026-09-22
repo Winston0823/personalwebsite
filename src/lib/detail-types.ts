@@ -97,6 +97,10 @@ export interface Project {
    *  shows a "Coming soon" badge. Use for work that's worth listing but not
    *  yet written up. */
   comingSoon?: boolean;
+  /** When true, the grid card shows a small green "In progress" pill in its
+   *  top-right corner. Independent of `comingSoon` — the project still opens
+   *  its normal case study. */
+  inProgress?: boolean;
   /** Lower number = higher up in the projects grid. Projects without a
    *  priority fall to the end, preserving the order they appear in the
    *  data file. Use integers (1, 2, 3, …) but gaps are fine. */

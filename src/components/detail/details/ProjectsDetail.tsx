@@ -1736,6 +1736,22 @@ function ProjectGrid({
                   Coming soon
                 </span>
               )}
+              {project.inProgress && (
+                <span
+                  className="absolute top-3 right-3 z-10 inline-flex items-center rounded-full px-2.5 py-1 uppercase"
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.56rem",
+                    letterSpacing: "0.16em",
+                    color: "#2B3B3D",
+                    background: "rgba(168,191,176,0.92)",
+                    border: "3px solid rgba(255,255,255,0.9)",
+                    backdropFilter: "blur(4px)",
+                  }}
+                >
+                  In progress
+                </span>
+              )}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={project.thumbnail}

@@ -522,7 +522,7 @@ body[data-detail-theme="minimal"] .detail-scroll {
   overflow: hidden;
   cursor: pointer;
   transform-style: preserve-3d;
-  transform: perspective(900px) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--scale));
+  transform: perspective(1200px) rotateX(var(--rx)) rotateY(var(--ry)) scale(var(--scale));
   contain: layout paint;
   box-shadow:
     0 2px 6px rgba(43, 59, 61, 0.08),
@@ -852,10 +852,10 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
   visibility: hidden !important;
 }
 
-/* ── Vinyl record (Now Playing detail) ──
-   Album art clipped into the inner circle of a black vinyl with subtle
-   concentric grooves and a small accent-colored center label. Spins
-   continuously while the detail panel is mounted. */
+/* ── Turntable (Now Playing detail) ──
+   The opened widget is a single object: a record player, centered, with the
+   album art as the disc. Plinth + platter + tonearm are pure CSS; only the
+   disc rotates. */
 @keyframes spin-disc {
   to { transform: rotate(360deg); }
 }
@@ -863,8 +863,8 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
 .vinyl {
   position: relative;
   aspect-ratio: 1;
-  width: clamp(320px, 42vw, 480px);
-  margin: 0 auto;
+  width: 78%;
+  margin: 0;
   border-radius: 50%;
   background: #000;
   box-shadow:
@@ -902,7 +902,8 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
   border-radius: 50%;
   object-fit: cover;
   pointer-events: none;
-  animation: spin-disc 5s linear infinite;
+  /* 6.25s = 5s at 80% speed — a calmer, closer-to-real platter rotation. */
+  animation: spin-disc 6.25s linear infinite;
   will-change: transform;
 }
 
@@ -910,6 +911,88 @@ body:has(.detail-panel.is-closing) .filter-sidebar {
   .vinyl__art {
     animation: none;
   }
+}
+
+/* Plinth — the player body. Square-ish slab the platter sits in. */
+.turntable {
+  position: relative;
+  width: clamp(300px, 46vw, 460px);
+  aspect-ratio: 1 / 1.04;
+  margin: 0 auto;
+  border-radius: 18px;
+  background: linear-gradient(160deg, #35474a 0%, #243234 60%, #1d282a 100%);
+  box-shadow:
+    0 30px 80px -20px rgba(20, 30, 31, 0.55),
+    0 8px 20px -8px rgba(20, 30, 31, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+/* Platter — the metal disc under the record. Slightly larger than the vinyl
+   so a rim of machined edge reads around it. */
+.turntable__platter {
+  position: relative;
+  width: 84%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 50% 50%, #4b5f61 0%, #3a4c4e 62%, #2b3b3d 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 6px 18px rgba(0, 0, 0, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Tonearm — pivot puck near the top-right corner with the arm swung down onto
+   the outer third of the record, where a stylus would actually sit. The shaft
+   is a child so it can rotate about the pivot without dragging the puck with
+   it. Decorative, so it never intercepts the pointer. */
+.turntable__arm {
+  position: absolute;
+  top: 9%;
+  right: 8%;
+  width: 11%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #c9d4d2, #7d8f8d 70%, #5c6c6b);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Shaft — anchored at the pivot centre, rotated toward the record. */
+.turntable__arm-shaft {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 250%;
+  height: 8%;
+  min-height: 5px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #d5dedc, #93a3a1 55%, #6b7b7a);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+  transform-origin: 0 50%;
+  transform: rotate(136deg);
+}
+
+/* Headshell at the far end of the shaft, counter-rotated so it reads flat. */
+.turntable__arm-shaft::after {
+  content: "";
+  position: absolute;
+  right: -6%;
+  top: 50%;
+  width: 22%;
+  height: 300%;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #e2e9e7, #8e9e9c);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+  transform: translateY(-50%) rotate(-16deg);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -1354,11 +1437,19 @@ html:not(.cc-active) [data-cursor="compare"] {
 .cc-layer[data-state="button"] .cc-ring,
 .cc-layer[data-state="prev"] .cc-ring,
 .cc-layer[data-state="next"] .cc-ring,
+/* Close is the one dismissing action, so it fills solid and ignores the
+   per-project palette: a bright red chip with a white X, the same red the
+   trash zone uses. Reads instantly over the dimmed backdrop, a light panel,
+   or full-bleed case-study art. */
 .cc-layer[data-state="close"] .cc-ring {
   width: 38px;
   height: 38px;
-  border-color: var(--cc-accent);
-  background: var(--cc-accent-faint);
+  /* No outline of any kind — the chip is one flat red disc, and the halo is
+     a soft red bloom rather than a hairline edge. */
+  border: none;
+  background: #ff3b30;
+  color: #fff;
+  box-shadow: 0 2px 14px rgba(255, 59, 48, 0.45);
   justify-content: center;
 }
 
@@ -1473,14 +1564,19 @@ html:not(.cc-active) [data-cursor="compare"] {
   --cc-glow: 0 0 10px rgba(232, 58, 138, 0.55), 0 0 4px rgba(232, 58, 138, 0.4);
 }
 
-/* AWL — minimal monochrome: near-black accent, hairline ring, no glow. */
+/* AWL — minimal monochrome, inverted: the case study is a dark cinematic page
+   (near-black grounds, white type), so the dot/ring are white. The pill keeps
+   its frosted-white chip, so its label stays near-black to remain legible. */
 .cc-layer[data-theme="awl"] {
-  --cc-accent: #111113;
-  --cc-accent-soft: rgba(17, 17, 19, 0.5);
-  --cc-accent-faint: rgba(17, 17, 19, 0.06);
-  --cc-pill-border: rgba(17, 17, 19, 0.35);
+  --cc-accent: #ffffff;
+  --cc-accent-soft: rgba(255, 255, 255, 0.55);
+  --cc-accent-faint: rgba(255, 255, 255, 0.10);
+  --cc-pill-border: rgba(17, 17, 19, 0.22);
   --cc-contrast: #111113;
   --cc-glow: 0 0 transparent;
+  /* Flip the contrast halo: a white cursor needs a dark edge, not a light
+     bloom, to stay visible if it crosses a pale frame or image. */
+  --cc-halo: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 0 6px rgba(0, 0, 0, 0.35);
 }
 /* Thin the ring to a hairline so it reads as a precise monochrome marker. */
 .cc-layer[data-theme="awl"] .cc-ring {

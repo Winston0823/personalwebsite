@@ -1,6 +1,6 @@
 import type { MouseEvent } from "react";
 
-const MAX_TILT = 8;
+const MAX_TILT = 3.5;
 const HOVER_SCALE = 1.04;
 
 // RAF-throttle: coalesce multiple mousemove events into one per animation

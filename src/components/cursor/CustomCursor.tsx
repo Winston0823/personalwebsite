@@ -317,6 +317,8 @@ export default function CustomCursor() {
       case "next":
         return <CaretRight size={ICON_SIZE + 2} weight="bold" />;
       case "close":
+        // `fill` would draw Phosphor's boxed X (a filled square with the mark
+        // knocked out) — we want the bare white mark on the red disc.
         return <X size={ICON_SIZE + 2} weight="bold" />;
       default:
         return null;

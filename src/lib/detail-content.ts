@@ -373,6 +373,7 @@ export const projects: Project[] = [
     roles: [],
     featured: false,
     comingSoon: false,
+    inProgress: true,
     heroStyle: "ambit",
     thumbnail: "/images/ambit/hero.jpg",
     date: "2026 — in progress",
