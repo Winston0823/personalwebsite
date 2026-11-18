@@ -17,6 +17,13 @@ Review: Browser inspection confirmed an intact idle ring, a final arrow pointing
 
 Review: The new seam sits where the oval's outgoing tangent aims toward the email, and the route's first Bézier handle follows that tangent. Browser inspection showed a flowing join during the transition, a curved final arrow, and a complete rewind. TypeScript, production build, diff check, and the restarted localhost preview passed.
 
+### Lower-edge arrow departure
+
+- [x] Move the oval seam to its bottom edge and preserve tangent continuity into the email route.
+- [x] Check the hover and rewind in the preview, run the build, and update the preview branch.
+
+Review: Browser inspection showed the arrow starting at the oval's lower edge, curling toward the email, and returning to the oval. TypeScript, diff check, and the production build passed; the local preview was restarted on port 3000.
+
 ## Contact namecard — 2026-11-18
 
 - [x] Replace the oversized contact callout with a linked namecard showing name, email, and doggo.

@@ -14,3 +14,4 @@
 - When adding a new block below a project grid, inspect the last card's caption-to-block gap as well as the block-to-footer gap. A zero top margin can make a card feel attached to the previous caption even when its internal spacing is generous.
 - For a line-to-arrow hover effect, keep the ring and arrow on one continuous path. Move its leading and trailing visible bounds on one reversible timeline so the head leads, the tail follows, and pointer exit naturally rewinds.
 - A continuous SVG path can still make an abrupt visual corner when adjacent Bézier segments have different tangents. Choose the ring seam from the destination direction and align the outgoing control point with the ring's ending tangent.
+- In a morphing line animation, tangent continuity alone does not set the desired visual origin. Place the seam on the part of the shape the user names, then choose traversal direction and outgoing handle to keep the motion smooth.

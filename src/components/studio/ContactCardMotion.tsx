@@ -72,8 +72,8 @@ export default function ContactCardMotion() {
       const radiusY = mark.height * 0.46;
       const endX = address.right - bounds.left + 20;
       const endY = address.top - bounds.top + address.height / 2;
-      // Put the seam where the oval's tangent naturally heads toward the email.
-      // The small periodic wobble keeps the ring drawn rather than mechanical.
+      // Depart from the lower edge of the oval, then follow its tangent toward
+      // the email. The small periodic wobble keeps the ring hand drawn.
       const ringPoint = (angle: number) => {
         const wobble = 1 + 0.015 * Math.sin(angle * 3 + 0.5) + 0.008 * Math.cos(angle * 5);
         return {
@@ -86,12 +86,9 @@ export default function ContactCardMotion() {
         const after = ringPoint(angle + 0.001);
         return { x: (after.x - before.x) / 0.002, y: (after.y - before.y) / 0.002 };
       };
-      const seamAngle = Math.atan2(
-        (endX - centerX) / radiusX,
-        -(endY - centerY) / radiusY,
-      );
+      const seamAngle = Math.PI * 0.56;
       const seam = ringPoint(seamAngle);
-      const step = -Math.PI / 4;
+      const step = Math.PI / 4;
       const ringParts = [`M ${seam.x} ${seam.y}`];
       for (let index = 0; index < 8; index++) {
         const angle = seamAngle + step * index;
@@ -115,8 +112,8 @@ export default function ContactCardMotion() {
       const tangentLength = Math.hypot(tangent.x, tangent.y);
       const reach = Math.hypot(endX - seam.x, endY - seam.y);
       const handle = Math.min(115, reach * 0.25);
-      const firstX = seam.x - tangent.x / tangentLength * handle;
-      const firstY = seam.y - tangent.y / tangentLength * handle;
+      const firstX = seam.x + tangent.x / tangentLength * handle;
+      const firstY = seam.y + tangent.y / tangentLength * handle;
       const route = `C ${firstX} ${firstY}, ${endX - (endX - seam.x) * 0.2} ${endY - (endY - seam.y) * 0.18}, ${endX} ${endY}`;
       svg.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
       oval.setAttribute("d", ring);
