@@ -12,3 +12,4 @@
 - When a visual experiment reaches a user-selected result, promote the selected values into the actual design tokens and remove the experiment UI and persistence path so the default is stable for everyone.
 - When a portfolio contact panel is asked to become a namecard, preserve its direct email action but reduce the content to identity and contact details; let a small brand-specific interaction supply personality.
 - When adding a new block below a project grid, inspect the last card's caption-to-block gap as well as the block-to-footer gap. A zero top margin can make a card feel attached to the previous caption even when its internal spacing is generous.
+- For a line-to-arrow hover effect, keep the ring and arrow on one continuous path. Move its leading and trailing visible bounds on one reversible timeline so the head leads, the tail follows, and pointer exit naturally rewinds.

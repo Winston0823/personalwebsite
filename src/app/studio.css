@@ -808,7 +808,7 @@ body:has(.studio) {
 }
 .contact-card-copy {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   min-width: 0;
 }
 .contact-card h2 {
@@ -845,6 +845,7 @@ body:has(.studio) {
 }
 .contact-card-doggo {
   position: relative;
+  z-index: 2;
   display: grid;
   place-items: center;
   justify-self: center;
@@ -857,8 +858,27 @@ body:has(.studio) {
   inset: 4% 0;
   border: 1.5px solid #ffffff8a;
   border-radius: 46% 54% 52% 48% / 53% 45% 55% 47%;
-  transform: rotate(-8deg);
-  transition: border-radius 600ms ease, transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 120ms ease;
+}
+.contact-card[data-motion-ready="true"] .contact-card-doggo::before {
+  opacity: 0;
+}
+.contact-card-motion {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.contact-card-trace,
+.contact-card-arrowhead {
+  stroke: #ffffffa8;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 .contact-card-doggo img {
   position: relative;
@@ -869,11 +889,6 @@ body:has(.studio) {
   filter: brightness(0) invert(1);
   transform: rotate(-4deg);
   transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-.contact-card:hover .contact-card-doggo::before,
-.contact-card:focus-visible .contact-card-doggo::before {
-  border-radius: 52% 48% 46% 54% / 46% 56% 44% 54%;
-  transform: rotate(7deg) scale(1.04);
 }
 .contact-card:hover .contact-card-doggo img,
 .contact-card:focus-visible .contact-card-doggo img {

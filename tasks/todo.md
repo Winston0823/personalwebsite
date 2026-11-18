@@ -1,5 +1,15 @@
 # Mobile Experience Overhaul — Audit & Plan (2026-06-14)
 
+## Namecard line-to-arrow motion — 2026-11-18
+
+- [x] Animate the existing doggo ring as one hand-drawn stroke whose head reaches the email before its tail follows.
+- [x] Rewind on pointer exit, support keyboard focus and reduced motion, and keep the geometry responsive.
+- [x] Inspect the idle and active states in the preview, run a production build, and leave the work on a separate branch.
+
+Design: The oval begins and ends at its left tip. Its leading end extends on a curved route toward the email and grows an arrowhead; the trailing end unwraps the oval after a short delay. Reversing the same timeline wraps the line back around doggo. Use SVG stroke lengths and direct DOM updates so there are no React renders per animation frame.
+
+Review: Browser inspection confirmed an intact idle ring, a final arrow pointing to the email, and a complete rewind after pointer exit. Keyboard focus triggered the same motion. The SVG path is measured against the live card/doggo/email positions and resized with them; reduced-motion preference jumps directly between the two states. TypeScript, diff check, production build, and localhost response passed. The preview branch is `codex/namecard-arrow-motion`.
+
 ## Contact namecard — 2026-11-18
 
 - [x] Replace the oversized contact callout with a linked namecard showing name, email, and doggo.

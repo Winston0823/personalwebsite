@@ -7,6 +7,7 @@ import { personalInfo, projects } from "@/lib/detail-content";
 import StudioNav from "@/components/studio/StudioNav";
 import DoggoTransfer from "@/components/studio/DoggoTransfer";
 import SquiggleOutline from "@/components/studio/SquiggleOutline";
+import ContactCardMotion from "@/components/studio/ContactCardMotion";
 import TypedDesignerRole from "@/components/studio/TypedDesignerRole";
 import NameSignature from "@/components/common/NameSignature";
 import { projectPath } from "@/lib/project-paths";
@@ -176,6 +177,7 @@ export default function Home() {
               href={`mailto:${personalInfo.email}`}
               aria-label={`Email Winston Gu at ${personalInfo.email}`}
             >
+              <ContactCardMotion />
               <span className="contact-card-copy">
                 <h2>Winston Gu</h2>
                 <span className="contact-card-email">{personalInfo.email}</span>
