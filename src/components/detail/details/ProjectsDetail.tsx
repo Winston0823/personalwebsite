@@ -1800,7 +1800,7 @@ function ProjectGrid({
 
 /* ── Main Component ── */
 
-export default function ProjectsDetail({ initialProjectId }: { initialProjectId?: string }) {
+export default function ProjectsDetail({ initialProjectId, onNavigateBack }: { initialProjectId?: string; onNavigateBack?: () => void }) {
   // When opened from a mobile project card we deep-link straight into that
   // project's case study (skipping the grid). Seed from the initializer so the
   // grid never flashes for a frame before the swap.
@@ -1833,7 +1833,7 @@ export default function ProjectsDetail({ initialProjectId }: { initialProjectId?
         {selectedProject ? (
           <ProjectCaseStudy
             project={selectedProject}
-            onBack={() => setSelectedProject(null)}
+            onBack={onNavigateBack ?? (() => setSelectedProject(null))}
           />
         ) : (
           <ProjectGrid filter={filter} onSelect={setSelectedProject} />

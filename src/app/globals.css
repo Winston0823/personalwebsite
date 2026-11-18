@@ -1,30 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  /* Palette from the supplied three-swatch reference: pale sage / sea green /
-     dark slate teal. The sage is the page ground and the slate is the ink —
-     the mid green is the accent. Only the card surface and the hairlines are
-     derived, because the reference has no near-white or border value. */
-  --color-bg: #A8BFB0;          /* ref swatch 1, literal */
-  --color-text-primary: #2B3B3D; /* ref swatch 3, literal */
-  --color-text-secondary: #5A6E6C;
-  /* Accent for TEXT is the mid green darkened to clear 4.5:1 on the card
-     surface; --color-accent-bright is the literal ref swatch, used for fills
-     and marks where contrast isn't a legibility question. */
-  --color-accent: #4E7566;
-  --color-accent-hover: #3A5B4E;
-  --color-accent-bright: #6F9A8B; /* ref swatch 2, literal */
-  /* Card surfaces are fully opaque. The names stay `glass-*` so the ~30
-     call sites don't churn, but nothing here is translucent any more. */
-  --color-glass-bg: #F3F6F3;
-  --color-glass-bg-hover: #FFFFFF;
-  --color-hairline: #93AC9D;
-  --color-hairline-strong: #7E9A8A;
-  /* Software marks in the Skills marquee — the pale sage of ref swatch 1. */
-  --color-logo: #A8BFB0;
-  /* Warm cream used for polaroid-style matting around inline artifacts
-     (editorial header poster card, narrative-block sketches). */
-  --color-cream-paper: #f5f3ee;
+  /* Neutral shared UI; case studies retain their own project art direction. */
+  --color-bg: #ffffff;
+  --color-text-primary: #252525;
+  --color-text-secondary: #636360;
+  --color-accent: #615092;
+  --color-accent-hover: #46386c;
+  --color-accent-bright: #d4ff5a;
+  --color-glass-bg: #f2f2ef;
+  --color-glass-bg-hover: #ffffff;
+  --color-hairline: #b7b7b1;
+  --color-hairline-strong: #92928c;
+  --color-logo: #b9b9b2;
+  --color-cream-paper: #f1f1ed;
   /* Monospace stack used by case studies with heroStyle="minimal".
      System-first so we don't ship a new font file. */
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco,
@@ -1895,3 +1884,7 @@ html.perf-lite .work-plate {
   backdrop-filter: none;
   background: rgba(22, 30, 32, 0.86);
 }
+
+/* Keep the original rearrangeable desktop available as an experiment. */
+.playground-home { position:fixed; left:20px; top:18px; z-index:45; color:var(--color-text-primary); background:var(--color-glass-bg); border:1px solid var(--color-hairline); border-radius:20px; padding:8px 14px; font:12px var(--font-supreme),sans-serif; }
+.playground-home:focus-visible { outline:2px solid var(--color-accent); outline-offset:3px; }

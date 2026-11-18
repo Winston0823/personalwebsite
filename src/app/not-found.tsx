@@ -25,8 +25,8 @@ export default function NotFound() {
           className="text-text-secondary leading-relaxed"
           style={{ fontSize: "var(--text-body)" }}
         >
-          The URL might be wrong, or the widget might be still in the drawer.
-          Either way — let&apos;s head back to the dashboard.
+          This experiment may have moved, or the URL might be wrong. Either way
+          — let&apos;s head back to the studio.
         </p>
         <div className="flex justify-center pt-2">
           <Link
@@ -35,7 +35,7 @@ export default function NotFound() {
             style={{ fontSize: "var(--text-body)" }}
           >
             <span aria-hidden="true">←</span>
-            Back to the dashboard
+            Back to the studio
           </Link>
         </div>
       </div>
