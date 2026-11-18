@@ -50,9 +50,8 @@ const clash = localFont({
   display: "swap",
 });
 
-// Ambit's real type pairing, self-hosted from the Ambit app's own font files
-// (constants/theme.ts → Zodiak-Bold display, PlusJakartaSans body). Scoped to
-// the Ambit case study.
+// Zodiak and Plus Jakarta Sans are the studio typography pairing. They are
+// also used in the Ambit case study, where these files originated.
 const zodiak = localFont({
   src: [
     {

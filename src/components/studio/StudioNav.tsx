@@ -8,14 +8,14 @@ import SquiggleOutline from "./SquiggleOutline";
 export default function StudioNav({
   page = "home",
 }: {
-  page?: "home" | "sandbox";
+  page?: "home" | "sandbox" | "about";
 }) {
   const shellRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const shell = shellRef.current;
     const header = shell?.querySelector<HTMLElement>(".studio-header");
     const nav = header?.querySelector<HTMLElement>("nav");
-    const logo = header?.querySelector<HTMLImageElement>(".wordmark img");
+    const logo = header?.querySelector<HTMLImageElement>(".wordmark img:not(.doggo-ghost)");
     const contact = header?.querySelector<HTMLElement>(".header-contact");
     if (!shell || !header || !nav || !logo || !contact) return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
@@ -124,26 +124,15 @@ export default function StudioNav({
           data-doggo-home={page === "home" ? "true" : undefined}
         >
           {page === "home" && (
-            <svg
+            <img
               className="doggo-ghost"
-              viewBox="0 0 200 104"
+              src="/images/cat-mark.png"
+              alt=""
               aria-hidden="true"
-              focusable="false"
-            >
-              <g
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeDasharray=".4 6"
-              >
-                <path d="M 39 36 L 56 5 L 85 34 M 135 36 L 153 5 L 175 36 M 34 44 C 18 51 11 64 10 78 C 24 105 149 109 192 86 C 204 79 196 66 188 56" />
-                <circle cx="79" cy="58" r="5" />
-                <circle cx="132" cy="58" r="5" />
-                <circle cx="9" cy="81" r="8" />
-              </g>
-            </svg>
+              width="72"
+              height="38"
+              draggable="false"
+            />
           )}
           <img
             data-nav-doggo={page === "home" ? "true" : undefined}
@@ -161,7 +150,9 @@ export default function StudioNav({
           >
             Sandbox
           </Link>
-          <Link href={page === "home" ? "#about" : "/#about"}>About</Link>
+          <Link href="/about" aria-current={page === "about" ? "page" : undefined}>
+            About
+          </Link>
         </nav>
         <a className="header-contact" href={`mailto:${personalInfo.email}`}>
           Reach Out

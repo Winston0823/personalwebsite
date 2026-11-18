@@ -34,12 +34,15 @@ export default function NameSignature({
   className = "relative w-full h-full overflow-hidden",
   style,
   ink = INK,
+  englishText = "Winston",
 }: {
   className?: string;
   style?: CSSProperties;
   /** Stroke colour for both the cursive and the hanzi passes. Mobile passes
    *  the palette's dark green; the desktop widget keeps the slate default. */
   ink?: string;
+  /** The studio hero uses the full name; existing widgets retain the short signature. */
+  englishText?: string;
 }) {
   const stageRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +54,8 @@ export default function NameSignature({
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (isPerfLite()) {
-      renderCursive(stage);
+      if (englishText === "Winston") renderCursive(stage);
+      else renderStatic(stage, ink);
       return () => {
         stage.replaceChildren();
       };
@@ -158,7 +162,7 @@ export default function NameSignature({
           const v = new Vara(
             `#${id}`,
             "/fonts/SatisfySL.json",
-            [{ text: "Winston", fontSize: 46, strokeWidth: 2.2, duration: 2400 }],
+            [{ text: englishText, fontSize: 46, strokeWidth: 2.2, duration: 2400 }],
             {
               fontSize: 46,
               strokeWidth: 2.2,
@@ -241,7 +245,7 @@ export default function NameSignature({
       if (resumeWaiter) resumeWaiter();
       stage.replaceChildren();
     };
-  }, []);
+  }, [englishText, ink]);
 
   return <div ref={stageRef} role="img" aria-label="Winston Gu · 顾文俊" className={className} style={style} />;
 }

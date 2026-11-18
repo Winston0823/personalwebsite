@@ -1,5 +1,106 @@
 # Mobile Experience Overhaul — Audit & Plan (2026-06-14)
 
+## Contact namecard — 2026-11-18
+
+- [x] Replace the oversized contact callout with a linked namecard showing name, email, and doggo.
+- [x] Add a restrained navy-and-ink hover/focus motion and responsive layout.
+- [x] Balance the space above and below the card and tighten name/email spacing.
+- [x] Verify desktop layout and interaction styles, responsive CSS, and production build.
+
+Design: Keep the established navy accent, Zodiak/Plus Jakarta pairing, and original doggo sprite. Make the entire card one accessible email link; hover animates the doggo outline and email underline once, with reduced-motion support.
+
+Review: Browser inspection showed the card's 64px desktop margins produce roughly equal visible gaps above and below the panel. The accessible email link contains only name, email, and the decorative doggo. TypeScript, diff check, and production build passed; the restarted preview returns HTTP 200. The mobile layout is covered by the existing 767px media query but was not visually inspected because this browser does not expose viewport resizing.
+
+## Final typography selection — 2026-11-18
+
+- [x] Set Zodiak as the fixed studio display face and Plus Jakarta Sans as the fixed body face.
+- [x] Remove the Type lab trigger, drawer, persistence logic, and preview-only font styles.
+- [x] Check Work, About, and Sandbox typography, run the build, and restore the preview.
+
+Design: Use the two selected local fonts from the screenshot as the studio defaults. Keep the handwritten name animation and utilitarian mono labels as intentional exceptions.
+
+Review: The production build, TypeScript check, and diff check passed. Browser computed styles show Zodiak on headings and Plus Jakarta Sans on studio copy across Work, About, and Sandbox. Type lab is absent, and the updated preview responds on port 3000.
+
+## Simpler work cards, navy accent, and About page — 2026-11-18
+
+- [x] Reduce project cards to a squiggly image and title; turn the outline navy on hover/focus.
+- [x] Add “Explore my sandbox!” beneath Work and above the centered filters.
+- [x] Move About to `/about`, update navigation, and remove the unused home About popup wiring.
+- [x] Verify project interactions, `/about` navigation, narrow layout, build, and preview.
+
+Design: Keep the photos and static squiggly crops. Use a restrained navy token for interactive edges and links. The dedicated About page expands the existing bio into a clear headline, two-column introduction, and résumé/social links.
+
+### Font preview and alignment refinement
+
+- [x] Restyle “Explore my sandbox!” as a text link and align project titles to the contour’s left edge.
+- [x] Add a top-right font drawer with local display/body font choices, live preview, persistence, and reset.
+- [x] Verify font changes across Home/About/Sandbox, drawer keyboard behavior, layout, build, and preview.
+
+Review: Browser inspection confirmed six image/title links with no arrow bubbles, indices, categories, or descriptions. The first contour changed to navy on hover and titles start 7px in from the card box, aligned with the visible contour. The sandbox text link reached `/sandbox`; About navigation reached `/about` and the page fit desktop and 390px views. Type lab switched both fonts, persisted across navigation, reset to Chubbo/Supreme, and closed with Escape. Production build and diff check passed; Home, About, and Sandbox return HTTP 200 on the restarted preview.
+
+## Quiet project outlines and centered Work heading — 2026-11-18
+
+- [x] Freeze project image outlines at one squiggly drawing while the hero and nav keep boiling.
+- [x] Replace the work heading with centered “Work” and a blinking cursor; remove the eyebrow, note, and project count.
+- [x] Center the filters directly beneath the title and verify desktop/narrow layouts and build.
+
+Design: Keep the enlarged organic image crops, but hold their edge still. Use the same cursor timing as the hero’s typed role. Give the heading and filters a centered vertical rhythm above the existing project grid.
+
+Review: Desktop and 390px browser views showed the centered title, cursor, and filters. The removed labels are absent from the DOM. After a fresh reload, the project contour path stayed identical over 800ms, while the nav path continued animating. TypeScript, diff check, and production build passed; the dev preview returns HTTP 200.
+
+## Project cards in the hero’s line-boil language — 2026-11-18
+
+- [x] Use one animated contour for each project image’s visible border and crop.
+- [x] Give project images more height and tune the overlays to match the hand-drawn hero treatment.
+- [x] Keep images lazy loaded and pause contour redraws when cards leave the viewport.
+- [x] Verify the image crop, narrow layout, and local preview; inspect the hover and reduced-motion paths.
+
+Design: Keep the existing two-column project grid and readable captions. Replace each smooth rectangular media window with a larger organic rounded shape using the hero’s five-frame line boil. The photograph stays inside the exact contour; badges sit above it. No new motion runs for offscreen cards.
+
+Review: Browser screenshots confirmed the crop follows the contour at desktop and 390px widths. Both initial images loaded, and their CSS clip paths point to live SVG contours. The hover zoom stays inside the clipped wrapper; reduced motion selects a fixed drawing and disables the interval. TypeScript, diff check, and production build passed; the dev preview responds with HTTP 200 on port 3000.
+
+## Original doggo sprite opacity — 2026-11-18
+
+## Animated hero identity — 2026-11-18
+
+- [x] Reuse the bilingual handwriting sequence in the hero sticker, keeping the doggo transfer intact.
+- [x] Type and delete “Game” and “Product” before a stable “Designer” label, with reduced-motion fallback.
+- [x] Check the desktop and narrow layouts, interaction, build, and preview.
+
+Design: The doggo remains the moving sprite. The handwritten stage takes the place of the static name inside the sticker and writes the complete English name before the Chinese name. The role cycles the two disciplines while “Designer” follows the typed word.
+
+Review: Desktop and 390px browser views showed the signature within the sticker and the role cycling to Product. The doggo stayed visible; the page had no horizontal overflow in the desktop check. TypeScript, diff check, and production build passed. The dev preview responds with HTTP 200 on port 3000.
+
+### Natural role typing correction
+
+- [x] Let the word slot shrink and grow with the typed characters so “Designer” follows the cursor.
+- [x] Verify “Designer” moves during typing and deleting without overflowing the sticker.
+
+Review: Browser measurements showed “Designer” shift 36px between “Product|” and the empty cursor, while the role stayed well within the sticker. The cursor remains attached to the typed word.
+
+- [x] Restore the original doggo face in the hero, navigation, footer, and scroll transfer.
+- [x] Try the hero sprite at 65% opacity and the navbar sprite at 40%.
+- [x] Use the original sprite for the faint navbar placeholder and docked mark.
+- [x] Verify the hero and nav visually, check the scroll transfer, and run the production build.
+
+Review: The original image is back in every location. The hero reads at 65% opacity; the navbar and transfer now use the refinements below. Verified the hero, compact navbar, and scroll transfer in the local browser. Production build, TypeScript check, diff check, and HTTP 200 passed.
+
+### Navbar opacity and handoff correction
+
+- [x] Set both navbar sprite states to 20% opacity.
+- [x] Keep the flying hero sprite above the navbar and interpolate to its exact displayed dimensions.
+- [x] Verify the in-flight, docked, and return states plus production build.
+
+Review: The browser measured both navbar images at a 20% opacity filter and the flying sprite at z-index 100 above the navbar's 40. The sprite travels visibly over the page, shrinks toward the live 50×28px navbar target, docks at 20% opacity, and returns to the hero on reverse scroll. Production build and diff check passed; dev preview is running.
+
+### Preserve hero opacity during the handoff
+
+- [x] Keep the waiting navbar placeholder at 20%.
+- [x] Keep the flying and docked hero sprite at its original 65% opacity.
+- [x] Verify the flight, docked state, reverse scroll, and build.
+
+Review: Browser inspection confirmed the 20% placeholder and the fixed 65% flyer during travel and 65% live mark after docking. Reverse scrolling restored the hero and placeholder. TypeScript, diff check, and production build passed.
+
 Audited live at iPhone viewport (390×844, DPR 3, 4× CPU throttle).
 
 ## Findings (prioritized by impact)

@@ -1,30 +1,37 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 
-/** A five-drawing line boil, held at roughly three frames per second. */
+/** A five-drawing line boil for the hero/nav; project crops keep one squiggly drawing. */
 export default function SquiggleOutline({
   variant = "pill",
+  imageSrc,
 }: {
-  variant?: "pill" | "sticker";
+  variant?: "pill" | "sticker" | "project";
+  imageSrc?: string;
 }) {
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
+  const clipRef = useRef<SVGPathElement>(null);
+  const clipId = `project-boil-${useId().replace(/:/g, "")}`;
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     let width = 0,
       height = 0,
-      frame = 0,
-      lastPaint = 0,
-      visible = true;
+      visible = false;
+    let timer: number | null = null;
     const paint = (time: number) => {
       if (!width || !height) return;
       const inset = 7;
       const w = width - inset * 2,
         h = height - inset * 2;
-      const radius = variant === "pill" ? h / 2 : Math.min(w, h) * 0.44;
+      const radius = variant === "pill"
+        ? h / 2
+        : variant === "project"
+          ? Math.min(46, Math.min(w, h) * 0.11)
+          : Math.min(w, h) * 0.44;
       const straightX = w - radius * 2,
         straightY = h - radius * 2;
       const arc = (Math.PI * radius) / 2;
@@ -41,7 +48,7 @@ export default function SquiggleOutline({
       const perimeter = lengths.reduce((a, b) => a + b, 0);
       const cycles = Math.max(5, Math.round(perimeter / 70));
       // Hold distinct drawings instead of sliding a wave around the edge.
-      const drawing = reduced.matches ? 0 : Math.floor(time / 330) % 5;
+      const drawing = variant === "project" || reduced.matches ? 0 : Math.floor(time / 330) % 5;
       const phase = [0.3, 2.1, 4.4, 1.2, 3.5][drawing];
       const points = Array.from({ length: 180 }, (_, index) => {
         const distance = (index / 180) * perimeter;
@@ -89,6 +96,7 @@ export default function SquiggleOutline({
       });
       const contour = `M${points.join(" L")} Z`;
       pathRef.current?.setAttribute("d", contour);
+      clipRef.current?.setAttribute("d", contour);
     };
     const resize = new ResizeObserver((entries) => {
       width = entries[0].contentRect.width;
@@ -97,47 +105,65 @@ export default function SquiggleOutline({
       paint(performance.now());
     });
     resize.observe(svg);
+    if (variant === "project") return () => resize.disconnect();
+    const syncAnimation = () => {
+      if (visible && !document.hidden && !reduced.matches) {
+        if (timer === null) timer = window.setInterval(() => paint(performance.now()), 330);
+      } else if (timer !== null) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+    };
     const intersection = new IntersectionObserver((entries) => {
       visible = entries[0].isIntersecting;
+      syncAnimation();
     });
     intersection.observe(svg);
-    const tick = (time: number) => {
-      if (
-        visible &&
-        !document.hidden &&
-        !reduced.matches &&
-        time - lastPaint > 315
-      ) {
-        paint(time);
-        lastPaint = time;
-      }
-      frame = requestAnimationFrame(tick);
+    const onPreference = () => {
+      paint(performance.now());
+      syncAnimation();
     };
-    frame = requestAnimationFrame(tick);
-    const onPreference = () => paint(performance.now());
+    document.addEventListener("visibilitychange", syncAnimation);
     reduced.addEventListener("change", onPreference);
     return () => {
-      cancelAnimationFrame(frame);
+      if (timer !== null) window.clearInterval(timer);
       resize.disconnect();
       intersection.disconnect();
+      document.removeEventListener("visibilitychange", syncAnimation);
       reduced.removeEventListener("change", onPreference);
     };
   }, [variant]);
-  return (
+  const outline = (
     <svg
       ref={svgRef}
       className={`squiggle-outline squiggle-${variant}`}
       aria-hidden="true"
       focusable="false"
     >
+      {variant === "project" && (
+        <defs>
+          <clipPath id={clipId} clipPathUnits="userSpaceOnUse">
+            <path ref={clipRef} />
+          </clipPath>
+        </defs>
+      )}
       <path
         ref={pathRef}
         className="contour-surface"
-        fill={variant === "sticker" ? "#f6f6f1" : "#ffffff"}
+        fill={variant === "project" ? "none" : variant === "sticker" ? "#f6f6f1" : "#ffffff"}
         stroke="currentColor"
         strokeWidth="2.8"
         strokeLinejoin="round"
       />
     </svg>
+  );
+  if (variant !== "project") return outline;
+  return (
+    <>
+      <div className="project-image-crop" style={{ clipPath: `url(#${clipId})` }}>
+        <img src={imageSrc} alt="" loading="lazy" decoding="async" />
+      </div>
+      {outline}
+    </>
   );
 }

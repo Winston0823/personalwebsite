@@ -15,7 +15,7 @@ export default function DoggoTransfer() {
     const sticker = hero?.closest<HTMLElement>(".doggo-sticker");
     const destination =
       document.querySelector<HTMLImageElement>("[data-nav-doggo]");
-    const ghost = document.querySelector<SVGSVGElement>(".doggo-ghost");
+    const ghost = document.querySelector<HTMLImageElement>(".doggo-ghost");
     const flyer = flyerRef.current;
     if (!hero || !sticker || !destination || !ghost || !flyer) return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
@@ -80,7 +80,8 @@ export default function DoggoTransfer() {
           const endY = targetBox.top + targetBox.height / 2;
           const width =
             sourceBox.width + (targetBox.width - sourceBox.width) * progress;
-          const height = (width * 412) / 792;
+          const height =
+            sourceBox.height + (targetBox.height - sourceBox.height) * progress;
           const hopHeight = Math.min(
             66,
             Math.max(15, (startY + endY) / 2 - sourceBox.height * 0.25 - 18),
