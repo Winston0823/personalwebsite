@@ -6,9 +6,16 @@
 - [x] Rewind on pointer exit, support keyboard focus and reduced motion, and keep the geometry responsive.
 - [x] Inspect the idle and active states in the preview, run a production build, and leave the work on a separate branch.
 
-Design: The oval begins and ends at its left tip. Its leading end extends on a curved route toward the email and grows an arrowhead; the trailing end unwraps the oval after a short delay. Reversing the same timeline wraps the line back around doggo. Use SVG stroke lengths and direct DOM updates so there are no React renders per animation frame.
+Design: The oval begins and ends at a point whose tangent leads toward the email. Its leading end extends on a curved route and grows an arrowhead; the trailing end unwraps the oval after a short delay. Reversing the same timeline wraps the line back around doggo. Use SVG stroke lengths and direct DOM updates so there are no React renders per animation frame.
 
 Review: Browser inspection confirmed an intact idle ring, a final arrow pointing to the email, and a complete rewind after pointer exit. Keyboard focus triggered the same motion. The SVG path is measured against the live card/doggo/email positions and resized with them; reduced-motion preference jumps directly between the two states. TypeScript, diff check, production build, and localhost response passed. The preview branch is `codex/namecard-arrow-motion`.
+
+### Smooth oval-to-arrow join
+
+- [x] Rebuild the oval around a seam whose tangent points toward the email; align the route’s first control point to that tangent.
+- [x] Inspect the join in motion and at rest, then run the build and refresh the branch preview.
+
+Review: The new seam sits where the oval's outgoing tangent aims toward the email, and the route's first Bézier handle follows that tangent. Browser inspection showed a flowing join during the transition, a curved final arrow, and a complete rewind. TypeScript, production build, diff check, and the restarted localhost preview passed.
 
 ## Contact namecard — 2026-11-18
 

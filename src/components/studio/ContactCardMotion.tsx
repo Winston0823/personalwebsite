@@ -70,19 +70,54 @@ export default function ContactCardMotion() {
       const centerY = mark.top - bounds.top + mark.height / 2;
       const radiusX = mark.width / 2;
       const radiusY = mark.height * 0.46;
-      const startX = centerX - radiusX;
       const endX = address.right - bounds.left + 20;
       const endY = address.top - bounds.top + address.height / 2;
-      const dx = endX - startX;
-      const dy = endY - centerY;
-      const ring = [
-        `M ${startX} ${centerY}`,
-        `C ${startX - 5} ${centerY - radiusY * 0.56}, ${centerX - radiusX * 0.54} ${centerY - radiusY * 1.03}, ${centerX} ${centerY - radiusY}`,
-        `C ${centerX + radiusX * 0.58} ${centerY - radiusY * 1.02}, ${centerX + radiusX} ${centerY - radiusY * 0.5}, ${centerX + radiusX} ${centerY}`,
-        `C ${centerX + radiusX * 1.02} ${centerY + radiusY * 0.56}, ${centerX + radiusX * 0.52} ${centerY + radiusY * 1.03}, ${centerX} ${centerY + radiusY}`,
-        `C ${centerX - radiusX * 0.56} ${centerY + radiusY * 0.98}, ${startX - 6} ${centerY + radiusY * 0.53}, ${startX} ${centerY}`,
-      ].join(" ");
-      const route = `C ${startX + dx * 0.26} ${centerY + dy * 0.08}, ${endX - dx * 0.23} ${endY - dy * 0.12}, ${endX} ${endY}`;
+      // Put the seam where the oval's tangent naturally heads toward the email.
+      // The small periodic wobble keeps the ring drawn rather than mechanical.
+      const ringPoint = (angle: number) => {
+        const wobble = 1 + 0.015 * Math.sin(angle * 3 + 0.5) + 0.008 * Math.cos(angle * 5);
+        return {
+          x: centerX + radiusX * wobble * Math.cos(angle),
+          y: centerY + radiusY * wobble * Math.sin(angle),
+        };
+      };
+      const ringDerivative = (angle: number) => {
+        const before = ringPoint(angle - 0.001);
+        const after = ringPoint(angle + 0.001);
+        return { x: (after.x - before.x) / 0.002, y: (after.y - before.y) / 0.002 };
+      };
+      const seamAngle = Math.atan2(
+        (endX - centerX) / radiusX,
+        -(endY - centerY) / radiusY,
+      );
+      const seam = ringPoint(seamAngle);
+      const step = -Math.PI / 4;
+      const ringParts = [`M ${seam.x} ${seam.y}`];
+      for (let index = 0; index < 8; index++) {
+        const angle = seamAngle + step * index;
+        const nextAngle = angle + step;
+        const from = ringPoint(angle);
+        const to = ringPoint(nextAngle);
+        const fromTangent = ringDerivative(angle);
+        const toTangent = ringDerivative(nextAngle);
+        const first = {
+          x: from.x + fromTangent.x * step / 3,
+          y: from.y + fromTangent.y * step / 3,
+        };
+        const second = {
+          x: to.x - toTangent.x * step / 3,
+          y: to.y - toTangent.y * step / 3,
+        };
+        ringParts.push(`C ${first.x} ${first.y}, ${second.x} ${second.y}, ${to.x} ${to.y}`);
+      }
+      const ring = ringParts.join(" ");
+      const tangent = ringDerivative(seamAngle);
+      const tangentLength = Math.hypot(tangent.x, tangent.y);
+      const reach = Math.hypot(endX - seam.x, endY - seam.y);
+      const handle = Math.min(115, reach * 0.25);
+      const firstX = seam.x - tangent.x / tangentLength * handle;
+      const firstY = seam.y - tangent.y / tangentLength * handle;
+      const route = `C ${firstX} ${firstY}, ${endX - (endX - seam.x) * 0.2} ${endY - (endY - seam.y) * 0.18}, ${endX} ${endY}`;
       svg.setAttribute("viewBox", `0 0 ${bounds.width} ${bounds.height}`);
       oval.setAttribute("d", ring);
       trace.setAttribute("d", `${ring} ${route}`);
