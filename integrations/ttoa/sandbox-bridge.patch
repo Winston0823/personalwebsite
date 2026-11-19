@@ -1,0 +1,479 @@
+diff --git a/app/globals.css b/app/globals.css
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -808,3 +808,14 @@
+     opacity: 0;
+   }
+ }
++
++/* Optional workbench controls; inactive on the normal app URL. */
++.sandbox-button-label { display:none; }
++:root[data-sandbox-connected] body,:root[data-sandbox-connected] .stage-inner { background:rgb(var(--sandbox-void,13 7 34)); }
++:root[data-sandbox-font="editorial"] .font-hud,:root[data-sandbox-font="mono"] .font-hud { font-family:var(--sandbox-font); }
++:root[data-sandbox-button="soft"] [data-sandbox-start],:root[data-sandbox-button="outline"] [data-sandbox-start] { min-height:12cqw; padding:2cqw 3cqw; background:rgb(var(--sandbox-splat)); color:rgb(var(--sandbox-foam)); border-radius:4cqw; font-family:var(--sandbox-font); font-size:4cqw; font-weight:700; border:2px solid transparent; }
++:root[data-sandbox-button="outline"] [data-sandbox-start] { background:transparent; border-color:rgb(var(--sandbox-surface)); color:rgb(var(--sandbox-surface)); border-radius:1cqw; }
++:root[data-sandbox-button="soft"] [data-sandbox-start]>img,:root[data-sandbox-button="outline"] [data-sandbox-start]>img { display:none; }
++:root[data-sandbox-button="soft"] .sandbox-button-label,:root[data-sandbox-button="outline"] .sandbox-button-label { display:inline; }
++:root[data-sandbox-layout="roomy"] .stage-inner { --title-top:8%; --title-bottom:10%; --result-x:9%; }
++:root[data-sandbox-layout="compact"] .stage-inner { --title-top:2%; --title-bottom:8%; --result-x:4%; }
+diff --git a/app/page.tsx b/app/page.tsx
+--- a/app/page.tsx
++++ b/app/page.tsx
+@@ -1,6 +1,7 @@
+ "use client";
+ 
+ import dynamic from "next/dynamic";
++import { useEffect } from "react";
+ 
+ /**
+  * MediaPipe reaches for `window` as soon as it is evaluated, so the whole game
+@@ -18,5 +19,11 @@
+ });
+ 
+ export default function Page() {
++  useEffect(() => {
++    let dispose: (() => void) | undefined;
++    let active = true;
++    import("@/lib/sandbox-bridge").then(({ attachSandboxBridge }) => { if (active) dispose = attachSandboxBridge(); });
++    return () => { active = false; dispose?.(); };
++  }, []);
+   return <GameShell />;
+ }
+diff --git a/components/GameShell.tsx b/components/GameShell.tsx
+--- a/components/GameShell.tsx
++++ b/components/GameShell.tsx
+@@ -446,6 +446,7 @@
+    * a worse answer than the hitch it replaced.
+    */
+   const [starting, setStarting] = useState<"idle" | "preparing" | "clearing">("idle");
++  const [cameraError, setCameraError] = useState<string | null>(null);
+   const titleLeaving = starting === "clearing";
+   const [resultLeaving, setResultLeaving] = useState(false);
+   const popId = useRef(0);
+@@ -589,7 +590,7 @@
+       setLoading("loading");
+       // Held so the start tap can await the SAME promise rather than polling a
+       // flag. A player who taps while this is in flight is queued behind it.
+-      const pending = game.preload();
++      const pending = new URLSearchParams(location.search).get("sandboxInput") === "touch" ? Promise.resolve({ ok: false }) : game.preload();
+       preloadRef.current = pending;
+       const res = await pending;
+       if (disposed) return;
+@@ -650,21 +651,25 @@
+    * requested inside this gesture for iOS. The model is awaited alongside it,
+    * not after it, so the two overlap.
+    */
+-  const handleStart = useCallback(async () => {
++  const handleStart = useCallback(async (forceTouch = false) => {
+     const game = gameRef.current;
+     const video = videoRef.current;
+     if (!game || !video || starting !== "idle") return;
+ 
+     setStarting("preparing");
+-
+-    const gotCamera = await Promise.all([
+-      // Camera + audio must both be kicked off inside this gesture for iOS.
+-      game.initCamera(video),
+-      // Resolved, not rejected, on failure — `preload` reports through its
+-      // return value, and a model that never arrives falls back to drag rather
+-      // than stranding the player on a spinner.
+-      preloadRef.current ?? Promise.resolve({ ok: false }),
+-    ]).then(([camera]) => camera);
++    setCameraError(null);
++    const touch = forceTouch || new URLSearchParams(location.search).get("sandboxInput") === "touch";
++
++    const camera = touch ? Promise.resolve(false) : game.initCamera(video);
++    // Camera rejection must return to the title immediately, even while the
++    // face model is still downloading. Do not silently start a drag-only run.
++    const gotCamera = await camera;
++    if (!touch && !gotCamera) {
++      setCameraError(game.cameraError ?? "The camera could not start. Try again or play by dragging.");
++      setStarting("idle");
++      return;
++    }
++    await (touch ? Promise.resolve() : preloadRef.current);
+ 
+     setCameraDenied(!gotCamera);
+ 
+@@ -680,6 +685,21 @@
+       setStarting("idle");
+     }
+   }, [reduced, starting]);
++
++  // The workbench can launch a drag-only test without requesting camera access.
++  useEffect(() => {
++    const start = () => { if (state.phase === "title") void handleStart(); };
++    window.addEventListener("sandbox:start-touch", start);
++    return () => window.removeEventListener("sandbox:start-touch", start);
++  }, [handleStart, state.phase]);
++  useEffect(() => {
++    const query = new URLSearchParams(location.search);
++    const parentOrigin = query.get("parentOrigin");
++    const allowed = ["http://localhost:3000", "http://127.0.0.1:3000", ...(process.env.NEXT_PUBLIC_SANDBOX_ORIGINS ?? "").split(",").map(value => value.trim())];
++    if (query.get("sandbox") === "1" && parentOrigin && allowed.includes(parentOrigin) && window.parent !== window) {
++      window.parent.postMessage({ type:"winston:state", version:1, phase:state.phase, timeLeft:Math.ceil(state.timeLeft) }, parentOrigin);
++    }
++  }, [state.phase, Math.ceil(state.timeLeft)]);
+ 
+   // Go Again lands on the title screen rather than straight into a run. It is
+   // the only place the how-to loop lives, so a player who missed a step gets to
+@@ -940,10 +960,16 @@
+                     itself — it would shift the tutorial and the title too,
+                     under the finger that just tapped.
+                   */}
++                  {cameraError && (
++                    <div role="alert" className="mb-[2cqw] text-[2.8cqw] text-gold">
++                      <p>{cameraError}</p>
++                      <button onClick={() => void handleStart(true)} className="mt-[1cqw] underline">Play by dragging instead</button>
++                    </div>
++                  )}
+                   {starting === "preparing" ? (
+                     <StartSpinner />
+                   ) : (
+-                    <StartButton onClick={handleStart} />
++                    <StartButton onClick={() => void handleStart()} />
+                   )}
+ 
+                   <p className="mt-[0.9cqw] text-[2.5cqw] font-black uppercase tracking-[0.14em] text-foam/40">
+@@ -1946,8 +1972,10 @@
+     <button
+       onClick={onClick}
+       aria-label="Start fishing"
++      data-sandbox-start="true"
+       className="mx-auto block w-[46cqw] origin-bottom transition-transform duration-100 active:scale-[0.94]"
+     >
++      <span className="sandbox-button-label">Start fishing</span>
+       {/* eslint-disable-next-line @next/next/no-img-element */}
+       <img
+         ref={ref}
+diff --git a/tailwind.config.ts b/tailwind.config.ts
+--- a/tailwind.config.ts
++++ b/tailwind.config.ts
+@@ -6,18 +6,18 @@
+   theme: {
+     extend: {
+       fontFamily: {
+-        display: ["ui-rounded", "SF Pro Rounded", "Nunito", "system-ui", "sans-serif"],
++        display: ["var(--sandbox-font, ui-rounded)", "SF Pro Rounded", "Nunito", "system-ui", "sans-serif"],
+         /** HUD numerals only. See the note in `app/layout.tsx`. */
+         hud: ["var(--font-hud)", "ui-rounded", "system-ui", "sans-serif"],
+       },
+       colors: {
+-        void: "#0d0722",
+-        deep: "#1b0f38",
+-        ink: "#2a1152",
+-        surface: "#8de8ff",
+-        splat: "#ff2d9b",
+-        gold: "#ffd23d",
+-        foam: "#f2ecff",
++        void: "rgb(var(--sandbox-void, 13 7 34) / <alpha-value>)",
++        deep: "rgb(var(--sandbox-deep, 27 15 56) / <alpha-value>)",
++        ink: "rgb(var(--sandbox-ink, 42 17 82) / <alpha-value>)",
++        surface: "rgb(var(--sandbox-surface, 141 232 255) / <alpha-value>)",
++        splat: "rgb(var(--sandbox-splat, 255 45 155) / <alpha-value>)",
++        gold: "rgb(var(--sandbox-gold, 255 210 61) / <alpha-value>)",
++        foam: "rgb(var(--sandbox-foam, 242 236 255) / <alpha-value>)",
+       },
+     },
+   },
+diff --git a/lib/sandbox-bridge.ts b/lib/sandbox-bridge.ts
+--- /dev/null
++++ b/lib/sandbox-bridge.ts
+@@ -0,0 +1,152 @@
++/** Optional, origin-checked adapter for Winston's prototype workbench. */
++import { CONFIG } from "./config";
++
++const fonts: Record<string, string> = {
++  original: 'ui-rounded, "SF Pro Rounded", system-ui, sans-serif',
++  editorial: 'Georgia, "Times New Roman", serif',
++  mono: "ui-monospace, Menlo, Consolas, monospace",
++};
++const allowedInk = [
++  "voidTop",
++  "voidBottom",
++  "waterTop",
++  "waterMid",
++  "waterDeep",
++  "surface",
++  "caustic",
++  "rope",
++  "splat",
++  "rareGlow",
++] as const;
++const isRecord = (value: unknown): value is Record<string, unknown> =>
++  typeof value === "object" && value !== null && !Array.isArray(value);
++const hex = (value: unknown): value is string =>
++  typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value);
++const rgb = (value: string) =>
++  [1, 3, 5]
++    .map((index) => parseInt(value.slice(index, index + 2), 16))
++    .join(" ");
++
++export function attachSandboxBridge() {
++  const query = new URLSearchParams(location.search);
++  if (query.get("sandbox") !== "1" || window.parent === window) return () => {};
++  const origin = query.get("parentOrigin");
++  const allowed = [
++    "http://localhost:3000",
++    "http://127.0.0.1:3000",
++    ...(process.env.NEXT_PUBLIC_SANDBOX_ORIGINS ?? "")
++      .split(",")
++      .map((value) => value.trim()),
++  ];
++  if (!origin || !allowed.includes(origin)) return () => {};
++  const baseline = structuredClone(CONFIG);
++  const root = document.documentElement;
++  root.dataset.sandboxConnected = "true";
++  const ready = () =>
++    window.parent.postMessage(
++      {
++        type: "winston:ready",
++        version: 1,
++        prototype: "ttoa",
++        capabilities: ["ink", "font", "button", "layout", "feel"],
++      },
++      origin,
++    );
++  const message = (event: MessageEvent) => {
++    if (
++      event.origin !== origin ||
++      event.source !== window.parent ||
++      !isRecord(event.data) ||
++      event.data.version !== 1
++    )
++      return;
++    if (event.data.type === "winston:hello") {
++      ready();
++      return;
++    }
++    if (
++      event.data.type === "winston:action" &&
++      event.data.action === "start-touch" &&
++      query.get("sandboxInput") === "touch"
++    ) {
++      window.dispatchEvent(new Event("sandbox:start-touch"));
++      return;
++    }
++    if (event.data.type !== "winston:apply" || !isRecord(event.data.settings))
++      return;
++    const settings = event.data.settings;
++    if (
++      !isRecord(settings.ink) ||
++      !allowedInk.every((key) =>
++        hex((settings.ink as Record<string, unknown>)[key]),
++      )
++    )
++      return;
++    if (
++      typeof settings.font !== "string" ||
++      !Object.hasOwn(fonts, settings.font)
++    )
++      return;
++    if (
++      !["artwork", "soft", "outline"].includes(String(settings.button)) ||
++      !["original", "roomy", "compact"].includes(String(settings.layout))
++    )
++      return;
++    const current = Number(settings.currentStrength),
++      damping = Number(settings.ropeDamping),
++      waves = Number(settings.waveAmplitude);
++    if (
++      ![current, damping, waves].every(Number.isFinite) ||
++      current < 0 ||
++      current > 500 ||
++      damping < 0.95 ||
++      damping > 0.999 ||
++      waves < 0 ||
++      waves > 45
++    )
++      return;
++    const ink = CONFIG.ink as unknown as Record<string, string>;
++    for (const key of allowedInk)
++      ink[key] = (settings.ink as Record<string, string>)[key];
++    // Mutate the shared objects: the running canvas renderer holds references to them.
++    (CONFIG.forces as { currentStrength: number }).currentStrength = current;
++    (CONFIG.rope as { swingDamping: number }).swingDamping = damping;
++    (CONFIG.water as { waveAmplitude: number }).waveAmplitude = waves;
++    const theme: Record<string, string> = {
++      void: ink.voidBottom,
++      deep: ink.voidTop,
++      ink: ink.waterMid,
++      surface: ink.surface,
++      splat: ink.splat,
++      gold: ink.rareGlow,
++      foam: "#f2ecff",
++    };
++    Object.entries(theme).forEach(([key, value]) =>
++      root.style.setProperty(`--sandbox-${key}`, rgb(value)),
++    );
++    root.style.setProperty("--sandbox-font", fonts[settings.font]);
++    root.dataset.sandboxFont = settings.font;
++    root.dataset.sandboxButton = String(settings.button);
++    root.dataset.sandboxLayout = String(settings.layout);
++    window.dispatchEvent(new Event("sandbox:style-applied"));
++    window.parent.postMessage(
++      { type: "winston:applied", version: 1, requestId: event.data.requestId },
++      origin,
++    );
++  };
++  window.addEventListener("message", message);
++  ready();
++  return () => {
++    window.removeEventListener("message", message);
++    Object.assign(CONFIG.ink, baseline.ink);
++    Object.assign(CONFIG.forces, baseline.forces);
++    Object.assign(CONFIG.rope, baseline.rope);
++    Object.assign(CONFIG.water, baseline.water);
++    Object.keys(root.dataset)
++      .filter((key) => key.startsWith("sandbox"))
++      .forEach((key) => delete root.dataset[key]);
++    [...root.style]
++      .filter((key) => key.startsWith("--sandbox-"))
++      .forEach((key) => root.style.removeProperty(key));
++  };
++}
+diff --git a/lib/game.ts b/lib/game.ts
+--- a/lib/game.ts
++++ b/lib/game.ts
+@@ -1,4 +1,5 @@
+ import { CONFIG } from "./config";
++import { requestCamera } from "./camera";
+ import { GameAudio } from "./audio";
+ import {
+   FaceTracker,
+@@ -230,6 +231,8 @@
+   private touch: { x: number; y: number } | null = null;
+   /** Whether a camera stream is actually attached and live. */
+   private hasCamera = false;
++  cameraError: string | null = null;
++  private destroyed = false;
+   private lastSample: FaceSample = {
+     noseX: 0.5,
+     noseY: 0.46,
+@@ -355,6 +358,7 @@
+    */
+   async initCamera(video: HTMLVideoElement): Promise<boolean> {
+     this.video = video;
++    this.cameraError = null;
+ 
+     // NOTE: camera acquisition no longer depends on the tracker.
+     //
+@@ -370,16 +374,14 @@
+     if (!this.hasLiveCamera(video)) {
+       this.releaseCamera();
+       try {
+-        const stream = await navigator.mediaDevices.getUserMedia({
+-          video: {
+-            facingMode: "user",
+-            width: { ideal: 640 },
+-            height: { ideal: 480 },
+-          },
+-          audio: false,
+-        });
++        const stream = await requestCamera(navigator.mediaDevices);
++        if (this.destroyed) {
++          stream.getTracks().forEach(track => track.stop());
++          return false;
++        }
+         video.srcObject = stream;
+-      } catch {
++      } catch (error) {
++        this.cameraError = error instanceof Error ? error.message : "The camera could not start.";
+         this.hasCamera = false;
+         this.inputMode = "touch";
+         this.video = null;
+@@ -389,7 +391,7 @@
+ 
+     // An element can be attached to a live track and still be paused, which
+     // freezes `readyState` and starves the tracker of new frames.
+-    if (video.paused) await video.play().catch(() => {});
++    if (video.paused) void video.play().catch(() => {});
+ 
+     // A camera that never delivers a frame is, to the player, the same thing as
+     // one they refused: there is nothing to aim with. It used to be treated as
+@@ -399,6 +401,7 @@
+     // it as the acquisition failure it is instead, and let the caller fall back
+     // to drag, which the title screen already explains.
+     if (!(await this.waitForFirstFrame(video))) {
++      this.cameraError = "The camera opened but no video arrived. Check camera permissions or try Open app outside the simulator.";
+       this.releaseCamera();
+       this.hasCamera = false;
+       this.inputMode = "touch";
+@@ -611,6 +614,7 @@
+   }
+ 
+   destroy() {
++    this.destroyed = true;
+     cancelAnimationFrame(this.raf);
+     this.raf = 0;
+     this.audio.stop();
+diff --git a/lib/camera.ts b/lib/camera.ts
+--- /dev/null
++++ b/lib/camera.ts
+@@ -0,0 +1,36 @@
++/** Request inside the Start gesture; release streams that arrive after timeout. */
++export function requestCamera(
++  media: Pick<MediaDevices, "getUserMedia"> | undefined,
++  timeoutMs = 15000,
++): Promise<MediaStream> {
++  if (!media?.getUserMedia) {
++    return Promise.reject(new Error("Camera access is unavailable in this browser. Open the app in Chrome or Safari over HTTPS (or localhost)."));
++  }
++  return new Promise((resolve, reject) => {
++    let settled = false;
++    const timer = setTimeout(() => {
++      settled = true;
++      reject(new Error("No camera response. Check the browser’s camera permission, or use Open app to try outside the simulator."));
++    }, timeoutMs);
++    media.getUserMedia({ video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }, audio: false }).then(stream => {
++      if (settled) { stream.getTracks().forEach(track => track.stop()); return; }
++      settled = true;
++      clearTimeout(timer);
++      resolve(stream);
++    }, error => {
++      if (settled) return;
++      settled = true;
++      clearTimeout(timer);
++      const name = error instanceof Error ? error.name : "";
++      reject(new Error(
++        name === "NotAllowedError" || name === "SecurityError"
++          ? "Camera access is blocked. Allow camera access in your browser’s site settings, then try again. If embedded access is blocked, use Open app."
++          : name === "NotFoundError"
++            ? "No camera was found. Connect a camera, then try again."
++            : name === "NotReadableError"
++              ? "The camera could not be opened. Close other apps using it and check your system’s camera permissions."
++              : "The camera could not start. Check your browser’s camera permission or try Open app."
++      ));
++    });
++  });
++}
+diff --git a/scripts/camera.test.mjs b/scripts/camera.test.mjs
+--- /dev/null
++++ b/scripts/camera.test.mjs
+@@ -0,0 +1,26 @@
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import { requestCamera } from '../lib/camera.ts';
++
++test('requests video without audio and returns the stream', async () => {
++  const stream = { getTracks: () => [] };
++  const result = await requestCamera({ getUserMedia: async constraints => {
++    assert.equal(constraints.audio, false);
++    assert.equal(constraints.video.facingMode, 'user');
++    return stream;
++  }});
++  assert.equal(result, stream);
++});
++test('unsupported and blocked cameras return actionable failures', async () => {
++  await assert.rejects(requestCamera(undefined), /unavailable/);
++  await assert.rejects(requestCamera({getUserMedia: async () => { throw new DOMException('Denied', 'NotAllowedError'); }}), /site settings/);
++});
++test('an unanswered request times out and releases a late stream', async () => {
++  let finish;
++  let stopped = false;
++  const pending = requestCamera({getUserMedia: () => new Promise(resolve => { finish = resolve; })}, 5);
++  await assert.rejects(pending, /No camera response/);
++  finish({getTracks: () => [{stop: () => { stopped = true; }}]});
++  await Promise.resolve();
++  assert.equal(stopped, true);
++});

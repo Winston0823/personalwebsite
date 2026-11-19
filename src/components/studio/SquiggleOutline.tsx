@@ -2,12 +2,12 @@
 
 import { useEffect, useId, useRef } from "react";
 
-/** A five-drawing line boil for the hero/nav; project crops keep one squiggly drawing. */
+/** Five held drawings for hero, nav, and drawers; project crops keep one drawing. */
 export default function SquiggleOutline({
   variant = "pill",
   imageSrc,
 }: {
-  variant?: "pill" | "sticker" | "project";
+  variant?: "pill" | "sticker" | "project" | "drawer";
   imageSrc?: string;
 }) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -27,11 +27,14 @@ export default function SquiggleOutline({
       const inset = 7;
       const w = width - inset * 2,
         h = height - inset * 2;
-      const radius = variant === "pill"
-        ? h / 2
-        : variant === "project"
-          ? Math.min(46, Math.min(w, h) * 0.11)
-          : Math.min(w, h) * 0.44;
+      const radius =
+        variant === "pill"
+          ? h / 2
+          : variant === "drawer"
+            ? Math.min(24, w * 0.25, h * 0.25)
+            : variant === "project"
+              ? Math.min(46, Math.min(w, h) * 0.11)
+              : Math.min(w, h) * 0.44;
       const straightX = w - radius * 2,
         straightY = h - radius * 2;
       const arc = (Math.PI * radius) / 2;
@@ -48,7 +51,10 @@ export default function SquiggleOutline({
       const perimeter = lengths.reduce((a, b) => a + b, 0);
       const cycles = Math.max(5, Math.round(perimeter / 70));
       // Hold distinct drawings instead of sliding a wave around the edge.
-      const drawing = variant === "project" || reduced.matches ? 0 : Math.floor(time / 330) % 5;
+      const drawing =
+        variant === "project" || reduced.matches
+          ? 0
+          : Math.floor(time / 330) % 5;
       const phase = [0.3, 2.1, 4.4, 1.2, 3.5][drawing];
       const points = Array.from({ length: 180 }, (_, index) => {
         const distance = (index / 180) * perimeter;
@@ -108,7 +114,8 @@ export default function SquiggleOutline({
     if (variant === "project") return () => resize.disconnect();
     const syncAnimation = () => {
       if (visible && !document.hidden && !reduced.matches) {
-        if (timer === null) timer = window.setInterval(() => paint(performance.now()), 330);
+        if (timer === null)
+          timer = window.setInterval(() => paint(performance.now()), 330);
       } else if (timer !== null) {
         window.clearInterval(timer);
         timer = null;
@@ -150,7 +157,13 @@ export default function SquiggleOutline({
       <path
         ref={pathRef}
         className="contour-surface"
-        fill={variant === "project" ? "none" : variant === "sticker" ? "#f6f6f1" : "#ffffff"}
+        fill={
+          variant === "project"
+            ? "none"
+            : variant === "sticker"
+              ? "#f6f6f1"
+              : "#ffffff"
+        }
         stroke="currentColor"
         strokeWidth="2.8"
         strokeLinejoin="round"
@@ -160,7 +173,10 @@ export default function SquiggleOutline({
   if (variant !== "project") return outline;
   return (
     <>
-      <div className="project-image-crop" style={{ clipPath: `url(#${clipId})` }}>
+      <div
+        className="project-image-crop"
+        style={{ clipPath: `url(#${clipId})` }}
+      >
         <img src={imageSrc} alt="" loading="lazy" decoding="async" />
       </div>
       {outline}
