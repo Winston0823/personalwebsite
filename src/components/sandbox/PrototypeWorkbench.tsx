@@ -6,7 +6,7 @@ import {
   CaretRight,
   SlidersHorizontal,
   SquaresFour,
-  ArrowUpRight,
+  ArrowSquareOut,
   ArrowCounterClockwise,
   DeviceMobile,
   Laptop,
@@ -337,44 +337,60 @@ export default function PrototypeWorkbench({
                   </span>
                 </h1>
               </div>
-              <a
-                className="lab-source"
-                href={previewUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Prototype <ArrowUpRight size={15} />
-              </a>
-            </div>
-            <div className="preview-toolbar">
-              <div
-                className="device-tabs"
-                role="group"
-                aria-label="Device preview"
-              >
-                <button
-                  onClick={() => setDevice("phone")}
-                  aria-pressed={device === "phone"}
+              <div className="lab-heading-actions">
+                <div
+                  className="device-tabs"
+                  role="group"
+                  aria-label="Device preview"
                 >
-                  <DeviceMobile size={17} />
-                  Phone
-                </button>
-                <button
-                  onClick={() => setDevice("laptop")}
-                  aria-pressed={device === "laptop"}
+                  <button
+                    onClick={() => setDevice("phone")}
+                    aria-label="Phone"
+                    title="Phone"
+                    aria-pressed={device === "phone"}
+                  >
+                    <DeviceMobile
+                      size={20}
+                      weight={device === "phone" ? "fill" : "regular"}
+                    />
+                  </button>
+                  <button
+                    onClick={() => setDevice("laptop")}
+                    aria-label="Laptop"
+                    title="Laptop"
+                    aria-pressed={device === "laptop"}
+                  >
+                    <Laptop
+                      size={21}
+                      weight={device === "laptop" ? "fill" : "regular"}
+                    />
+                  </button>
+                </div>
+                <div
+                  className="preview-toolbar"
+                  role="group"
+                  aria-label="Prototype actions"
                 >
-                  <Laptop size={18} />
-                  Laptop
-                </button>
+                  <button
+                    className="lab-icon-button"
+                    aria-label="Restart prototype"
+                    title="Restart prototype"
+                    onClick={() => setRestart((value) => value + 1)}
+                  >
+                    <ArrowCounterClockwise size={18} />
+                  </button>
+                  <a
+                    className="lab-source"
+                    aria-label="Open prototype in a new tab"
+                    title="Open prototype in a new tab"
+                    href={previewUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <ArrowSquareOut size={20} />
+                  </a>
+                </div>
               </div>
-              <button
-                className="lab-icon-button"
-                aria-label="Restart prototype"
-                title="Restart prototype"
-                onClick={() => setRestart((value) => value + 1)}
-              >
-                <ArrowCounterClockwise size={18} />
-              </button>
             </div>
             <div className="device-stage" ref={stageRef}>
               <div

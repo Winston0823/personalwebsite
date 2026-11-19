@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
+import DoggoRouteTransition from "@/components/studio/DoggoRouteTransition";
 
 import { PERF_TIER_SCRIPT } from "@/lib/perf-tier";
 import "./globals.css";
@@ -110,6 +111,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen antialiased" suppressHydrationWarning>
         <div className="relative z-10">{children}</div>
+        <DoggoRouteTransition />
         <Analytics />
       </body>
     </html>

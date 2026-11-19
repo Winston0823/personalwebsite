@@ -15,7 +15,9 @@ export default function StudioNav({
     const shell = shellRef.current;
     const header = shell?.querySelector<HTMLElement>(".studio-header");
     const nav = header?.querySelector<HTMLElement>("nav");
-    const logo = header?.querySelector<HTMLImageElement>(".wordmark img:not(.doggo-ghost)");
+    const logo = header?.querySelector<HTMLImageElement>(
+      ".wordmark img:not(.doggo-ghost)",
+    );
     const contact = header?.querySelector<HTMLElement>(".header-contact");
     if (!shell || !header || !nav || !logo || !contact) return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
@@ -123,7 +125,7 @@ export default function StudioNav({
           aria-label="Winston Gu home"
           data-doggo-home={page === "home" ? "true" : undefined}
         >
-          {page === "home" && (
+          {(page === "home" || page === "about") && (
             <img
               className="doggo-ghost"
               src="/images/cat-mark.png"
@@ -135,6 +137,7 @@ export default function StudioNav({
             />
           )}
           <img
+            data-about-nav-doggo={page === "about" ? "true" : undefined}
             data-nav-doggo={page === "home" ? "true" : undefined}
             src="/images/cat-mark.png"
             alt="Winston’s doggo mark"
@@ -150,7 +153,10 @@ export default function StudioNav({
           >
             Sandbox
           </Link>
-          <Link href="/about" aria-current={page === "about" ? "page" : undefined}>
+          <Link
+            href="/about"
+            aria-current={page === "about" ? "page" : undefined}
+          >
             About
           </Link>
         </nav>

@@ -116,6 +116,7 @@ export default function DoggoTransfer() {
     observer.observe(sticker);
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule, { passive: true });
+    window.addEventListener("studio:doggo-route-landed", schedule);
     reduced.addEventListener("change", schedule);
     document.fonts.ready.then(() => {
       if (alive) schedule();
@@ -127,6 +128,7 @@ export default function DoggoTransfer() {
       observer.disconnect();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
+      window.removeEventListener("studio:doggo-route-landed", schedule);
       reduced.removeEventListener("change", schedule);
       hero.style.removeProperty("opacity");
       destination.style.removeProperty("opacity");

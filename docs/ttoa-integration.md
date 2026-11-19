@@ -9,7 +9,9 @@ The portfolio owns the project drawer, device frames, and editor. `/sandbox` ope
 - Local adapter branch: `codex/sandbox-bridge`, in the sibling `../TTOA` checkout.
 - Portable adapter patch: `integrations/ttoa/sandbox-bridge.patch`.
 
-Apply the patch to a clean checkout at the base commit, install its dependencies, and run TTOA on port 3001. In the portfolio's ignored local environment file, set `NEXT_PUBLIC_TTOA_PREVIEW_URL` to `http://localhost:3001`, then run the portfolio on port 3000. Open `/sandbox/ttoa`.
+Apply the patch to a clean checkout at the base commit and install its dependencies. Keep TTOA in the sibling `../TTOA` directory (or set `TTOA_DIR` to its checkout). Run `npm run dev` in the portfolio: it starts both the site on port 3000 and TTOA on port 3001. Open `/sandbox`. This also works with `npm run dev:turbo`.
+
+If `.env.local` sets `NEXT_PUBLIC_TTOA_PREVIEW_URL` to a local address, the launcher starts TTOA on that port or reuses the existing listener. If a remote URL is configured, it starts only the portfolio. With no configured URL, an installed sibling TTOA checkout is used automatically; otherwise the public preview remains available. `npm run dev:site` runs only the portfolio when the prototype is managed separately. The full sandbox begins at commit `37f6b90`. Older checkouts may still have the previous sandbox; verify the checkout and refresh the browser after switching versions.
 
 For publishing, deploy the adapter-enabled TTOA build independently and set its `NEXT_PUBLIC_SANDBOX_ORIGINS` to the exact portfolio origin. Set the portfolio's preview URL to that deployment and rebuild. Without a configured adapter URL, the existing public TTOA deployment is available in preview mode; editing is disabled until a bridge connects. The TTOA adapter is included as a portable patch; deploy its adapter-enabled build separately.
 

@@ -1888,3 +1888,14 @@ html.perf-lite .work-plate {
 /* Keep the original rearrangeable desktop available as an experiment. */
 .playground-home { position:fixed; left:20px; top:18px; z-index:45; color:var(--color-text-primary); background:var(--color-glass-bg); border:1px solid var(--color-hairline); border-radius:20px; padding:8px 14px; font:12px var(--font-supreme),sans-serif; }
 .playground-home:focus-visible { outline:2px solid var(--color-accent); outline-offset:3px; }
+
+/* Keep one visible doggo while its route-level copy travels between pages. */
+html[data-doggo-journey] [data-hero-doggo],
+html[data-doggo-journey] [data-about-doggo],
+html[data-doggo-journey] .nav-shell .wordmark img:not(.doggo-ghost),
+html[data-doggo-journey] .doggo-flight {
+  visibility: hidden !important;
+}
+html:not([data-doggo-ready]) [data-about-doggo] {
+  opacity: 0 !important;
+}

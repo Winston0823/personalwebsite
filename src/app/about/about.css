@@ -1,0 +1,214 @@
+.studio.about-page main {
+  max-width: 1180px;
+  padding-top: clamp(195px, 22vh, 245px);
+}
+.about-introduction {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  align-items: center;
+  gap: clamp(48px, 7vw, 100px);
+  padding-bottom: 100px;
+}
+.about-sticker-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+.studio .about-doggo-sticker {
+  width: min(100%, 360px);
+  aspect-ratio: 1.04;
+  padding: 45px 34px 36px;
+  gap: 9px;
+  transform: rotate(-2deg);
+}
+.about-doggo-sticker .sticker-name {
+  height: 63px;
+  margin-top: 2px;
+}
+.about-doggo-sticker .sticker-role {
+  font-size: 11px;
+  letter-spacing: 0.4px;
+}
+.about-doggo-sticker .about-doggo-image {
+  width: 82%;
+  opacity: 1;
+}
+.about-sticker-caption {
+  color: #92928a;
+  font-size: 9px;
+  letter-spacing: 0.15px;
+}
+.studio.about-page .eyebrow {
+  display: block;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  color: #919189;
+  margin-bottom: 19px;
+}
+.about-page .about-introduction h1 {
+  font-size: clamp(58px, 6.5vw, 84px);
+  letter-spacing: -3px;
+  line-height: 1.08;
+  margin: 0 0 24px;
+}
+.about-page .about-introduction h1 em {
+  color: var(--studio-accent);
+  font-style: normal;
+}
+.about-page .about-intro-copy > p {
+  font-size: 12px;
+  color: #7d7d75;
+  line-height: 1.95;
+  margin-bottom: 15px;
+  max-width: 420px;
+}
+.about-page .about-intro-copy > p.about-intro-lead {
+  font-size: 17px;
+  line-height: 1.7;
+  letter-spacing: -0.35px;
+  color: #45453f;
+  margin-bottom: 22px;
+}
+.about-page .about-page-links {
+  margin-top: 27px;
+  gap: 22px;
+}
+.about-page .about-page-links a {
+  font-size: 10px;
+  gap: 12px;
+  border-bottom-color: #c5ccd5;
+  padding-bottom: 8px;
+}
+.about-page .about-page-links a:hover {
+  border-bottom-color: var(--studio-accent);
+}
+.about-small-things {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(42px, 8vw, 120px);
+  border-top: 1px solid var(--studio-line);
+  padding: 43px 0 52px;
+}
+.about-page .about-small-things .eyebrow {
+  margin-bottom: 15px;
+  font-size: 7px;
+}
+.studio .about-small-things h2 {
+  font-size: 25px;
+  letter-spacing: -0.8px;
+  line-height: 1.3;
+  margin: 0 0 15px;
+}
+.about-small-things p {
+  font-size: 11px;
+  line-height: 1.9;
+  color: #8a8a80;
+  max-width: 330px;
+}
+.about-reach-out {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  padding: 46px 0;
+  border-top: 1px solid var(--studio-line);
+}
+.about-page .about-reach-out .eyebrow {
+  margin-bottom: 10px;
+  font-size: 7px;
+}
+.studio .about-reach-out h2 {
+  font-size: clamp(28px, 3.4vw, 40px);
+  letter-spacing: -1px;
+  line-height: 1.3;
+  margin: 0;
+}
+.about-reach-out > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 30px;
+  color: var(--studio-accent);
+  font-size: 13px;
+  border-bottom: 1px solid #aab6c6;
+  padding: 9px 0;
+  flex-shrink: 0;
+}
+.studio .about-page-footer {
+  width: 100%;
+  max-width: 1180px;
+  padding: 23px 64px 38px;
+  margin: 0 auto;
+  border-top: 0;
+  font-size: 9px;
+  color: #92928a;
+}
+.about-page-footer > span {
+  margin-left: auto;
+}
+.about-page .wordmark .doggo-ghost {
+  opacity: 1;
+}
+.about-page .wordmark [data-about-nav-doggo] {
+  opacity: 0;
+}
+@media (max-width: 767px) {
+  .studio.about-page main {
+    padding: 146px 28px 0;
+  }
+  .about-introduction {
+    grid-template-columns: 1fr;
+    gap: 47px;
+    padding-bottom: 52px;
+  }
+  .studio .about-doggo-sticker {
+    width: min(80vw, 290px);
+    padding: 34px 25px 28px;
+    gap: 5px;
+  }
+  .about-doggo-sticker .sticker-name {
+    height: 47px;
+  }
+  .about-doggo-sticker .sticker-role {
+    font-size: 10px;
+  }
+  .about-sticker-wrap {
+    gap: 21px;
+  }
+  .about-sticker-caption {
+    font-size: 8px;
+  }
+  .about-page .about-introduction h1 {
+    font-size: 57px;
+    letter-spacing: -2px;
+    margin-bottom: 22px;
+  }
+  .about-page .about-intro-copy > p.about-intro-lead {
+    font-size: 17px;
+  }
+  .about-page .about-intro-copy > p {
+    font-size: 12px;
+  }
+  .about-small-things {
+    grid-template-columns: 1fr;
+    gap: 34px;
+    padding: 33px 0 39px;
+  }
+  .about-small-things p {
+    font-size: 12px;
+  }
+  .about-reach-out {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+    padding: 34px 0;
+  }
+  .studio .about-page-footer {
+    padding: 20px 28px 34px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .about-doggo-sticker.is-nudged {
+    animation: none;
+  }
+}
